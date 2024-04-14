@@ -182,9 +182,11 @@ library(dplyr)
 data("nrc")
 lexicon <- get_sentiments("nrc")
 
-# Step 3: Tokenize Post Content
+# Step 3: Tokenize Post Content and filter out words containing "March" or "August"
 post_words <- posts_data %>%
-  unnest_tokens(word, 'Post Content')
+  unnest_tokens(word, 'Post Content') %>%
+  filter(!grepl("March", word, ignore.case = TRUE) & 
+           !grepl("August", word, ignore.case = TRUE))
 
 # Step 4: Join Emotion Lexicon with Tokenized Words
 post_words_emotion <- post_words %>%
@@ -219,7 +221,7 @@ ggplot(word_contribution, aes(x = reorder(word, n), y = n, fill = sentiment)) +
   theme_minimal() +
   theme(legend.position = "none",
         axis.text.y = element_text(size = 8),
-        axis.text.x = element_text(angle = 45, hjust = 1)) # Rotate x-axis labels and adjust spacing
+        axis.text.x = element_text(angle = 45, hjust = 1))
 
 #SECTION 6: TEMPORAL ANALYSIS
 
@@ -395,6 +397,11 @@ testing_data_agg$year <- as.factor(testing_data_agg$year)
 testing_data_agg$month <- factor(testing_data_agg$month, levels = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))
 testing_data_agg$day_of_week <- factor(testing_data_agg$day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
 
+# Convert year, month, and day_of_week to factors
+testing_data_agg$year <- as.factor(testing_data_agg$year)
+testing_data_agg$month <- factor(testing_data_agg$month, levels = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))
+testing_data_agg$day_of_week <- factor(testing_data_agg$day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+
 library(ggplot2)
 
 # Visualization of predicted mean sentiment scores by year
@@ -408,20 +415,108 @@ ggplot(yearly_data, aes(x = year)) +
   scale_color_manual(values = c("True" = "red", "Predicted" = "blue")) +
   theme_minimal()
 
+library(ggplot2)
+library(dplyr)
+
+# Aggregate sentiment scores by month
+monthly_data_agg <- testing_data_agg %>%
+  group_by(month) %>%
+  summarise(true_mean_sentiment_score = mean(true_mean_sentiment_score),
+            predicted_mean_sentiment_score = mean(predicted_mean_sentiment_score))
+
+# Aggregate sentiment scores by day of the week
+daily_data_agg <- testing_data_agg %>%
+  group_by(day_of_week) %>%
+  summarise(true_mean_sentiment_score = mean(true_mean_sentiment_score),
+            predicted_mean_sentiment_score = mean(predicted_mean_sentiment_score))
+
+# Plotting for month
+ggplot(monthly_data_agg, aes(x = month)) +
+  geom_point(aes(y = true_mean_sentiment_score, color = "True")) +
+  geom_smooth(aes(y = true_mean_sentiment_score), method = "lm", formula = y ~ poly(x, 2), se = FALSE, color = "red") +
+  geom_point(aes(y = predicted_mean_sentiment_score, color = "Predicted")) +
+  geom_smooth(aes(y = predicted_mean_sentiment_score), method = "lm", formula = y ~ poly(x, 2), se = FALSE, color = "blue") +
+  labs(title = "Predicted vs True Mean Sentiment Score by Month (Testing Data)",
+       x = "Month", y = "Mean Sentiment Score") +
+  scale_color_manual(values = c("True" = "red", "Predicted" = "blue")) +
+  theme_minimal()
+
+
+library(ggplot2)
+library(dplyr)
+
+# Calculate Root Mean Squared Error (RMSE)
+rmse_day <- sqrt(mean((daily_data_agg$true_mean_sentiment_score - daily_data_agg$predicted_mean_sentiment_score)^2))
+
+
+##WINNERWINNER
+# Plotting for day of the week
+ggplot(daily_data_agg, aes(x = day_of_week)) +
+  geom_point(aes(y = true_mean_sentiment_score, color = "True")) +
+  geom_smooth(aes(y = true_mean_sentiment_score), method = "lm", formula = y ~ poly(x, 2), se = FALSE, color = "red") +
+  geom_point(aes(y = predicted_mean_sentiment_score, color = "Predicted")) +
+  geom_smooth(aes(y = predicted_mean_sentiment_score), method = "lm", formula = y ~ poly(x, 2), se = FALSE, color = "blue") +
+  labs(
+    title = "Predicted vs True Mean Sentiment Score by Day of the Week (Testing Data)",
+    subtitle = paste0("Root Mean Squared Error (RMSE): ", round(rmse_day, 2)),
+    x = "Day of the Week", y = "Mean Sentiment Score"
+  ) +
+  scale_color_manual(values = c("True" = "red", "Predicted" = "blue")) +
+  theme_minimal() +
+  # Add separate polynomial lines of best fit
+  geom_smooth(aes(y = true_mean_sentiment_score), method = "lm", formula = y ~ poly(x, 2), se = FALSE, color = "red") +
+  geom_smooth(aes(y = predicted_mean_sentiment_score), method = "lm", formula = y ~ poly(x, 2), se = FALSE, color = "blue")
+
+
+library(dplyr)
+library(modelr)
+
+# Calculate Mean Absolute Error (MAE)
+mae <- mean(abs(daily_data_agg$true_mean_sentiment_score - daily_data_agg$predicted_mean_sentiment_score))
+
+# Calculate Root Mean Squared Error (RMSE)
+rmse <- sqrt(mean((daily_data_agg$true_mean_sentiment_score - daily_data_agg$predicted_mean_sentiment_score)^2))
+
+# Calculate R-squared (R^2) Score
+r_squared <- cor(daily_data_agg$true_mean_sentiment_score, daily_data_agg$predicted_mean_sentiment_score)^2
+
+# Print the metrics
+cat("Mean Absolute Error (MAE):", mae, "\n")
+cat("Root Mean Squared Error (RMSE):", rmse, "\n")
+cat("R-squared (R^2) Score:", r_squared, "\n")
+
 library(plotly)
+library(dplyr)
+
+# Define a function to filter outliers based on standard deviation
+filter_outliers <- function(data, variable, sd_threshold = 3) {
+  mean_val <- mean(data[[variable]])
+  sd_val <- sd(data[[variable]])
+  filtered_data <- data %>%
+    filter(abs(.data[[variable]] - mean_val) <= sd_threshold * sd_val)
+  return(filtered_data)
+}
+
+# Filter out outliers from monthly_data
+monthly_data_filtered <- filter_outliers(monthly_data, "true_mean_sentiment_score", sd_threshold = 3)
+monthly_data_filtered <- filter_outliers(monthly_data_filtered, "predicted_mean_sentiment_score", sd_threshold = 3)
+
+# Filter out outliers from daily_data
+daily_data_filtered <- filter_outliers(daily_data, "true_mean_sentiment_score", sd_threshold = 3)
+daily_data_filtered <- filter_outliers(daily_data_filtered, "predicted_mean_sentiment_score", sd_threshold = 3)
 
 # Convert month and day_of_week to factors
-monthly_data$month <- factor(monthly_data$month, levels = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))
-daily_data$day_of_week <- factor(daily_data$day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+monthly_data_filtered$month <- factor(monthly_data_filtered$month, levels = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))
+daily_data_filtered$day_of_week <- factor(daily_data_filtered$day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
 
-# Create 3D plot for monthly data
-plot_monthly <- plot_ly(monthly_data, x = ~year, y = ~month, z = ~true_mean_sentiment_score, type = "scatter3d", mode = "lines", line = list(color = "red"), name = "True") %>%
+# Create 3D plot for monthly data with curves of best fit
+plot_monthly <- plot_ly(monthly_data_filtered, x = ~year, y = ~month, z = ~true_mean_sentiment_score, type = "scatter3d", mode = "lines", line = list(color = "red"), name = "True") %>%
   add_trace(y = ~month, z = ~predicted_mean_sentiment_score, type = "scatter3d", mode = "lines", line = list(color = "blue"), name = "Predicted") %>%
   layout(scene = list(xaxis = list(title = "Year"), yaxis = list(title = "Month"), zaxis = list(title = "Mean Sentiment Score")), 
          title = "Predicted vs True Mean Sentiment Score by Month (Testing Data)")
 
-# Create 3D plot for daily data
-plot_daily <- plot_ly(daily_data, x = ~year, y = ~day_of_week, z = ~true_mean_sentiment_score, type = "scatter3d", mode = "lines", line = list(color = "red"), name = "True") %>%
+# Create 3D plot for daily data with curves of best fit
+plot_daily <- plot_ly(daily_data_filtered, x = ~year, y = ~day_of_week, z = ~true_mean_sentiment_score, type = "scatter3d", mode = "lines", line = list(color = "red"), name = "True") %>%
   add_trace(y = ~day_of_week, z = ~predicted_mean_sentiment_score, type = "scatter3d", mode = "lines", line = list(color = "blue"), name = "Predicted") %>%
   layout(scene = list(xaxis = list(title = "Year"), yaxis = list(title = "Day of the Week"), zaxis = list(title = "Mean Sentiment Score")), 
          title = "Predicted vs True Mean Sentiment Score by Day of the Week (Testing Data)")
@@ -429,3 +524,4 @@ plot_daily <- plot_ly(daily_data, x = ~year, y = ~day_of_week, z = ~true_mean_se
 # Show plots
 plot_monthly
 plot_daily
+
