@@ -15,7 +15,7 @@ def fetch_html(url):
 
 def extract_posts(soup, keyword, page_number, show_debug):
     # Bot indicators and special characters
-    bot_indicators = ["download for free", "survey", "http", "https", "www.", "torrent", "hack tool", "hack"]
+    bot_indicators = ["download for free", "survey", "http", "https", "www.", "torrent", "hack tool", "hack", ".com", "download", "porn"]
     special_chars = set("ÜÄÝÞßþÙ")
 
     posts = soup.find_all('div', class_='post')
@@ -47,7 +47,8 @@ def extract_posts(soup, keyword, page_number, show_debug):
                     'year': date_time.year,
                     'month': date_time.strftime('%B'),
                     'day_of_week': date_time.strftime('%A'),
-                    'Time': date_time.strftime('%H:%M')
+                    'time': date_time.strftime('%H:%M'),
+                    'post_date': date_time.strftime('%Y-%m-%d')
                 }
                 data.append(post_data)
                 post_number += 1  # Increment post counter
@@ -104,7 +105,64 @@ def scrape_all_posts(keywords, base_url):
     return all_posts
 
 base_url = "https://www.somewheretowrite.com"
-keywords = ["joyous", "celebration", "wonderful", "death", "sad", "depressed"]
+keywords = [
+    # Positive Sentiment Keywords
+    "joyous", "celebration", "wonderful", "amazing", "delightful", "ecstatic",
+    "blissful", "love", "exuberant", "jubilant", "euphoric", "thrilled",
+    "content", "elated", "gleeful", "grateful", "happy", "merry", "radiant",
+    "sunny", "upbeat", "victorious", "vivacious", "zestful", "blessed", "fortunate",
+    "lucky", "jolly", "smiling", "joy", "happiness", "perfect", "excited", "positive", "enchanted",
+    "charmed", "overjoyed", "pleased", "satisfied", "rewarded", "fulfilled",
+    "accomplished", "proud", "inspired", "motivated", "optimistic",
+    "hopeful", "sanguine", "contented", "peaceful", "rejuvenated", "refreshed",
+    "relieved", "serene", "tranquil", "secure", "loved", "adored", "cherished",
+    "valued", "respected", "praised", "esteemed", "admired", "welcomed", "celebrated",
+    "approved", "applauded", "honored", "empathetic", "compassionate", "supportive",
+    "caring", "kind", "generous", "affectionate", "passionate", "good", "fond", "loving",
+    "playful", "funny", "entertaining", "amusing", "lighthearted", "joyful",
+    "spirited", "energetic", "lively", "invigorated", "stimulated", "keen",
+    "eager", "fervent", "enthusiastic", "involved", "engaged", "interested",
+    "attracted", "intrigued", "fascinated", "enthralled", "captivated",
+    "charismatic", "dynamic", "vibrant", "sparkling", "dazzling", "shining",
+    "glowing", "flourishing", "thriving", "prospering", "successful", "winning",
+    "leading", "prominent", "eminent", "reputable", "influential", "uplifted", "exalted", "enraptured", "over the moon", "buoyant",
+    "cheerful", "appreciative", "heartwarming", "promising", "favorable", "gleaming",
+    "shimmering", "beaming", "agile", "nimble", "luminous", "brilliant", "illustrious",
+    "distinguished", "legendary", "memorable", "pristine", "immaculate", "spotless",
+    "polished", "sunlit", "bright", "glittering", "sparkly", "bejeweled",
+    "majestic", "regal", "stately", "noble", "prized", "treasured" "powerful",
+    "strong", "healthy", "robust", "vital", "vigorous", "fit", "wholesome",
+    "hearty", "blooming", "sufficient", "ample", "plentiful", "bountiful",
+
+    # Negative Sentiment Keywords
+    "death", "sad", "depressed", "worst", "miserable", "terrible", "hate", "unhappy", "tragic",
+    "grief", "heartbroken", "sorrow", "melancholy", "gloomy", "bad", "grief-stricken",
+    "despair", "disheartened", "tearful", "unfortunate", "bleak", "desolate",
+    "forlorn", "dejected", "woeful", "anguish", "dismal", "unbearable", "painful",
+    "distraught", "regretful", "bereaved", "pain", "suffering", "negative", "downcast",
+    "upset", "disturbed", "displeased", "annoyed", "agitated", "frustrated",
+    "irritated", "angry", "furious", "enraged", "outraged", "wrathful",
+    "offended", "insulted", "neglected", "rejected", "excluded", "isolated",
+    "abandoned", "lonely", "alone", "lost", "confused", "perplexed", "indignant",
+    "embittered", "sour", "disgruntled", "discontented", "disappointed", "dissatisfied",
+    "defeated", "helpless", "powerless", "hopeless", "demoralized", "discouraged",
+    "uninspired", "dull", "bored", "tired", "fatigued", "weary", "burned out",
+    "exhausted", "strained", "stressed", "pressured", "troubled", "tormented",
+    "tortured", "afflicted", "harassed", "bothered", "worried", "alarmed", "frightened",
+    "scared", "terrified", "horrified", "apprehensive", "panicked", "hysterical",
+    "shocked", "stunned", "flustered", "rattled", "disoriented", "kill", "unsettled",
+    "uncomfortable", "insecure", "vulnerable", "exposed", "threatened", "menaced",
+    "endangered", "fuming", "doomed", "defective", "flawed", "imperfect",
+    "inadequate", "insufficient", "lacking", "wanting", "needing", "craving",
+    "desiring", "longing", "yearning", "pining", "nostalgic", "homesick", "remorseful",
+    "guilty", "ashamed", "pissed", "humiliated", "embarrassed", "awkward",
+    "clumsy", "inept", "incompetent", "ineffective", "useless", "unproductive",
+    "futile", "pointless", "senseless", "absurd", "ridiculous", "laughable",
+    "silly", "foolish", "stupid", "idiotic", "crazy", "insane", "mad", "deranged",
+    "manic", "wild", "uncontrolled", "chaotic", "disordered", "disarrayed",
+    "disorganized", "untidy", "messy", "muddled", "scattered", "dispersed", "squandered",
+    "wasted"
+]
 all_posts = scrape_all_posts(keywords, base_url)
 df = pd.DataFrame(all_posts)
 df.to_excel('C:/Users/admin/Documents/anonymitysentiment/posts_data.xlsx', index=False)
