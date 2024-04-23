@@ -193,16 +193,26 @@ library(dplyr)
 
 # Assuming 'train_data' is your training dataset and has the necessary columns preprocessed
 # Define a simpler formula for the randomForest model
-sentiment_formula <- mean_sentiment ~ scaled_buffer_ratio + scaled_neutral_ratio +
-  scaled_positive_ratio + scaled_negative_ratio +
-  scaled_buffer_ratio:scaled_neutral_ratio +  # Interaction between buffer and neutral
-  scaled_positive_ratio:scaled_negative_ratio  # Interaction between positive and negative
+sentiment_formula <- mean_sentiment ~ 
+  scaled_neutral_ratio + 
+  scaled_positive_ratio + 
+  scaled_negative_ratio + 
+  scaled_buffer_ratio + 
+  total_words +
+  neutral_ratio +
+  buffer_ratio +
+  total_emotion_words +
+  exp(scaled_buffer_ratio) +
+  exp(scaled_neutral_ratio) +
+  log(scaled_positive_ratio + 1) +
+  log(scaled_negative_ratio + 1)
+# Interaction between positive and negative
 
 # Train the random forest model using the defined formula
 sentiment_model <- randomForest(
   formula = sentiment_formula,
   data = train_data,
-  ntree = 100,
+  ntree = 500,
   mtry = 3,  # Adjust based on the number of predictors
   importance = TRUE,
   do.trace = 100,
@@ -219,7 +229,6 @@ varImpPlot(sentiment_model)
 # Optionally, evaluate the model's performance
 # Assuming 'test_data' is your testing dataset and also preprocessed similarly
 # Scale the ratios to [0, 1] range to normalize their impact
-library(caret)
 
 test_data$predicted_sentiment <- predict(sentiment_model, newdata = test_data)
 results <- postResample(pred = test_data$predicted_sentiment, obs = test_data$mean_sentiment)
@@ -275,47 +284,6 @@ ggplot(test_data_summary, aes(x = day_of_week, y = mean_actual_sentiment, group 
        color = "Year",
        linetype = "Legend") +
   theme_minimal()
-
-# Plotting mean sentiment scores by years
-ggplot(test_data_summary, aes(x = as.factor(year), y = mean_actual_sentiment, group = year)) +
-  geom_line(aes(color = as.factor(year)), size = 1) +
-  geom_line(aes(y = mean_predicted_sentiment, linetype = "Predicted"), size = 1) +
-  labs(title = "Mean Sentiment Score by Year",
-       x = "Year",
-       y = "Mean Sentiment Score",
-       color = "Year",
-       linetype = "Legend") +
-  theme_minimal()
-
-# Convert time column to POSIXct format
-test_data$time <- as.POSIXct(test_data$time, format = "%H:%M")
-
-# Aggregate data by hourly timestamp
-test_data_hourly <- test_data %>%
-  mutate(hour = lubridate::hour(time)) %>%
-  group_by(hour) %>%
-  summarise(
-    mean_actual_sentiment = mean(mean_sentiment),
-    mean_predicted_sentiment = mean(predicted_sentiment)
-  ) %>%
-  ungroup() %>%
-  arrange(hour)
-
-# Plotting mean sentiment scores by hourly timestamp with time labels in AM/PM format
-ggplot(test_data_hourly, aes(x = hour, y = mean_actual_sentiment)) +
-  geom_line(aes(color = "Actual"), size = 1) +
-  geom_line(aes(y = mean_predicted_sentiment, color = "Predicted"), linetype = "dashed", size = 1) +
-  labs(title = "Mean Sentiment Score by Hour of Day",
-       x = "Hour of Day",
-       y = "Mean Sentiment Score",
-       color = "Legend",
-       linetype = "Legend") +
-  scale_x_continuous(breaks = seq(0, 23, by = 1),
-                     labels = function(x) {
-                       ifelse(x < 12, paste0(x, " AM"), ifelse(x == 12, "12 PM", paste0(x - 12, " PM")))
-                     }) +
-  theme_minimal()
-
 
 ###############bindinGFORTESTING################
 # Combining the data frames
@@ -414,9 +382,3 @@ var_importance <- importance(sentiment_model)
 
 # Print the variable importance values
 print(var_importance)
-
-
-######modelplot###
-
-library(randomForest)
-plot(sentiment_model)
