@@ -274,6 +274,13 @@ ggplot(test_data_summary, aes(x = day_of_week, y = mean_actual_sentiment, group 
        color = "Year",
        linetype = "Legend") +
   theme_minimal()
+
+###############bindinGFORTESTING################
+# Combining the data frames
+combined_data <- rbind(train_data, test_data)
+#######PERFORM 5 OR 10 FOLD CROSS VALIDATION##############
+
+
 ###########TESTS#################################
 library(caret)
 library(lubridate)
@@ -281,16 +288,20 @@ library(lubridate)
 # Assuming 'data_processed' is ordered chronologically
 set.seed(123)  # for reproducibility
 
-# Creating time slices manually
-initial <- floor(0.8 * nrow(data_processed))
-horizon <- nrow(data_processed) - initial
-slices <- createTimeSlices(1:nrow(data_processed),
+# Recreating time slices based on actual size of train_data
+initial <- floor(0.8 * nrow(train_data))
+horizon <- nrow(train_data) - initial
+slices <- createTimeSlices(1:nrow(train_data),
                            initialWindow = initial,
                            horizon = horizon,
                            fixedWindow = TRUE,
                            skip = 0)
 
-# Setup trainControl with manual indices
+# Now check the new ranges
+print(range(slices$train))
+print(range(slices$test))
+
+# Setup trainControl with the corrected indices
 fitControl <- trainControl(
   method = "timeslice",
   index = slices$train,
@@ -305,33 +316,9 @@ sentiment_formula <- mean_sentiment ~ scaled_buffer_ratio + scaled_neutral_ratio
   scaled_buffer_ratio:scaled_neutral_ratio +
   scaled_positive_ratio:scaled_negative_ratio
 
-data_processed <- data_processed %>%
-  mutate(
-    negative_impact = 1.5 * slight_negative_ratio + 2 * medium_negative_ratio + 2.5 * moderate_negative_ratio + 3 * extreme_negative_ratio,
-    positive_impact = 1.5 * slight_positive_ratio + 2 * medium_positive_ratio + 2.5 * moderate_positive_ratio + 3 * extreme_positive_ratio,
-    interaction_term = negative_impact * positive_impact,
-    squared_negative_impact = negative_impact^2,
-    squared_positive_impact = positive_impact^2
-  )
-
-
-# First, calculate max values in the training data
-max_buffer_ratio <- max(data_processed$buffer_ratio, na.rm = TRUE)
-max_neutral_ratio <- max(data_processed$neutral_ratio, na.rm = TRUE)
-max_positive_impact <- max(data_processed$positive_impact, na.rm = TRUE)
-max_negative_impact <- max(data_processed$negative_impact, na.rm = TRUE)
-
-# Then use these max values to scale both training and test data
-data_processed <- data_processed %>%
-  mutate(
-    scaled_buffer_ratio = buffer_ratio / max_buffer_ratio,
-    scaled_neutral_ratio = neutral_ratio / max_neutral_ratio,
-    scaled_positive_ratio = positive_impact / max_positive_impact,
-    scaled_negative_ratio = negative_impact / max_negative_impact
-  )
 
 # Train the model using caret
-model <- train(sentiment_formula, data=data_processed,
+model <- train(sentiment_formula, data=train_data,
                method="rf",  # Random forest
                trControl=fitControl,
                tuneLength=5)  # Number of different tuning parameters to try

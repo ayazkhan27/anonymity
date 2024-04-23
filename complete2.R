@@ -202,7 +202,7 @@ sentiment_formula <- mean_sentiment ~ scaled_buffer_ratio + scaled_neutral_ratio
 sentiment_model <- randomForest(
   formula = sentiment_formula,
   data = train_data,
-  ntree = 500,
+  ntree = 100,
   mtry = 3,  # Adjust based on the number of predictors
   importance = TRUE,
   do.trace = 100,
@@ -219,6 +219,7 @@ varImpPlot(sentiment_model)
 # Optionally, evaluate the model's performance
 # Assuming 'test_data' is your testing dataset and also preprocessed similarly
 # Scale the ratios to [0, 1] range to normalize their impact
+library(caret)
 
 test_data$predicted_sentiment <- predict(sentiment_model, newdata = test_data)
 results <- postResample(pred = test_data$predicted_sentiment, obs = test_data$mean_sentiment)
@@ -274,6 +275,47 @@ ggplot(test_data_summary, aes(x = day_of_week, y = mean_actual_sentiment, group 
        color = "Year",
        linetype = "Legend") +
   theme_minimal()
+
+# Plotting mean sentiment scores by years
+ggplot(test_data_summary, aes(x = as.factor(year), y = mean_actual_sentiment, group = year)) +
+  geom_line(aes(color = as.factor(year)), size = 1) +
+  geom_line(aes(y = mean_predicted_sentiment, linetype = "Predicted"), size = 1) +
+  labs(title = "Mean Sentiment Score by Year",
+       x = "Year",
+       y = "Mean Sentiment Score",
+       color = "Year",
+       linetype = "Legend") +
+  theme_minimal()
+
+# Convert time column to POSIXct format
+test_data$time <- as.POSIXct(test_data$time, format = "%H:%M")
+
+# Aggregate data by hourly timestamp
+test_data_hourly <- test_data %>%
+  mutate(hour = lubridate::hour(time)) %>%
+  group_by(hour) %>%
+  summarise(
+    mean_actual_sentiment = mean(mean_sentiment),
+    mean_predicted_sentiment = mean(predicted_sentiment)
+  ) %>%
+  ungroup() %>%
+  arrange(hour)
+
+# Plotting mean sentiment scores by hourly timestamp with time labels in AM/PM format
+ggplot(test_data_hourly, aes(x = hour, y = mean_actual_sentiment)) +
+  geom_line(aes(color = "Actual"), size = 1) +
+  geom_line(aes(y = mean_predicted_sentiment, color = "Predicted"), linetype = "dashed", size = 1) +
+  labs(title = "Mean Sentiment Score by Hour of Day",
+       x = "Hour of Day",
+       y = "Mean Sentiment Score",
+       color = "Legend",
+       linetype = "Legend") +
+  scale_x_continuous(breaks = seq(0, 23, by = 1),
+                     labels = function(x) {
+                       ifelse(x < 12, paste0(x, " AM"), ifelse(x == 12, "12 PM", paste0(x - 12, " PM")))
+                     }) +
+  theme_minimal()
+
 
 ###############bindinGFORTESTING################
 # Combining the data frames
@@ -339,3 +381,42 @@ data_summary <- test_data %>%
   ) %>%
   ungroup() %>%
   arrange(year, month, day_of_week)
+
+library(dplyr)
+
+# Summarizing data to get average sentiments per year
+yearly_sentiments <- combined_data %>%
+  group_by(year) %>%
+  summarise(mean_actual_sentiment = mean(mean_sentiment, na.rm = TRUE),
+            mean_predicted_sentiment = mean(predicted_sentiment, na.rm = TRUE))
+
+library(ggplot2)
+
+# Enhanced Plotting
+ggplot(yearly_sentiments, aes(x = year)) +
+  geom_line(aes(y = mean_actual_sentiment, color = "Actual Sentiment"), size = 1) +
+  geom_point(aes(y = mean_actual_sentiment, color = "Actual Sentiment")) +
+  geom_line(aes(y = mean_predicted_sentiment, color = "Predicted Sentiment"), size = 1, linetype = "dashed") +
+  geom_point(aes(y = mean_predicted_sentiment, color = "Predicted Sentiment")) +
+  scale_color_manual(values = c("Actual Sentiment" = "blue", "Predicted Sentiment" = "red")) +
+  labs(title = "Mean and Predicted Sentiment Scores by Year",
+       x = "Year",
+       y = "Sentiment Score",
+       color = "Legend") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Plot variable importance
+varImpPlot(sentiment_model)
+
+# Get variable importance
+var_importance <- importance(sentiment_model)
+
+# Print the variable importance values
+print(var_importance)
+
+
+######modelplot###
+
+library(randomForest)
+plot(sentiment_model)
