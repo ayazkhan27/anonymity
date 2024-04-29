@@ -1,5 +1,10 @@
 library(tidytext)
 library(randomForest)
+library(dplyr)
+library(readxl)
+library(tidytext)
+library(dplyr)
+library(syuzhet)
 
 predict_mean_sentiment_2 <- function(paragraph, sentiment_model_2) {
   # Clean the paragraph
@@ -117,28 +122,8 @@ predict_mean_sentiment <- function(paragraph, sentiment_model_2) {
   # Calculate max values from the paragraph itself
   max_buffer_ratio <- max(paragraph_aggregated$buffer_ratio, na.rm = TRUE)
   max_neutral_ratio <- max(paragraph_aggregated$neutral_ratio, na.rm = TRUE)
-  
-  # Set placeholder value for buffer and neutral ratios
-  buffer_placeholder <- 0.001
-  neutral_placeholder <- 0.001
-  
-  # Check if max buffer ratio is 0 and if so, set it to max neutral ratio or placeholder value
-  if (max_buffer_ratio == 0) {
-    if (max_neutral_ratio == 0) {
-      max_buffer_ratio <- buffer_placeholder
-    } else {
-      max_buffer_ratio <- max_neutral_ratio
-    }
-  }
-  
-  # Check if max neutral ratio is 0 and if so, set it to max buffer ratio or placeholder value
-  if (max_neutral_ratio == 0) {
-    if (max_buffer_ratio == 0) {
-      max_neutral_ratio <- neutral_placeholder
-    } else {
-      max_neutral_ratio <- max_buffer_ratio
-    }
-  }
+  max_positive_impact <- max(1.5 * paragraph_aggregated$slight_positive_ratio + 2 * paragraph_aggregated$medium_positive_ratio + 2.5 * paragraph_aggregated$moderate_positive_ratio + 3 * paragraph_aggregated$extreme_positive_ratio, na.rm = TRUE)
+  max_negative_impact <- max(1.5 * paragraph_aggregated$slight_negative_ratio + 2 * paragraph_aggregated$medium_negative_ratio + 2.5 * paragraph_aggregated$moderate_negative_ratio + 3 * paragraph_aggregated$extreme_negative_ratio, na.rm = TRUE)
   
   
   # Scale features based on their calculated maximums
@@ -220,12 +205,12 @@ predict_mean_sentiment <- function(paragraph, sentiment_model_2) {
 }
 
 # Example usage
-paragraph <- "hell hell hell hell hell hell hell hell hi"
-loaded_model_2 <- readRDS("sentiment_model_2.rds") # Replace with the actual path to your saved model
-predicted_sentiment <- predict_mean_sentiment(paragraph, loaded_model_2)
+paragraph <- "Today was a good day, took the kids to the mall, went up the ladder, construction work, did some errands here and there, but you know what? Today was a goshdarn terrible, miserable day."
+predicted_sentiment <- predict_mean_sentiment(paragraph, sentiment_model_2)
 print(predicted_sentiment)
 
 
 #########BOOKTEST############################
 
 
+#Today was a good day, took the kids to the mall, went up the ladder, construction work, did some errands here and there, but you know what? Today was a goshdarn good day.

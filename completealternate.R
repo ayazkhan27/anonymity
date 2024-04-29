@@ -131,7 +131,10 @@ process_data <- function(data) {
       exp_buffer_neutral_ratio = exp(min(neutral_count + buffer_count, 10) / total_words),
       decay_factor = exp(-(neutral_count + buffer_count) / total_words),
       mean_sentiment = total_sentiment / total_emotion_words,
-      adjusted_mean_sentiment = adjusted_mean_sentiment * decay_factor
+      abs_adjusted_mean_sentiment = abs(adjusted_mean_sentiment), 
+      adjusted_mean_sentiment_sign = sign(adjusted_mean_sentiment),
+      adjusted_mean_sentiment = if_else(total_emotion_words > 0, abs_adjusted_mean_sentiment * decay_factor * adjusted_mean_sentiment_sign,
+                                        0)  # Apply decay factor to adjusted mean sentiment
     )
 }
 # Apply the function to train and test data
@@ -212,7 +215,7 @@ sentiment_model_2 <- randomForest(
   ntree = 80,
   mtry = 3,  # Adjust based on the number of predictors
   importance = TRUE,
-  do.trace = 100,
+  do.trace = 10,
   parallel = TRUE
 )
 
@@ -240,13 +243,6 @@ actual_sentiment <- test_data$adjusted_mean_sentiment
 r_squared <- summary(lm(predicted_sentiment ~ actual_sentiment))$r.squared
 print(paste("R-squared: ", r_squared))
 
-
-# Calculate R-squared value for the test set
-predicted_sentiment <- predict(sentiment_model_2, newdata = test_data)
-actual_sentiment <- test_data$mean_sentiment
-r_squared <- summary(lm(predicted_sentiment ~ actual_sentiment))$r.squared
-print(paste("R-squared: ", r_squared))
-
 ###############
 
 # Add predicted sentiments back to the test data
@@ -268,6 +264,17 @@ test_data_summary <- test_data %>%
 library(ggplot2)
 
 # Plotting mean sentiment scores by time periods
+library(showtext)
+
+# Initialize showtext to automatically use added fonts
+showtext_auto(enable = TRUE)
+
+# Load Arial font from your system, ensure it's available
+font_add(family = "Arial", regular = "arial.ttf")  # Check the actual path if not found
+
+library(ggplot2)
+
+# Plotting mean sentiment scores by time periods
 ggplot(test_data_summary, aes(x = month, y = mean_actual_sentiment, group = year)) +
   geom_line(aes(color = as.factor(year)), size = 1) +
   geom_line(aes(y = mean_predicted_sentiment, linetype = "Predicted"), size = 1) +
@@ -277,7 +284,14 @@ ggplot(test_data_summary, aes(x = month, y = mean_actual_sentiment, group = year
        y = "Mean Sentiment Score",
        color = "Year",
        linetype = "Legend") +
-  theme_minimal()
+  theme_minimal() +
+  theme(text = element_text(size = 20, family = "Arial"),  # Apply Arial with a larger base size
+        axis.title = element_text(size = 24, family = "Arial"),
+        plot.title = element_text(size = 28, face = "bold", family = "Arial", hjust = 0.5),
+        legend.title = element_text(size = 24, family = "Arial"),
+        legend.text = element_text(size = 20, family = "Arial"))
+
+
 
 # Additional plot for day of the week
 ggplot(test_data_summary, aes(x = day_of_week, y = mean_actual_sentiment, group = year)) +
@@ -408,7 +422,7 @@ library(ggplot2)
 
 # Enhanced Plotting
 ggplot(yearly_sentiments, aes(x = year)) +
-  geom_line(aes(y = mean_actual_sentiment, color = "Actual Sentiment"), size = 1) +
+  geom_line(aes(y = mean_actual_sentiment, color = "Actual Sentiment"), linewidth = 1) +
   geom_point(aes(y = mean_actual_sentiment, color = "Actual Sentiment")) +
   geom_line(aes(y = mean_predicted_sentiment, color = "Predicted Sentiment"), size = 1, linetype = "dashed") +
   geom_point(aes(y = mean_predicted_sentiment, color = "Predicted Sentiment")) +
@@ -431,9 +445,16 @@ print(var_importance)
 
 
 ######modelplot###
-
 library(randomForest)
-plot(sentiment_model_2)
+library(extrafont)
+
+# Plot the random forest model
+plot(sentiment_model_2, main = "Sentiment Gummy Worm (SGW) Model",
+     cex.main = 2.5,  # Increase the main title size
+     cex.lab = 2.2,   # Increase the axis labels size
+     cex.axis = 2.1,  # Increase the axis text size
+     family = "Arial")  # Ensure Arial is used
+
 
 # Save the model to an RDS file
 saveRDS(sentiment_model_2, "sentiment_model_2.rds")

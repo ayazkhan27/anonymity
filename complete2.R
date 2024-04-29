@@ -202,7 +202,7 @@ sentiment_formula <- mean_sentiment ~ scaled_buffer_ratio + scaled_neutral_ratio
 sentiment_model <- randomForest(
   formula = sentiment_formula,
   data = train_data,
-  ntree = 100,
+  ntree = 80,
   mtry = 3,  # Adjust based on the number of predictors
   importance = TRUE,
   do.trace = 100,
