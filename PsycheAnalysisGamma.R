@@ -1,41 +1,4 @@
 ###PREBOOT:
-# Assuming your dataset is named testing_data
-# Replace 'day_of_week' with the actual column name in your dataset
-# Create a new column 'day_count' to store the total occurrences for each day of the week
-testing_data$day_count <- NA
-
-# Loop through each year from 2017 to 2024
-for (year in 2017:2024) {
-  # Calculate the count for each day of the week in the current year
-  for (day in c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
-    day_count <- sum(testing_data$year == year & testing_data$day_of_week == day, na.rm = TRUE)
-    # Assign the count to the corresponding rows in the 'day_count' column
-    testing_data$day_count[testing_data$year == year & testing_data$day_of_week == day] <- day_count
-  }
-}
-
-# Print the updated dataset
-head(testing_data)
-
-# Assuming your dataset is named testing_data
-# Replace 'month' with the actual column name in your dataset
-# Create a new column 'month_count' to store the total occurrences for each month
-testing_data$month_count <- NA
-
-# Loop through each year from 2017 to 2024
-for (year in 2017:2024) {
-  # Calculate the count for each month in the current year
-  for (month in c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) {
-    month_count <- sum(testing_data$year == year & testing_data$month == month, na.rm = TRUE)
-    # Assign the count to the corresponding rows in the 'month_count' column
-    testing_data$month_count[testing_data$year == year & testing_data$month == month] <- month_count
-  }
-}
-
-# Print the updated dataset
-head(testing_data)
-
-
 
 # SECTION 1: Sentiment Analysis
 library(readxl)
@@ -45,14 +8,12 @@ library(syuzhet)
 
 # Step 1: Load data and preprocess
 file_path <- "C:/Users/admin/AppData/Local/Programs/Python/Python312/posts_data.xlsx"
+posts_data <- read_excel(file_path) %>%
+  mutate(`Post Content` = as.character(`Post Content`))
 
-# Read data from all sheets
-posts_data <- lapply(excel_sheets(file_path), function(sheet) {
-  read_excel(file_path, sheet = sheet) %>%
-    mutate_all(as.character)
-}) %>% 
-  bind_rows() %>%
-  mutate(`Post Content` = gsub("\\b(uncategorized|anonymous)\\b", "", `Post Content`, ignore.case = TRUE)) # Remove "uncategorized" and "anonymous"
+# Remove duplicates based on 'Post Content' to avoid processing the same text multiple times
+posts_data <- posts_data %>%
+  distinct(`Post Content`, .keep_all = TRUE)
 
 # Step 2: Preprocess data
 posts_data <- posts_data %>%
@@ -68,19 +29,6 @@ posts_data <- posts_data %>%
 # Step 4: Calculate sentiment scores
 posts_data <- posts_data %>%
   mutate(sentiment_score = get_sentiment(word, method = "afinn"))
-
-# Step 5: Remove repeated keywords
-posts_data <- posts_data %>%
-  group_by(Keyword, word) %>%
-  mutate(word_count = n()) %>%
-  filter(word_count < 3) %>%
-  ungroup() %>%
-  select(-word_count)
-
-# Step 6: Filter out introductory website text
-introductory_text <- c("Love","Work","Family","Friends","Games","Kids", "Life", "Home", "About", "Search", "Write", "Categories", "Login", "Write what you feel...", "Please enter a keyword, term, or post number to search for:")
-posts_data <- posts_data %>%
-  filter(!word %in% introductory_text)
 
 # Step 7: Remove neutral sentiments and sentiment scores of 0
 posts_data <- posts_data %>%
@@ -105,42 +53,42 @@ print(aggregate_sentiment)
 
 # SECTION 2: Word Frequency Analysis
 
-# Step 1: Define Happy and Sad Keywords
-happy_keywords <- c("joyous", "celebration", "wonderful", "amazing", "delightful", "ecstatic", "blissful", "cheerful", "exuberant", "jubilant", "euphoric", "thrilled", "content", "elated", "gleeful", "grateful", "happy", "merry", "radiant", "sunny", "upbeat", "victorious", "vivacious", "zestful", "blessed", "fortunate", "lucky", "jolly", "smiling", "joy", "happiness", "excited", "positive")
+library(dplyr)
 
-sad_keywords <- c("death", "sad", "depressed", "worst", "miserable", "hate", "unhappy", "tragic", "grief", "heartbroken", "sorrow", "melancholy", "gloomy", "grief-stricken", "despair", "disheartened", "tearful", "unfortunate", "bleak", "desolate", "forlorn", "dejected", "woeful", "anguish", "dismal", "unbearable", "painful", "distraught", "regretful", "bereaved", "pain", "suffering", "negative", "downcast")
+# Assuming posts_data has already been loaded and includes necessary columns
+# Group data by 'Keyword', 'Page', 'Post Number', and calculate the mean sentiment score, while preserving the unique "Post Content" and other details
+grouped_posts <- posts_data %>%
+  group_by(Keyword, Page, `Post Number`) %>%
+  summarise(
+    "Post Content" = first(`Post Content`),  # Assuming all entries in a group share the same Post Content
+    year = first(year),
+    month = first(month),
+    day_of_week = first(day_of_week),
+    time = first(time),
+    post_date = first(post_date),
+    mean_sentiment_score = mean(sentiment_score, na.rm = TRUE),
+    .groups = 'drop'
+  )
 
-# Step 2: Count Word Frequency for Happy and Sad Keywords
-count_keywords <- function(text, keywords) {
-  keyword_count <- sum(grepl(paste0(keywords, collapse = "|"), text, ignore.case = TRUE))
-  return(keyword_count)
-}
+# Split the grouped data into happy, sad, and neutral posts based on mean sentiment score
+happy_posts <- grouped_posts %>%
+  filter(mean_sentiment_score > 0)
 
-# Define Happy and Sad Keywords
-happy_keywords <- c("joyous", "celebration", "wonderful", "amazing", "delightful", "ecstatic", "blissful", "cheerful", "exuberant", "jubilant", "euphoric", "thrilled", "content", "elated", "gleeful", "grateful", "happy", "merry", "radiant", "sunny", "upbeat", "victorious", "vivacious", "zestful", "blessed", "fortunate", "lucky", "jolly", "smiling", "joy", "happiness", "excited", "positive")
+sad_posts <- grouped_posts %>%
+  filter(mean_sentiment_score < 0)
 
-sad_keywords <- c("death", "sad", "depressed", "worst", "miserable", "hate", "unhappy", "tragic", "grief", "heartbroken", "sorrow", "melancholy", "gloomy", "grief-stricken", "despair", "disheartened", "tearful", "unfortunate", "bleak", "desolate", "forlorn", "dejected", "woeful", "anguish", "dismal", "unbearable", "painful", "distraught", "regretful", "bereaved", "pain", "suffering", "negative", "downcast")
+neutral_posts <- grouped_posts %>%
+  filter(mean_sentiment_score == 0)
 
-# Count word occurrences for happy and sad keywords
-posts_data$happy_keyword_count <- sapply(posts_data$`Post Content`, count_keywords, keywords = happy_keywords)
-posts_data$sad_keyword_count <- sapply(posts_data$`Post Content`, count_keywords, keywords = sad_keywords)
+# Print the total counts for each category
+cat("Total Happy Posts:", nrow(happy_posts), "\n")
+cat("Total Sad Posts:", nrow(sad_posts), "\n")
+cat("Total Neutral Posts:", nrow(neutral_posts), "\n")
 
-# Step 3: Filter out posts with no happy keywords or only sad keywords
-happy_posts <- posts_data %>%
-  filter(happy_keyword_count > 0 & sad_keyword_count == 0) # Exclude posts with sad keywords
-
-sad_posts <- posts_data %>%
-  filter(sad_keyword_count > 0 & happy_keyword_count == 0) # Exclude posts with happy keywords
-
-# Step 4: Aggregate keyword counts and count posts
-aggregate_keywords <- posts_data %>%
-  summarise(total_happy_posts = sum(happy_keyword_count),
-            total_sad_posts = sum(sad_keyword_count))
-
-# Print the aggregated keyword counts
-print(aggregate_keywords)
-##revision
-# SECTION 3: Word Clouds
+# Optionally print the first few rows of each dataframe to verify
+print(head(happy_posts))
+print(head(sad_posts))
+print(head(neutral_posts))
 
 # Step 1: Prepare data for word clouds
 library(wordcloud)
@@ -162,12 +110,12 @@ filtered_sad_posts <- filtered_sad_posts %>%
 
 # Step 2: Create word clouds for happy and sad posts
 happy_wordcloud <- wordcloud::wordcloud(words = unlist(strsplit(filtered_happy_posts$`Post Content`, "\\s+")),
-                                        max.words = 100, colors = brewer.pal(8, "Dark2"),
-                                        scale = c(2, 0.7), random.order = FALSE, rot.per = 0.35)
+                                        max.words = 100, colors = brewer.pal(8, "Set2"),
+                                        scale = c(2.75, 0.5), random.order = FALSE, rot.per = 0.45)
 
 sad_wordcloud <- wordcloud::wordcloud(words = unlist(strsplit(filtered_sad_posts$`Post Content`, "\\s+")),
                                       max.words = 100, colors = brewer.pal(8, "Dark2"),
-                                      scale = c(2, 0.7), random.order = FALSE, rot.per = 0.35)
+                                      scale = c(2.75, 0.5), random.order = FALSE, rot.per = 0.45)
 
 ###DEADSECTION
 ###SECTION 4 = FAILURE###
@@ -236,39 +184,39 @@ months <- c("January", "February", "March", "April", "May", "June", "July", "Aug
 days_of_week <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
 # Function to extract date from Post Content
-extract_date <- function(content) {
-  date_pattern <- "\\b\\w+ \\d{1,2}, \\d{4}\\b"
-  date_match <- regmatches(content, regexpr(date_pattern, content))
-  date <- as.Date(date_match, format = "%B %d, %Y")
-  return(date)
-}
+#extract_date <- function(content) {
+  #date_pattern <- "\\b\\w+ \\d{1,2}, \\d{4}\\b"
+  #date_match <- regmatches(content, regexpr(date_pattern, content))
+  #date <- as.Date(date_match, format = "%B %d, %Y")
+  #return(date)
+#}
 
 # Data Preparation
-posts_data$post_date <- as.Date(gsub(paste0(".*\\b(", paste0(years, collapse = "|"), ")\\b.*"), "\\1", posts_data$`Post Content`), format = "%Y")
-posts_data$year <- lubridate::year(posts_data$post_date)
+#posts_data$post_date <- as.Date(gsub(paste0(".*\\b(", paste0(years, collapse = "|"), ")\\b.*"), "\\1", posts_data$`Post Content`), format = "%Y")
+#posts_data$year <- lubridate::year(posts_data$post_date)
 # Function to extract date from Post Content
-extract_date <- function(content) {
-  date_pattern <- "\\b\\w+ \\d{1,2}, \\d{4}\\b"
-  date_match <- regmatches(content, regexpr(date_pattern, content))
-  date <- as.Date(date_match, format = "%B %d, %Y")
-  return(date)
-}
+#extract_date <- function(content) {
+  #date_pattern <- "\\b\\w+ \\d{1,2}, \\d{4}\\b"
+  #date_match <- regmatches(content, regexpr(date_pattern, content))
+  #date <- as.Date(date_match, format = "%B %d, %Y")
+  #return(date)
+#}
 
 # Function to determine day of the week
-determine_day_of_week <- function(date) {
-  return(weekdays(date))
-}
+#determine_day_of_week <- function(date) {
+  #return(weekdays(date))
+#}
 
 # Data Preparation
-posts_data$post_date <- as.Date(gsub(paste0(".*\\b(", paste0(years, collapse = "|"), ")\\b.*"), "\\1", posts_data$`Post Content`), format = "%Y")
-posts_data$month <- NA
-for (i in 1:length(months)) {
-  posts_data$month[grepl(months[i], posts_data$`Post Content`, ignore.case = TRUE)] <- months[i]
-}
-posts_data$day_of_week <- NA
-for (i in 1:length(days_of_week)) {
-  posts_data$day_of_week[grepl(days_of_week[i], posts_data$`Post Content`, ignore.case = TRUE)] <- days_of_week[i]
-}
+#posts_data$post_date <- as.Date(gsub(paste0(".*\\b(", paste0(years, collapse = "|"), ")\\b.*"), "\\1", posts_data$`Post Content`), format = "%Y")
+#posts_data$month <- NA
+#for (i in 1:length(months)) {
+  #posts_data$month[grepl(months[i], posts_data$`Post Content`, ignore.case = TRUE)] <- months[i]
+#}
+#posts_data$day_of_week <- NA
+#for (i in 1:length(days_of_week)) {
+  #posts_data$day_of_week[grepl(days_of_week[i], posts_data$`Post Content`, ignore.case = TRUE)] <- days_of_week[i]
+#}
 
 # Remove rows with missing or NA values in the year column
 posts_data <- posts_data[complete.cases(posts_data$year), ]
@@ -278,9 +226,9 @@ training_data <- subset(posts_data, year(post_date) %in% 2009:2016)
 testing_data <- subset(posts_data, year(post_date) %in% 2017:2024)
 
 # Apply functions to extract dates and determine day of the week
-training_data$extracted_date <- sapply(training_data$`Post Content`, extract_date)
-training_data$day_of_week[is.na(training_data$day_of_week)] <- sapply(training_data$extracted_date[is.na(training_data$day_of_week)], determine_day_of_week)
-training_data$extracted_date <- NULL
+#training_data$extracted_date <- sapply(training_data$`Post Content`, extract_date)
+#training_data$day_of_week[is.na(training_data$day_of_week)] <- sapply(training_data$extracted_date[is.na(training_data$day_of_week)], determine_day_of_week)
+#training_data$extracted_date <- NULL
 
 # Feature Extraction
 training_data$mean_sentiment_score <- training_data$sentiment_score
@@ -329,15 +277,15 @@ print(plot_day)
 # Prepare testing data to match training format
 
 # Extract date, month, and day of the week from Post Content
-testing_data$post_date <- as.Date(gsub(paste0(".*\\b(", paste0(years, collapse = "|"), ")\\b.*"), "\\1", testing_data$`Post Content`), format = "%Y")
-testing_data$month <- NA
-for (i in 1:length(months)) {
-  testing_data$month[grepl(months[i], testing_data$`Post Content`, ignore.case = TRUE)] <- months[i]
-}
-testing_data$day_of_week <- NA
-for (i in 1:length(days_of_week)) {
-  testing_data$day_of_week[grepl(days_of_week[i], testing_data$`Post Content`, ignore.case = TRUE)] <- days_of_week[i]
-}
+#testing_data$post_date <- as.Date(gsub(paste0(".*\\b(", paste0(years, collapse = "|"), ")\\b.*"), "\\1", testing_data$`Post Content`), format = "%Y")
+#testing_data$month <- NA
+#for (i in 1:length(months)) {
+  #testing_data$month[grepl(months[i], testing_data$`Post Content`, ignore.case = TRUE)] <- months[i]
+#}
+#testing_data$day_of_week <- NA
+#for (i in 1:length(days_of_week)) {
+  #testing_data$day_of_week[grepl(days_of_week[i], testing_data$`Post Content`, ignore.case = TRUE)] <- days_of_week[i]
+#}
 
 # Remove rows with missing or NA values in the year column
 testing_data <- testing_data[complete.cases(testing_data$year), ]
@@ -389,6 +337,22 @@ mae_day <- mean(abs(daily_data$true_mean_sentiment_score - daily_data$predicted_
 accuracy_percentage_year <- 100 * (1 - mae_year / mean(yearly_data$true_mean_sentiment_score))
 accuracy_percentage_month <- 100 * (1 - mae_month / mean(monthly_data$true_mean_sentiment_score))
 accuracy_percentage_day <- 100 * (1 - mae_day / mean(daily_data$true_mean_sentiment_score))
+
+# Calculate absolute error for each graph
+abs_error_year <- abs(yearly_data$true_mean_sentiment_score - yearly_data$predicted_mean_sentiment_score)
+abs_error_month <- abs(monthly_data$true_mean_sentiment_score - monthly_data$predicted_mean_sentiment_score)
+abs_error_day <- abs(daily_data$true_mean_sentiment_score - daily_data$predicted_mean_sentiment_score)
+
+# Calculate accuracy percentage for each graph
+# Scale the absolute error relative to the range of sentiment scores
+accuracy_percentage_year <- 100 * (1 - (mean(abs_error_year) / (max(yearly_data$true_mean_sentiment_score) - min(yearly_data$true_mean_sentiment_score))))
+accuracy_percentage_month <- 100 * (1 - (mean(abs_error_month) / (max(monthly_data$true_mean_sentiment_score) - min(monthly_data$true_mean_sentiment_score))))
+accuracy_percentage_day <- 100 * (1 - (mean(abs_error_day) / (max(daily_data$true_mean_sentiment_score) - min(daily_data$true_mean_sentiment_score))))
+
+# Print accuracy percentage for each graph
+cat("Accuracy percentage for yearly data:", accuracy_percentage_year, "%\n")
+cat("Accuracy percentage for monthly data:", accuracy_percentage_month, "%\n")
+cat("Accuracy percentage for daily data:", accuracy_percentage_day, "%\n")
 
 library(ggplot2)
 
@@ -524,4 +488,3 @@ plot_daily <- plot_ly(daily_data_filtered, x = ~year, y = ~day_of_week, z = ~tru
 # Show plots
 plot_monthly
 plot_daily
-

@@ -138,7 +138,7 @@ predict_mean_sentiment <- function(paragraph, loaded_model) {
 }
 
 # Example usage
-paragraph <- "Dolfragah."
+paragraph <- "Yesterday started off great. The sun was shining, birds chirping, and I felt on top of the world. However, as the day progressed, things took a turn for the worse. I got stuck in traffic on my way to work, which made me late for an important meeting. Then, to top it off, I spilled coffee all over my favorite shirt. Despite these setbacks, I managed to salvage the day by treating myself to a delicious dinner with friends in the evening. Overall, it was a rollercoaster of emotions, but I'm ending the day with a positive outlook."
 loaded_model <- readRDS("sentiment_model.rds")
 predicted_sentiment <- predict_mean_sentiment(paragraph, loaded_model)
 print(predicted_sentiment)

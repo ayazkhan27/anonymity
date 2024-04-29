@@ -10,25 +10,27 @@ library(caret)
 registerDoParallel(cores = detectCores() - 1)  # use one less than the total number of cores
 # Assuming 'train_data' is your full dataset already prepared
 set.seed(123)  # for reproducibility
-train_index <- createDataPartition(train_data$mean_sentiment, p = 0.8, list = FALSE)
+train_index <- createDataPartition(train_data$adjusted_mean_sentiment, p = 0.8, list = FALSE)
 train_set <- train_data[train_index, ]
 test_set <- train_data[-train_index, ]
 
 # Define your custom formula
-sentiment_formula <- mean_sentiment ~ scaled_buffer_ratio + scaled_neutral_ratio +
+sentiment_formula <- adjusted_mean_sentiment ~ 
+  log_emotion_ratio +
+  + (scaled_positive_ratio:scaled_negative_ratio):log_emotion_ratio + scaled_buffer_ratio + scaled_neutral_ratio +
   scaled_positive_ratio + scaled_negative_ratio +
-  scaled_buffer_ratio:scaled_neutral_ratio +
-  scaled_positive_ratio:scaled_negative_ratio
+  scaled_buffer_ratio:scaled_neutral_ratio +  # Interaction between buffer and neutral
+  scaled_positive_ratio:scaled_negative_ratio + decay_factor
 
 # Train the model using your formula
-model_rf <- randomForest(sentiment_formula, data = train_set, mtry = 3, ntree = 100)
+model_rf <- randomForest(sentiment_formula, data = train_set, mtry = 3, ntree = 80)
 
 # Predict on the test set
 predictions <- predict(model_rf, test_set)
 
 # Calculate performance metrics
-test_rmse <- RMSE(predictions, test_set$mean_sentiment)
-test_r_squared <- cor(predictions, test_set$mean_sentiment)^2
+test_rmse <- RMSE(predictions, test_set$adjusted_mean_sentiment)
+test_r_squared <- cor(predictions, test_set$adjusted_mean_sentiment)^2
 
 print(paste("Test RMSE: ", test_rmse))
 print(paste("Test R-squared: ", test_r_squared))
@@ -67,7 +69,7 @@ print(model_cv)
 
 # Assuming 'model_rf' is your trained model and 'test_set' is your test data
 predictions <- predict(model_rf, test_set)
-residuals <- test_set$mean_sentiment - predictions
+residuals <- test_set$adjusted_mean_sentiment - predictions
 
 plot(predictions, residuals, main = "Residual vs. Predicted", xlab = "Predicted", ylab = "Residuals")
 abline(h = 0, col = "red")
@@ -78,7 +80,7 @@ qqnorm(residuals)
 qqline(residuals, col = "red")
 
 # Assuming predictions and actual values are stored in test_set
-residuals <- test_set$mean_sentiment - predictions
+residuals <- test_set$adjusted_mean_sentiment - predictions
 
 # Plot residuals to check for autocorrelation visually
 plot(residuals, type = 'l', main = "Residuals Plot", xlab = "Observation", ylab = "Residuals")
@@ -88,7 +90,7 @@ abline(h = 0, col = "red")
 acf(residuals, main = "Autocorrelation Function")
 
 # Calculate residuals
-residuals <- test_set$mean_sentiment - predictions
+residuals <- test_set$adjusted_mean_sentiment - predictions
 
 # Plot residuals against predicted values
 plot(predictions, residuals,
