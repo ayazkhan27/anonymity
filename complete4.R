@@ -1,3 +1,9 @@
+install.packages("readxl")            # Text mining
+install.packages("tidytext")      # Text mining using tidy data principles
+install.packages("dplyr")      # Sentiment lexicons like AFINN
+install.packages("syuzhet")       # String manipulation   # Text analysis and NLP
+
+
 # SECTION 1: Sentiment Analysis
 library(readxl)
 library(tidytext)
@@ -5,7 +11,7 @@ library(dplyr)
 library(syuzhet)
 
 # Step 1: Load data and preprocess
-file_path <- "C:/Users/admin/AppData/Local/Programs/Python/Python312/posts_data.xlsx"
+file_path <- "home/zephyr27/Documents/GitHub/anonymity/posts_data.xlsx"
 posts_data <- read_excel(file_path) %>%
   mutate(`Post Content` = as.character(`Post Content`))
 
