@@ -10,6 +10,9 @@ dilution:
   k_default: 2.0  # Will be calibrated in Tier 3. This is a placeholder.
   k_search_range: [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0]
 
+normalization:
+  power: 0.8
+
 valence:
   positive_seeds:
     - "excellent"
@@ -54,6 +57,36 @@ valence:
     - "wretched"
     - "despair"
   fallback_valence: 0.0  # Return this if word is OOV
+  valence_threshold_factor: 0.85  # Ignore valence projections below this factor of sigma_v_aff
+  valence_overrides:
+    experience: 0.0
+    service: 0.0
+    data: 0.0
+    product: 0.0
+    item: 0.0
+    purchase: 0.0
+    order: 0.0
+    delivery: 0.0
+    shipping: 0.0
+    active: 0.0
+    located: 0.0
+    material: 0.0
+    object: 0.0
+    entity: 0.0
+    exists: 0.0
+    process: 0.0
+    inert: 0.0
+    substance: 0.0
+    coordinates: 0.0
+    was: 0.0
+    is: 0.0
+    it: 0.0
+    the: 0.0
+    a: 0.0
+    at: 0.0
+    and: 0.0
+    in: 0.0
+    on: 0.0
 
 syntax:
   buffer_pos_tags:

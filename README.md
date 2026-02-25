@@ -1,40 +1,69 @@
-# Sentiment Gummy Worm (SGW) V3
+# SGW: Sentiment Gummy Worm V3.5.0 🐛
 
-**Unsupervised mathematical sentiment scoring via spatial decay, vector valence projection, and syntactic dilution.**
+**Unsupervised Mathematical Sentiment Scoring for High-Stakes Natural Language.**
 
-SGW produces continuous sentiment scores from -1.0 to +1.0 for arbitrary English text without requiring any labeled training data.
+SGW is a robust, interpretable sentiment engine designed for complex, long-form documents where traditional lexicon-based models (like VADER) fail and black-box LLMs are too expensive or opaque for auditability.
 
-## Quick Start
+## 🚀 Key Features (V3.5.0 PRODUCT RELEASE)
 
+- **Domain-Adaptive Sentiment Axes**: Change the engine's worldview (General, CX, Finance, Healthcare) by hot-swapping polar seed words without retraining.
+- **Decomposable Explanations**: Every score includes a token-level breakdown of valence, intensity modifiers, negation triggers, and spatial decay.
+- **Structural Sentiment Formula**:
+  - **Spatial Decay**: Recency bias for final-judgment dominance.
+  - **Buffer Dilution**: Emotional concentration awareness (handles "fluff").
+  - **Magnitude-Aware Negation**: Sentiment magnitude affects negation strength.
+- **Enterprise-Ready API**: FastAPI endpoints for `/analyze`, `/explain`, and `/axis/swap`.
+
+## 📦 Installation
+
+```bash
+git clone https://github.com/ayazkhan27/anonymity.git
+cd anonymity
+pip install -e .
+python -m spacy download en_core_web_sm
+```
+
+## 🛠 Usage
+
+### Basic Scoring
 ```python
-from sgw.utils.vectors import load_vectors
+from sgw.core.engine import SGWEngine
 from sgw.core.valence.scorer import ValenceScorer
 from sgw.pipeline.syntax import SyntaxParser
-from sgw.core.engine import SGWEngine
+from sgw.utils.vectors import load_vectors
 
-vectors = load_vectors(limit=500000)
+# Load GloVe vectors
+vectors = load_vectors(limit=300000)
+
+# Initialize engine
 scorer = ValenceScorer(vectors)
 parser = SyntaxParser()
 engine = SGWEngine(scorer, parser)
 
-score = engine.score("I am incredibly happy today!")
-print(f"Sentiment: {score:.3f}")  # Positive value
+# Score text
+score = engine.score("The service was terrible but the food was excellent.")
+print(f"SGW Score: {score}")
 ```
 
-## How It Works
+### Explanatory Output
+```python
+explanation = engine.explain("The service was terrible but the food was excellent.")
+print(explanation.summary())
+```
 
-SGW computes sentiment via three novel components:
+### Domain Adaptation
+```python
+from sgw.core.valence.axis import SentimentAxis
+finance_axis = SentimentAxis.from_preset(vectors, "finance")
+engine.valence_scorer.swap_axis(finance_axis)
+```
 
-1. **Vector Valence**: Projects word embeddings onto a sentiment axis (SemAxis method).
-2. **Spatial Decay**: Weights earlier words more heavily (primacy effect).
-3. **Syntactic Dilution**: Dampens intensity based on function-word ratio.
+## 📊 Benchmarking
 
-See `docs/` for the full methodology paper.
+Run the product validation suite (Tier 4.5):
+```bash
+python sgw/evaluation/run_tier4_5.py
+```
 
-## Evaluation Results
-
-Run `python sgw/evaluation/run_evaluation.py` to reproduce all benchmarks.
-
-## License
-
-MIT
+## ⚖️ License
+Proprietary / Enterprise SDK.
