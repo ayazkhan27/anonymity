@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sgw"
+version = "3.0.0"
+description = "Sentiment Gummy Worm — unsupervised mathematical sentiment scoring engine"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+include = ["sgw*"]

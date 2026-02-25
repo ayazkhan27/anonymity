@@ -1,0 +1,49 @@
+# Core data
+pandas==2.2.0
+numpy==1.26.3
+pyarrow==15.0.0
+
+# Database
+SQLAlchemy==2.0.25
+psycopg2-binary==2.9.9
+alembic==1.13.1
+
+# NLP
+spacy==3.7.2
+gensim==4.3.2
+
+# Modeling and statistics
+scipy==1.12.0
+scikit-learn==1.4.0
+lightgbm==4.3.0
+statsmodels==0.14.1
+
+# API and UI
+fastapi==0.109.0
+uvicorn==0.27.0
+streamlit==1.31.0
+pydantic==2.6.0
+
+# Reddit ingestion
+praw==7.7.1
+
+# Evaluation
+datasets==2.17.0
+nltk==3.8.1
+
+# Utilities
+python-dotenv==1.0.1
+joblib==1.3.2
+tqdm==4.66.1
+pyyaml==6.0.1
+emoji==2.10.1
+contractions==0.1.73
+
+# Testing
+pytest==8.0.0
+pytest-cov==4.1.0
+
+# Code quality
+black==24.1.1
+flake8==7.0.0
+mypy==1.8.0
