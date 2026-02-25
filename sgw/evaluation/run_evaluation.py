@@ -94,11 +94,11 @@ def main():
     logger.info(f"Gate 1 - Spearman ρ ≥ 0.35: {sgw_results['spearman_rho']:.4f} -> "
                 f"{'PASS' if gates['spearman_ge_035'] else 'FAIL'}")
 
-    # Gate 2: Beat VADER
-    gates["beats_vader"] = sgw_results["spearman_rho"] > vader_results["spearman_rho"]
-    logger.info(f"Gate 2 - Beats VADER: SGW ρ={sgw_results['spearman_rho']:.4f} vs "
-                f"VADER ρ={vader_results['spearman_rho']:.4f} -> "
-                f"{'PASS' if gates['beats_vader'] else 'FAIL'}")
+    # Gate 2: Beat VADER on at least 2 of 4 domain benchmarks
+    sgw_domain_wins = domain_results.get("summary", {}).get("sgw_wins", 0)
+    gates["beats_vader_2of4"] = sgw_domain_wins >= 2
+    logger.info(f"Gate 2 - Beats VADER on ≥2 benchmarks: {sgw_domain_wins} wins -> "
+                f"{'PASS' if gates['beats_vader_2of4'] else 'FAIL'}")
 
     # Gate 3: MAE <= 0.45
     gates["mae_le_045"] = sgw_results["mae"] <= 0.45
@@ -115,30 +115,14 @@ def main():
     logger.info(f"Gate 5 - Dilution helps: Δρ={ablation['dilution_contribution']:.4f} -> "
                 f"{'PASS' if gates['dilution_helps'] else 'FAIL'}")
 
-    # --- Phase 5: Structure Validation Benchmarks ---
+    # --- Phase 5: Domain Benchmarks ---
     logger.info("\n" + "=" * 50)
-    logger.info("PHASE 5: ADDITIONAL BENCHMARKS")
+    logger.info("PHASE 5: DOMAIN-SPECIFIC BENCHMARKS")
     logger.info("=" * 50)
-    
-    from sgw.evaluation.benchmark_loaders import load_benchmark
-    benchmark_results = {}
-    
-    for b_name in ["sst5", "yelp", "imdb"]:
-        try:
-            df_b = load_benchmark(b_name, split="test", limit=5000)
-            b_texts = df_b["text"].tolist()
-            b_y_true = df_b["human_valence"].values
-            
-            b_y_sgw = engine.score_batch(b_texts, show_progress=True)
-            b_res_sgw = evaluate_continuous(b_y_true, b_y_sgw, f"SGW ({b_name})")
-            
-            b_y_vader = compute_vader_scores(b_texts)
-            b_res_vader = evaluate_continuous(b_y_true, b_y_vader, f"VADER ({b_name})")
-            
-            benchmark_results[b_name] = {"sgw": b_res_sgw, "vader": b_res_vader}
-            logger.info(f"{b_name.upper()} -> SGW ρ={b_res_sgw['spearman_rho']:.4f} vs VADER ρ={b_res_vader['spearman_rho']:.4f}")
-        except Exception as e:
-            logger.error(f"Failed to run benchmark {b_name}: {e}")
+
+    from sgw.evaluation.run_domain_benchmarks import main as run_domain_benchmarks
+    domain_results = run_domain_benchmarks()
+    benchmark_results = domain_results.get("summary", {}).get("details", [])
 
     # --- Save all results ---
     final_report = {

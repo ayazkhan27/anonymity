@@ -3,11 +3,11 @@
 # DO NOT hardcode any of these values in source code.
 
 decay:
-  lambda_default: 1.0  # Will be calibrated in Tier 3. This is a placeholder.
+  lambda_default: 0.7  # Calibrated on GoEmotions validation set
   lambda_search_range: [0.1, 0.2, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0, 2.5, 3.0]
 
 dilution:
-  k_default: 2.0  # Will be calibrated in Tier 3. This is a placeholder.
+  k_default: 3.0  # Calibrated on GoEmotions validation set
   k_search_range: [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0]
 
 normalization:
