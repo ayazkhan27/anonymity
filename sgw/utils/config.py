@@ -31,4 +31,17 @@ def load_config(config_path: str = None) -> dict:
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
+    # Fix YAML boolean coercion in overrides (e.g. 'on', 'off', 'yes', 'no')
+    if "valence_overrides" in config.get("valence", {}):
+        import logging
+        logger = logging.getLogger(__name__)
+        overrides = config["valence"]["valence_overrides"]
+        fixed = {}
+        for key, val in overrides.items():
+            if not isinstance(key, str):
+                logger.warning(f"YAML coerced override key to {type(key).__name__}: "
+                              f"{key!r} -> converting to string")
+            fixed[str(key).lower()] = float(val)
+        config["valence"]["valence_overrides"] = fixed
+
     return config

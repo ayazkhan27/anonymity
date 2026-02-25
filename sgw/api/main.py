@@ -56,6 +56,51 @@ async def analyze(req: TextRequest):
     return SentimentResponse(score=score, lambda_c=_engine.lambda_c, k=_engine.k)
 
 
+@app.post("/explain")
+async def explain(req: TextRequest):
+    """Return SGW score with full token-level explanation summary."""
+    if _engine is None:
+        raise HTTPException(status_code=503, detail="Model not loaded.")
+    explanation = _engine.explain(req.text)
+    return explanation.summary()
+
+
+@app.post("/explain/full")
+async def explain_full(req: TextRequest):
+    """Return complete SGW explanation with every token's contribution."""
+    if _engine is None:
+        raise HTTPException(status_code=503, detail="Model not loaded.")
+    explanation = _engine.explain(req.text)
+    return explanation.to_dict()
+
+
+class DomainRequest(BaseModel):
+    domain: str = Field(..., description="Domain preset name: general, customer_experience, finance, healthcare, product_reviews")
+
+
+@app.post("/axis/swap")
+async def swap_axis(req: DomainRequest):
+    """Hot-swap the sentiment axis to a different domain."""
+    if _engine is None:
+        raise HTTPException(status_code=503, detail="Model not loaded.")
+    from sgw.core.valence.axis import SentimentAxis
+    try:
+        vectors = _engine.valence_scorer.vectors
+        new_axis = SentimentAxis.from_preset(vectors, req.domain)
+        _engine.valence_scorer.swap_axis(new_axis)
+        return {"status": "ok", "axis": new_axis.summary()}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/axis/current")
+async def current_axis():
+    """Return information about the currently active sentiment axis."""
+    if _engine is None:
+        raise HTTPException(status_code=503, detail="Model not loaded.")
+    return _engine.valence_scorer.axis.summary()
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok", "model_loaded": _engine is not None}
