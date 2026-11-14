@@ -32,8 +32,12 @@ def ci(name, triple, fmt="{:.2f}", scale=1):
 
 
 def sci(x):
+    """x as m x 10^e with the mantissa rounded up, so that 'below' statements stay true."""
     e = int(np.floor(np.log10(x)))
-    return f"{x / 10 ** e:.0f}\\times10^{{{e}}}"
+    m = int(np.ceil(x / 10 ** e - 1e-9))
+    if m == 10:
+        m, e = 1, e + 1
+    return f"{m}\\times10^{{{e}}}"
 
 
 lex = R("lexicon")

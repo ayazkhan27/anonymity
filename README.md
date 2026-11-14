@@ -55,7 +55,7 @@ One hedon is the charge of a word that every rater places at the top of the rati
 | Mean Pearson r with human ratings (five rated corpora, constants fitted on other corpora) | signature 0.51; VADER 0.49; TextBlob 0.44; hedonometer 0.42; DistilBERT 0.59; Twitter-RoBERTa 0.68 |
 | Sentences per second on one processor core | signature 167,000; VADER 27,900; DistilBERT 37; DistilBERT on an RTX 3090 12,200 |
 | One billion sentences | 1.7 hours on one core, 21 minutes on twelve |
-| Merged against single-pass signatures, 356 novels | relative difference below 1e-13 in floating point; exact in integers |
+| Merged against single-pass signatures, 356 novels | relative difference below 2e-13 in floating point; exact in integers |
 | Chapters of novels | between-chapter variance 5.9 times the shuffled-sentence value (median) |
 | VADER book score by chunk size | 0.11 with one-sentence chunks, 0.76 with whole chapters |
 | Recency, three confirmatory tests | 3 of 3 supported |

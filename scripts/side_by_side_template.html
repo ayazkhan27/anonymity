@@ -1,0 +1,105 @@
+<title>Essay Versions Compared</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root {
+  --bg: #f5f3ee; --surface: #fffdf9; --human: #f0eadb; --ink: #1d1b16; --muted: #6a655b; --line: rgba(29, 27, 22, .13);
+  --hd: #1c5aa6; --dl: #b2441a; --hd-wash: rgba(28, 90, 166, .10); --dl-wash: rgba(178, 68, 26, .11); --accent: #1c5aa6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161512; --surface: #1e1d19; --human: #2a2720; --ink: #ece8df; --muted: #a49e91; --line: rgba(236, 232, 223, .15);
+    --hd: #86b5ee; --dl: #ea9a72; --hd-wash: rgba(134, 181, 238, .14); --dl-wash: rgba(234, 154, 114, .14); --accent: #86b5ee; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161512; --surface: #1e1d19; --human: #2a2720; --ink: #ece8df; --muted: #a49e91; --line: rgba(236, 232, 223, .15);
+  --hd: #86b5ee; --dl: #ea9a72; --hd-wash: rgba(134, 181, 238, .14); --dl-wash: rgba(234, 154, 114, .14); --accent: #86b5ee; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font: 400 15px/1.5 Inter, system-ui, sans-serif; }
+.wrap { max-width: 1480px; margin: 0 auto; padding-block: 40px 72px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font: 600 30px/1.15 "Source Serif 4", Georgia, serif; margin: 0 0 12px; text-wrap: balance; letter-spacing: -.01em; }
+h2 { font: 600 24px/1.2 "Source Serif 4", Georgia, serif; margin: 4px 0 6px; text-wrap: balance; }
+h3 { font: 600 14px/1.3 Inter, system-ui, sans-serif; margin: 0; }
+p { margin: 0; }
+.lede { max-width: 68ch; color: var(--muted); font-size: 16px; }
+.lede b { color: var(--ink); font-weight: 500; }
+.key { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 28px 0 20px; }
+.key div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.key div:first-child { background: var(--human); }
+.key b { display: block; font-weight: 600; margin-bottom: 2px; }
+.key span { color: var(--muted); font-size: 14px; }
+.bar { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; padding: 14px 0; border-block: 1px solid var(--line); font-size: 14px; }
+.bar nav { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-right: auto; }
+.bar a { color: var(--accent); text-decoration: none; }
+.bar a:hover, .bar a:focus-visible { text-decoration: underline; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--muted); }
+label.toggle { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; }
+input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+.set { padding-top: 56px; }
+.eyebrow { color: var(--muted); font-size: 13px; }
+.why { color: var(--muted); max-width: 72ch; }
+.topic { margin: 20px 0 16px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; max-width: 96ch; }
+.topic span { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+.topic p { font: 400 17px/1.5 "Source Serif 4", Georgia, serif; }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; max-width: 960px; }
+.facts div { border-left: 2px solid var(--line); padding: 2px 0 2px 14px; }
+.facts span, .facts small { display: block; color: var(--muted); font-size: 13px; }
+.facts b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.scroll { overflow-x: auto; margin-bottom: 20px; }
+table { border-collapse: collapse; min-width: 640px; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 20px 8px 0; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child { text-align: left; font-weight: 500; }
+thead th { font-weight: 600; font-size: 13px; color: var(--muted); }
+tbody th small { color: var(--muted); font-weight: 400; margin-left: 8px; }
+.tgt { color: var(--accent); }
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.col { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.col.student { background: var(--human); }
+.col header { padding: 16px 18px 12px; border-bottom: 1px solid var(--line); }
+.col header p { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.wc { display: block; color: var(--muted); font-size: 12px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.text { padding: 16px 18px 20px; font: 400 16px/1.6 "Source Serif 4", Georgia, serif; overflow-wrap: anywhere; }
+.text p + p { margin-top: 12px; }
+.hd { background: var(--hd-wash); box-shadow: inset 0 -2px 0 var(--hd); border-radius: 2px; }
+.dl { background: var(--dl-wash); box-shadow: inset 0 -2px 0 var(--dl); border-radius: 2px; }
+.neg, .boost { border-bottom: 1px dotted var(--muted); }
+.plain .hd, .plain .dl { background: none; box-shadow: none; }
+.plain .neg, .plain .boost { border-bottom: 0; }
+.swatch { display: inline-block; padding: 0 5px; color: var(--ink); }
+footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; max-width: 80ch; }
+@media (max-width: 1180px) { .grid, .key { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 680px) {
+  .grid, .key, .facts { grid-template-columns: minmax(0, 1fr); }
+  h1 { font-size: 25px; } h2 { font-size: 21px; } .set { padding-top: 40px; }
+}
+</style>
+
+<div class="wrap">
+  <h1>Did the dial make AI essays read like a student's?</h1>
+  <p class="lede">Four essays from the experiment, each in four versions on the <b>same assignment</b>. Read across a row and judge for yourself. The essays were picked by rule from the /*N*/ with every version complete, not by eye.</p>
+
+  <div class="key">
+    <div><b>Human</b><span>An essay a real US school student wrote in class (PERSUADE 2.0 corpus).</span></div>
+    <div><b>AI first draft</b><span>What Claude wrote when given only the assignment and a word count. Earlier I called this the machine draft.</span></div>
+    <div><b>AI, plain revision</b><span>Claude was asked twice to revise its draft so that it reads as a student of that grade wrote it.</span></div>
+    <div><b>AI, dial revision</b><span>The same request, plus a sheet of target numbers from the scorer, twice.</span></div>
+  </div>
+
+  <div class="bar">
+    <nav aria-label="Essays"><a href="#essay-1">Essay 1</a><a href="#essay-2">Essay 2</a><a href="#essay-3">Essay 3</a><a href="#essay-4">Essay 4</a></nav>
+    <div class="legend"><span><span class="swatch hd">positive word</span></span><span><span class="swatch dl">negative word</span></span><span><span class="swatch neg">not, very</span> negators and intensifiers</span></div>
+    <label class="toggle"><input type="checkbox" id="marks" checked> Mark what the scorer sees</label>
+  </div>
+
+  /*SETS*/
+
+  <footer>
+    <p>Student essays are from the PERSUADE 2.0 corpus (Crossley and colleagues, 2024), licensed CC BY 4.0. The dial's target for each draft was the measured profile of a different student essay on another assignment, so the human essay shown beside each draft is its length match, not its target. The blind judge was a language model, not a person.</p>
+  </footer>
+</div>
+
+<script>
+  var box = document.getElementById('marks');
+  box.addEventListener('change', function () { document.body.classList.toggle('plain', !box.checked); });
+</script>
