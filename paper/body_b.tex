@@ -20,7 +20,7 @@ One hoped-for property did not hold. The standard error of a level shrinks with 
 
 \subsection{Cost}
 
-\speedParagraph
+Scoring is one table lookup per word. On one core of a desktop processor the implementation, written in Python with NumPy, scores \sgwRate{} sentences per second, or \sgwWords{} million words (\figref{fig:accuracy}b). On the same core VADER scores \vaderRate{} sentences per second, TextBlob \blobRate, DistilBERT \distilRate{} and the RoBERTa model \robertaRate. The signature is therefore about \speedDistil{} times faster than DistilBERT, well past the factor of 100 that the plan set as its criterion. On a graphics card (\gpuName, half precision) DistilBERT reaches \distilGpuHalf{} sentences per second, and one processor core running the signature is still \speedDistilGpu{} times faster. Time grows in proportion to the amount of text (log-log slope \scalingSlope{} from $10^4$ to $10^6$ sentences); ten million sentences took \streamSeconds{} seconds in fixed-size batches. Because signatures merge, the work divides among cores without changing any result, and twelve processes scored \sgwAllCores{} million sentences per second. At these rates a billion sentences take \billionHours{} hours on one core or \billionMinutesAll{} minutes on twelve, against \billionHoursDistilGpu{} hours for DistilBERT on the graphics card and \billionDaysDistil{} days on one core.
 
 \subsection{Where the feeling sits}
 
@@ -43,6 +43,10 @@ Dilution fares better (\figref{fig:dilution}). Holding a text's total charge fix
 Human phrase ratings show the effect without any scorer. Take a phrase with a clear rating and join it to a neutral phrase of $m$ words. When the neutral words come after the rated phrase, the joined phrase keeps \keptAfterOne{} of the rating for $m=1$ and \keptAfterNine{} \keptAfterNineCI{} for $m\geq 9$. When they come before it, the share kept is \keptBeforeOne{} for $m=1$ and \keptBeforeNine{} \keptBeforeNineCI{} for $m\geq 9$: no decline (\figref{fig:dilution}a). The level of these shares is pulled down by regression to the mean, because the rated phrase was selected for a strong rating; the comparison between the two orders, and the trend with $m$, are not.
 
 So the 2024 manuscript had dilution right and its direction of travel wrong. Trailing neutral words weaken a judgement and leading ones do not, which is recency once more: what a reader meets last counts most, and if that is neutral the feeling fades.
+
+\subsection{A revised hypothesis: recency}
+
+The two results point the same way, so I replace front-loading with a hypothesis of recency: what comes last in a text counts most toward a reader's judgement of it. The data above suggested it, which makes them useless as a test of it. I therefore wrote the hypothesis down with three predictions, committed them, and tested them on data that had played no part: the development and test trees of the treebank and \confReviews{} IMDB film reviews (Methods). All three held. In \confNodes{} held-out phrase pairs the later part has weight \confLater{} and the earlier part \confEarlier{} (difference \confWeight{} \confWeightCI). A rated phrase keeps \confKeptAfter{} of its rating when two or more neutral words follow it and \confKeptBefore{} when they come before it (difference \confKept{} \confKeptCI). And the last fifth of an IMDB review separates favourable from unfavourable reviews better than the first fifth does (area under the curve \confAucLast{} against \confAucFirst; difference \confAuc{} \confAucCI). Recency adds little to agreement with raters at the scale of a sentence, as the ablation of the position moments showed, but it holds from the phrase to the review.
 
 \figDilution
 

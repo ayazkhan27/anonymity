@@ -283,8 +283,16 @@ if mc:
         M("rvVerdict", r["HT1"])
         for arm in ("draft", "control", "report", "human"):
             M("rvScore" + arm.title(), r["machine_score"][arm], "{:.2f}")
-        for arm in ("draft", "control", "report"):
+        for arm in ["draft"] + r.get("arms", ["control", "report"]):
             M("rvLift" + arm.title(), r["per_measure_z"][arm]["ending_lift"], "{:+.2f}"); M("rvBoost" + arm.title(), r["per_measure_z"][arm]["intensified"], "{:+.2f}")
+            M("rvNeg" + arm.title(), r["per_measure_z"][arm]["negated"], "{:+.2f}")
+        M("rvDeclined", sum(r.get("declined", {}).values()))
+        for arm, tag in (("humanizer", "H"), ("sepia", "S")):
+            if arm in r.get("arms", []):
+                M("rv" + arm.title(), r["distance"][arm], "{:.2f}"); M("rvScore" + arm.title(), r["machine_score"][arm], "{:.2f}"); M("rvVerdict" + arm.title(), r["HS1"][arm])
+                for k, t in ((f"{arm}_minus_control", "C"), (f"{arm}_minus_draft", "D"), (f"report_minus_{arm}", "R")):
+                    M("dRv" + tag + t, r[k]["diff"], "{:+.2f}"); macros["dRv" + tag + t + "CI"] = f"[{r[k]['ci_prompts'][0]:+.2f}, {r[k]['ci_prompts'][1]:+.2f}]"
+                    macros["dRv" + tag + t + "CIessays"] = f"[{r[k]['ci_essays'][0]:+.2f}, {r[k]['ci_essays'][1]:+.2f}]"
 
 if not sp:
     macros["speedParagraph"] = "\\textcolor{red}{Throughput benchmark pending.}"

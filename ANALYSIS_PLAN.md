@@ -126,3 +126,24 @@ Arms. The same 60 condition-A drafts as in the tone check. Each is rewritten twi
 Outcome and decision rule as for HT1: mean squared standardised distance to the human reference (student essays on other assignments), paired differences, resampling assignments.
 
 - HS1. Distance after a skill rewrite differs from distance after the control revision. No direction is predicted: the skills target wording, and the measures target how feeling is carried. Reported for each skill, with the difference from the draft and the classifier's machine score as secondary outcomes.
+
+## Addendum 4: the dial
+
+Written and committed on 13 November 2026, before any dial revision was generated. The tone check above reports where a draft sits against a range. This experiment asks whether a model can be steered to a stated target.
+
+Drafts. A seeded sample of 60 condition-A machine essays that were not used in the tone check (15 per model where available).
+
+Targets. Each draft is assigned the measured profile of one student essay drawn at random (seed 0) from the other assignments. Targets are whole profiles of real essays, so that a set of revisions can match the spread of human writing and not only its centre.
+
+Arms, two rounds each, by the model that wrote the draft.
+
+- Dial. Round 1: the control instruction plus a sheet listing, for each of the ten measures, the draft's value and the target value. Round 2: the same for the round-1 revision, with its new values.
+- Control. Round 1: the control instruction (revise so that it reads as a student of that grade wrote it). Round 2: the same instruction applied to the round-1 revision.
+
+Hypotheses, on the round-2 texts. Decision rule as before, resampling assignments; results that resample essays are also given.
+
+- HD1, the dial is followed. Across essays, the achieved value of a measure correlates with its assigned target in the dial arm more than in the control arm, for the mean correlation over the ten measures. Also reported: the mean squared standardised gap between achieved and target profiles, dial against control.
+- HD2, the set moves toward the human set. The mean machine score from a classifier trained on other essays (student essays against condition-A machine essays, none from this sample) is lower for the dial arm than for the control arm.
+- HD3, the prose survives. A judge model that does not know the arms reads the control and dial revisions of the same draft in random order and answers which is better written. The dial arm is not chosen less often than half the time (the interval of its share of wins is not wholly below 0.5).
+
+Excerpts for the paper are taken from the essay at the median of the improvement in gap, not chosen by eye.

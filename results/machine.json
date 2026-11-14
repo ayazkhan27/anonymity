@@ -776,5 +776,12 @@
    "report": 0.5305190069405825,
    "human": 0.3789618408277219
   }
+ },
+ "skilljobs": {
+  "n": 60,
+  "skills": {
+   "humanizer": "humanizer:humanizer",
+   "sepia": "sepia:sepia-recreate"
+  }
  }
 }
