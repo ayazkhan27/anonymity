@@ -59,6 +59,19 @@ def boot(stat, groups, n=2000):
     return full, lo, hi
 
 
+def jack(stat, groups):
+    """Delete-one-cluster jackknife with a t reference: estimate and 95% interval. For results that rest on a
+    handful of clusters, where a percentile bootstrap over clusters is too narrow."""
+    from scipy.stats import t as tdist
+    ids = np.unique(groups)
+    full = float(stat(np.arange(len(groups))))
+    drop = np.array([float(stat(np.flatnonzero(groups != g))) for g in ids])
+    n = len(ids)
+    se = np.sqrt((n - 1) / n * np.sum((drop - drop.mean()) ** 2))
+    h = tdist.ppf(0.975, n - 1) * se
+    return [full, full - h, full + h]
+
+
 def fmt(x):
     return [float(v) for v in np.atleast_1d(x)] if np.ndim(x) else float(x)
 

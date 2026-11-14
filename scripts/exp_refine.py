@@ -88,7 +88,8 @@ def main():
         out[target] = json.load(open(done))
         print(target, out[target], flush=True)
     m = fit(corpora, list(corpora), verbose="all")                 # shipped refined lexicon: every corpus, train + dev
-    R.write(os.path.join(HERE, "..", "sgw", "lexicon_refined.tsv"))
+    os.makedirs(os.path.join(HERE, "..", "data", "lexicons"), exist_ok=True)
+    R.write(os.path.join(HERE, "..", "data", "lexicons", "lexicon_refined.tsv"))   # kept out of the package: see the paper on bias
     out["shipped"] = dict(a=m["a"], lam=m["lam"], coef=fmt(m["coef"]), n_words=m["n_words"], n_new=m["n_new"])
     out["lambdas"] = list(LAMBDAS)
     save("refine", out)

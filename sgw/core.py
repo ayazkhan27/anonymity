@@ -48,13 +48,13 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 def load_lexicon(path=None, delta=None, extra=()):
     """Build the lookup tables from a `word<TAB>charge in milli-units` file.
 
-    path   None for the shipped norm lexicon, "refined" for the shipped refined one, or a file
+    path   None for the shipped norm lexicon, "refined" for the one scripts/exp_refine.py builds, or a file
     delta  neutral band in milli-units (default DELTA; the refined lexicon uses 0)
     extra  further words to give an id, with zero charge
     """
     global VOCAB, CHARGE, KIND, _EMO
-    if path == "refined":
-        path, delta = os.path.join(_HERE, "lexicon_refined.tsv"), 0
+    if path == "refined":                                      # built by scripts/exp_refine.py; not shipped (it absorbs social bias)
+        path, delta = os.path.join(_HERE, "..", "data", "lexicons", "lexicon_refined.tsv"), 0
     delta = DELTA if delta is None else delta
     VOCAB, charge, kind, _EMO = {}, [0], [WORD], {}            # id 0: a word the lexicon does not know
     rows = [line.rstrip("\n").split("\t") for line in open(path or os.path.join(_HERE, "lexicon.tsv"), encoding="utf-8")]

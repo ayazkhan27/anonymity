@@ -251,6 +251,13 @@ def parts():
                           abs_gap_median=float(np.median(np.abs(whole - mean))), r_rating_whole=pearson(whole, df.y.values), r_rating_sentence_mean=pearson(mean, df.y.values),
                           saturated_whole=float(np.mean(np.abs(whole) > 0.9)))
         print(label, {k: round(v, 3) for k, v in out[label].items()})
+    # the plan's H3 for VADER: score of the whole review against the mean score of its sentences
+    sent_text = [[x for x in SENT.split(t.replace("\n", " ")) if x.strip()] for t in df.text]
+    whole = vader_scores(list(df.text))
+    mean = np.array([vader_scores(ss).mean() for ss in sent_text])
+    out["VADER"] = dict(r_between=pearson(whole, mean), sign_differs=float(np.mean(np.sign(whole) != np.sign(mean))), abs_gap_median=float(np.median(np.abs(whole - mean))),
+                        r_rating_whole=pearson(whole, df.y.values), r_rating_sentence_mean=pearson(mean, df.y.values), saturated_whole=float(np.mean(np.abs(whole) > 0.99)))
+    print("VADER", {k: round(v, 3) for k, v in out["VADER"].items()})
     S = sgw.sketch(list(df.text))
     out["SGW density r with rating"] = pearson(lvl(S), df.y.values)
     save("parts", out)

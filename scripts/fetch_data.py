@@ -47,6 +47,7 @@ def lex():
 
 def emobank():
     get("https://raw.githubusercontent.com/JULIELab/EmoBank/master/corpus/emobank.csv", "emobank/emobank.csv")
+    get("https://raw.githubusercontent.com/JULIELab/EmoBank/master/corpus/meta.tsv", "emobank/meta.tsv")
 
 
 def fb():

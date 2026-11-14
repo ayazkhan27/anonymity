@@ -49,14 +49,14 @@ def main():
             txt = {"student": s.loc[r.k].human, "draft": s.loc[r.k].A, "plain": open(p["control"]).read(), "dial": open(p["dial"]).read()}
             P = {a: tone.profiles([t])[0][0] for a, t in txt.items()}
             gap = {a: float(np.nanmean(((P[a] - T[i]) / sd) ** 2)) for a in ("draft", "plain", "dial")}
-            rows.append(dict(k=int(r.k), tier=r.tier, prompt=r.prompt, grade=r.grade, txt=txt, P=P, T=T[i], gap=gap, imp=gap["draft"] - gap["dial"]))
+            rows.append(dict(k=int(r.k), essay_id=r.essay_id, tier=r.tier, prompt=r.prompt, grade=r.grade, txt=txt, P=P, T=T[i], gap=gap, imp=gap["draft"] - gap["dial"]))
     rows.sort(key=lambda x: x["imp"])
     chosen = [("Middle case", "the essay at the median improvement; the paper's table uses this one", rows[len(rows) // 2]),
               ("Best case for the dial", "the largest move toward the target", rows[-1]),
               ("Worst case for the dial", "the smallest move toward the target", rows[0])]
     liked = [x for x in rows if verdict[x["k"]][1] == "dial"]
     if liked:
-        chosen.append(("A case the judge scored for the dial", "one of the few pairs where the blind judge called the dial revision the more student-like", liked[len(liked) // 2]))
+        chosen.append(("A case the judge scored for the dial", f"of the {len(liked)} pairs where the blind judge called the dial revision the more student-like, the middle one by improvement", liked[len(liked) // 2]))
     cols = [("student", "Human", "A real student wrote this", "student"), ("draft", "AI first draft", "The model's first essay for the same topic and length", "ai"),
             ("plain", "AI, plain revision", "Told twice: make it read as a student wrote it", "ai"), ("dial", "AI, dial revision", "The same, plus target numbers from the scorer", "ai")]
     show = [("hedons", "Positive words", "per 1,000 words"), ("dolors", "Negative words", "per 1,000 words"), ("negated", "Feeling under not / never", "% of feeling"),
@@ -73,7 +73,7 @@ def main():
         sets.append(f"""<section class="set" id="essay-{n + 1}">
 <p class="eyebrow">Essay {n + 1} of {len(chosen)} · {title}</p>
 <h2>{html.escape(x['prompt'])}</h2>
-<p class="why">Picked by rule: {why}. Written by Claude {x['tier'].title()}, matched to a {grade} student's essay.</p>
+<p class="why">Picked by rule: {why}. Written by Claude {x['tier'].title()}, matched to a {grade} student's essay (PERSUADE 2.0 essay {x['essay_id']}).</p>
 <div class="topic"><span>The assignment both writers got</span><p>{html.escape(assign[x['prompt']].strip())}</p></div>
 <div class="facts">
 <div><span>Blind judge: better written</span><b>{name(v[0])}</b></div>

@@ -27,6 +27,41 @@ HYP = {"HL1": ("net", 1), "HL2": ("dolors", -1), "HL3": ("clustering", -1), "HL4
 GLUE = re.compile(r"\s+(n't|'s|'re|'ve|'ll|'d|'m)\b")           # HC3's human answers are pre-tokenised
 
 
+def prepare():
+    """One row per essay from the PERSUADE 2.0 training file (which has one row per discourse element)."""
+    cols = ["essay_id_comp", "full_text", "task", "source_text", "prompt_name", "assignment", "grade_level", "essay_word_count", "holistic_essay_score"]
+    parts = [c.drop_duplicates("essay_id_comp") for c in pd.read_csv(f"{DATA}/persuade/persuade_train.csv", usecols=cols, chunksize=40000, low_memory=False)]
+    df = pd.concat(parts).drop_duplicates("essay_id_comp").reset_index(drop=True)
+    df.to_parquet(f"{DATA}/persuade/essays.parquet")
+    print(len(df), "essays;", df.prompt_name.nunique(), "assignments")
+    return {"essays": int(len(df))}
+
+
+TIERS = ["fable", "sonnet", "haiku", "opus"]
+
+
+def samplejobs():
+    """The sample of 160 student essays (20 per independent assignment, seed 0) and the two essay jobs for each."""
+    df = pd.read_parquet(f"{DATA}/persuade/essays.parquet")
+    df = df[(df.task == "Independent") & df.essay_word_count.between(150, 800)]
+    s = pd.concat([g.sample(20, random_state=0) for _, g in sorted(df.groupby("prompt_name"), key=lambda kv: kv[0])]).reset_index(drop=True)
+    os.makedirs(f"{MT}/jobs", exist_ok=True)
+    meta = []
+    for k, r in s.iterrows():
+        n = int(round(r.essay_word_count, -1))
+        grade = None if pd.isna(r.grade_level) else int(r.grade_level)
+        tier = TIERS[k % 4]
+        for cond in "AB":
+            as_student = ("" if cond == "A" else f", the way a US grade {grade} student would write it in class for a timed writing test" if grade
+                          else ", the way a US high school student would write it in class for a timed writing test")
+            text = (f"Write an essay in response to the assignment below{as_student}. Aim for about {n} words. "
+                    f"The file must contain only the essay itself: no notes, no commentary, no word count.\n\nAssignment: {r.assignment.strip()}")
+            json.dump({"instructions": text, "output_path": f"machine_text/essays/{cond}/{k:03d}_{tier}.txt"}, open(f"{MT}/jobs/{2 * k + (cond == 'B'):03d}.json", "w"), indent=1)
+        meta.append(dict(k=k, essay_id=r.essay_id_comp, prompt=r.prompt_name, grade=grade, words=int(r.essay_word_count), tier=tier))
+    pd.DataFrame(meta).to_csv(f"{MT}/sample.csv", index=False)
+    return {"essays": int(len(s))}
+
+
 def paired(Xh, Xm, groups, n=2000):
     """Machine minus human on the same prompt: mean difference per measure, 95% interval, and the same in human s.d. units."""
     d, sd = Xm - Xh, np.nanstd(Xh, 0)
@@ -107,14 +142,19 @@ def essays():
         prof[c] = (d, Xh, Xm)
         g = d.prompt.values
         res, res_item = paired(Xh, Xm, g), paired(Xh, Xm, np.arange(len(d)))
+        dz = (Xm - Xh) / np.nanstd(Xh, 0)
+        jk = {m: jack(lambda i, j=j: float(np.nanmean(dz[i, j])), g) for j, m in enumerate(M)}
+        verdict_jk = {h: ("supported" if sgn * jk[m][1] > 0 and sgn * jk[m][2] > 0 else "refuted" if sgn * jk[m][1] < 0 and sgn * jk[m][2] < 0 else "undecided") for h, (m, sgn) in HYP.items()}
         out[c] = dict(n=int(len(d)), words_human=float(np.median(nh)), words_machine=float(np.median(nm)), measures=res, decisions=decisions(res),
                       decisions_resampling_essays=decisions(res_item), d_ci_resampling_essays={m: [res_item[m]["d_lo"], res_item[m]["d_hi"]] for m in M},
+                      d_jackknife=jk, decisions_jackknife=verdict_jk,
                       auc=auc(Xh, Xm, g, 8), auc_words=auc(np.log(nh)[:, None], np.log(nm)[:, None], g, 8),
                       by_tier={t: {m: float(np.nanmean((Xm - Xh)[idx, j]) / np.nanstd(Xh[:, j])) for j, m in enumerate(M)} for t, idx in d.groupby("tier").indices.items()})
         print(f"\nEssays, condition {c}: {len(d)} pairs; AUC {out[c]['auc'][0]:.3f} [{out[c]['auc'][1]:.3f}, {out[c]['auc'][2]:.3f}]; word count alone {out[c]['auc_words'][0]:.3f}")
         for m in M:
             print(f"  {m:15s} human {res[m]['human']:7.2f}  machine {res[m]['machine']:7.2f}  d = {res[m]['d']:+.2f} [{res[m]['d_lo']:+.2f}, {res[m]['d_hi']:+.2f}]")
-        print(" ", out[c]["decisions"], "| resampling essays:", out[c]["decisions_resampling_essays"])
+        print(" ", out[c]["decisions"], "| resampling essays:", out[c]["decisions_resampling_essays"], "| jackknife:", verdict_jk)
+        print("  jackknife d:", {m: [round(v, 2) for v in jk[m]] for m in ("net", "dolors", "clustering", "ending_lift", "negated", "intensified")})
     # does a classifier trained on people versus ChatGPT (2023 answers) carry over to students versus Claude (2026 essays)?
     z = np.load(os.path.join(CACHE, "hc3_profiles.npz"))
     clf = classifier().fit(np.vstack([z["Xh"], z["Xm"]]), np.r_[np.zeros(len(z["Xh"])), np.ones(len(z["Xm"]))])
@@ -173,7 +213,7 @@ def jobs(n_per_tier=15):
     for arm in ("control", "report"):
         os.makedirs(f"{MT}/revisions/{arm}", exist_ok=True)
     refs = {p: essay_reference(p) for p in pick.prompt.unique()}
-    root = os.path.abspath(MT)
+    root = "machine_text"                                       # job files carry repository-relative paths
     for i, r in enumerate(pick.itertuples()):
         who = f"a US grade {int(r.grade)} student" if not np.isnan(r.grade) else "a US high school student"
         base = (f"Below is a draft essay. Revise it so that it reads as if {who} wrote it in class for a timed writing test. "
@@ -195,7 +235,7 @@ def skilljobs():
     pick = pd.read_csv(f"{MT}/revision_sample.csv")
     s = load_essays().set_index("k").loc[pick.k].reset_index()
     os.makedirs(f"{MT}/skill_jobs", exist_ok=True)
-    root, tiers = os.path.abspath(MT), []
+    root, tiers = "machine_text", []
     for i, r in enumerate(s.itertuples()):
         who = f"a US grade {int(r.grade)} student" if not np.isnan(r.grade) else "a US high school student"
         base = (f"Below is a draft essay. Revise it so that it reads as if {who} wrote it in class for a timed writing test. "
@@ -234,14 +274,15 @@ def revise():
         words[arm] = float(np.median(n))
     dist["human"] = np.nanmean(((Xh - mu) / sd) ** 2, 1)
     g = s.prompt.values
-    out = dict(n=int(len(s)), arms=arms, declined=declined, words=words, distance={k: float(np.mean(v)) for k, v in dist.items()})
+    out = dict(n=int(len(s)), n_assignments=int(len(set(g))), arms=arms, declined=declined, words=words, distance={k: float(np.mean(v)) for k, v in dist.items()})
     pairs = [("report_minus_control", "report", "control"), ("control_minus_draft", "control", "draft"), ("report_minus_draft", "report", "draft")]
     pairs += [(f"{a}_minus_control", a, "control") for a in arms if a in SKILLS] + [(f"{a}_minus_draft", a, "draft") for a in arms if a in SKILLS]
     pairs += [(f"report_minus_{a}", "report", a) for a in arms if a in SKILLS]
     for name, a, b in pairs:
         e = boot(lambda i: float(np.mean(dist[a][i] - dist[b][i])), g)
         e2 = boot(lambda i: float(np.mean(dist[a][i] - dist[b][i])), np.arange(len(s)))
-        out[name] = dict(diff=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])])
+        out[name] = dict(diff=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])],
+                         ci_jackknife=jack(lambda i: float(np.mean(dist[a][i] - dist[b][i])), g)[1:])
     verdict = lambda k: "supported" if out[k]["ci_prompts"][1] < 0 else "refuted" if out[k]["ci_prompts"][0] > 0 else "undecided"
     out["HT1"] = verdict("report_minus_control")
     out["HS1"] = {a: ("closer" if out[f"{a}_minus_control"]["ci_prompts"][1] < 0 else "farther" if out[f"{a}_minus_control"]["ci_prompts"][0] > 0 else "undecided") for a in arms if a in SKILLS}
@@ -301,7 +342,7 @@ def dial_sample():
 def dialjobs():
     """Round 1: dial arm (control instruction plus the sheet) and control arm, on fresh condition-A drafts."""
     pick, targets = dial_sample()
-    root = os.path.abspath(MT)
+    root = "machine_text"                                       # job files carry repository-relative paths
     for d in ("dial_jobs/r1", "dial_jobs/r2", "dial/r1/dial", "dial/r1/control", "dial/r2/dial", "dial/r2/control"):
         os.makedirs(f"{MT}/{d}", exist_ok=True)
     cur, _ = tone.profiles(pick.A)
@@ -322,7 +363,7 @@ def dialjobs():
 def dialjobs2():
     """Round 2: each arm revises its own round-1 text; the dial arm gets a fresh sheet."""
     pick, targets = pd.read_csv(f"{MT}/dial_sample.csv"), np.load(f"{MT}/dial_targets.npy")
-    root, tiers, n = os.path.abspath(MT), [], 0
+    root, tiers, n = "machine_text", [], 0
     for i, r in enumerate(pick.itertuples()):
         for j, arm in enumerate(("dial", "control")):
             p1 = f"{MT}/dial/r1/{arm}/{r.k:03d}_{r.tier}.txt"
@@ -379,35 +420,45 @@ def dial():
         P[arm + "_r1"] = tone.profiles([t if t is not None else "" for t, keep in zip(r1[arm], ok) if keep])[0]
     corr = lambda X, i: np.array([pearson(T[i, j], np.nan_to_num(X[i, j], nan=np.nanmean(X[:, j]))) for j in range(len(M))])
     gap = lambda X: np.nanmean(((X - T) / sd) ** 2, 1)
-    out = dict(n=int(len(pick)), declined=int((~ok).sum()), corr={a: {m: float(c) for m, c in zip(M, corr(P[a], np.arange(len(pick))))} for a in ("dial", "control", "draft")},
+    out = dict(n=int(len(pick)), n_assignments=int(len(set(g))), declined=int((~ok).sum()), corr={a: {m: float(c) for m, c in zip(M, corr(P[a], np.arange(len(pick))))} for a in ("dial", "control", "draft")},
                gap={a: float(gap(P[a]).mean()) for a in ("draft", "control_r1", "dial_r1", "control", "dial")},
                distance_to_centre={a: float(np.nanmean(((P[a] - mu) / sd) ** 2)) for a in ("draft", "control", "dial", "human")})
     for name, stat in (("corr_dial_minus_control", lambda i: float(np.mean(corr(P["dial"], i) - corr(P["control"], i)))),
                        ("gap_dial_minus_control", lambda i: float(np.mean(gap(P["dial"])[i] - gap(P["control"])[i])))):
         e, e2 = boot(stat, g), boot(stat, np.arange(len(pick)))
-        out[name] = dict(diff=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])])
+        out[name] = dict(diff=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])], ci_jackknife=jack(stat, g)[1:])
     out["mean_corr"] = {a: float(np.mean(list(out["corr"][a].values()))) for a in out["corr"]}
     full = pd.read_csv(f"{MT}/dial_sample.csv")
     gone = [t for t, x in zip(full.tier, texts["dial"]) if x is None]
     out["missing_dial"] = dict(total=len(gone), haiku=gone.count("haiku"), requested=int(len(full)), missing_control=int(sum(x is None for x in texts["control"])))
     out["HD1"] = "supported" if out["corr_dial_minus_control"]["ci_prompts"][0] > 0 else "refuted" if out["corr_dial_minus_control"]["ci_prompts"][1] < 0 else "undecided"
-    rest = load_essays(); rest = rest[rest.A.notna() & ~rest.k.isin(pick.k)]
+    rest = load_essays(); rest = rest[rest.A.notna() & ~rest.k.isin(full.k)]            # none of the 60 sampled essays, complete or not
     clf = classifier().fit(np.vstack([tone.profiles(rest.human)[0], tone.profiles(rest.A)[0]]), np.r_[np.zeros(len(rest)), np.ones(len(rest))])
+    out["classifier_training_essays"] = int(len(rest))
+    out["mean_corr_by_model"] = {t: dict(n=int((pick.tier == t).sum()), dial=float(np.mean(corr(P["dial"], np.flatnonzero((pick.tier == t).values)))),
+                                         control=float(np.mean(corr(P["control"], np.flatnonzero((pick.tier == t).values))))) for t in sorted(pick.tier.unique()) if (pick.tier == t).sum() >= 8}
     sc = {a: clf.predict_proba(P[a])[:, 1] for a in ("draft", "control", "dial", "human")}
     out["machine_score"] = {a: float(v.mean()) for a, v in sc.items()}
     from sklearn.metrics import roc_auc_score
     out["auc_vs_matched_students"] = {a: float(roc_auc_score(np.r_[np.zeros(len(pick)), np.ones(len(pick))], np.r_[sc["human"], sc[a]])) for a in ("draft", "control", "dial")}
     e, e2 = boot(lambda i: float(np.mean(sc["dial"][i] - sc["control"][i])), g), boot(lambda i: float(np.mean(sc["dial"][i] - sc["control"][i])), np.arange(len(pick)))
-    out["score_dial_minus_control"] = dict(diff=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])])
+    out["score_dial_minus_control"] = dict(diff=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])],
+                                           ci_jackknife=jack(lambda i: float(np.mean(sc["dial"][i] - sc["control"][i])), g)[1:])
     out["HD2"] = "supported" if e[2] < 0 else "refuted" if e[1] > 0 else "undecided"
     jpath = f"{MT}/judge_results.json"
     if os.path.exists(jpath):
         key, res = pd.read_csv(f"{MT}/judge_key.csv"), json.load(open(jpath))
         rows = [(k.k, (k.first == "dial") == (r["better_written"] == 1), (k.first == "dial") == (r["more_like_a_student"] == 1)) for k, r in zip(key.itertuples(), res) if r]
-        J = pd.DataFrame(rows, columns=["k", "better", "student"]).merge(pick[["k", "prompt"]], on="k")
+        J = pd.DataFrame(rows, columns=["k", "better", "student"]).merge(pick[["k", "prompt", "tier"]], on="k")
+        from scipy.stats import beta
         for col in ("better", "student"):
             e, e2 = boot(lambda i: float(J[col].values[i].mean()), J.prompt.values), boot(lambda i: float(J[col].values[i].mean()), np.arange(len(J)))
-            out["judge_" + col] = dict(share=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])], n=int(len(J)))
+            out["judge_" + col] = dict(share=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])], n=int(len(J)),
+                                       ci_jackknife=jack(lambda i: float(J[col].values[i].mean()), J.prompt.values)[1:])
+            w, n = int(J[col].sum()), len(J)                              # exact binomial interval: pairs treated as independent
+            out["judge_" + col].update(wins=w, ci_exact=[float(beta.ppf(0.025, w, n - w + 1)) if w else 0.0, float(beta.ppf(0.975, w + 1, n - w)) if w < n else 1.0])
+        out["judge_by_model"] = {t_: dict(n=int(len(x)), better=int(x.better.sum()), student=int(x.student.sum())) for t_, x in J.groupby("tier")}
+        out["judge_both"] = int((J.better & J.student).sum())
         out["HD3"] = "supported" if out["judge_better"]["ci_prompts"][1] >= 0.5 else "refuted"
     # excerpt: the essay at the median improvement in gap (dial round 2 against draft)
     imp = gap(P["draft"]) - gap(P["dial"])
@@ -427,5 +478,5 @@ if __name__ == "__main__":
     path = os.path.join(RESULTS, "machine.json")
     res = json.load(open(path)) if os.path.exists(path) else {}
     for name in sys.argv[1:] or ("hc3", "essays", "reference"):
-        res[name] = dict(hc3=hc3, essays=essays, reference=reference, jobs=jobs, skilljobs=skilljobs, revise=revise, dialjobs=dialjobs, dialjobs2=dialjobs2, judgejobs=judgejobs, dial=dial)[name]()
+        res[name] = dict(prepare=prepare, samplejobs=samplejobs, hc3=hc3, essays=essays, reference=reference, jobs=jobs, skilljobs=skilljobs, revise=revise, dialjobs=dialjobs, dialjobs2=dialjobs2, judgejobs=judgejobs, dial=dial)[name]()
         save("machine", res)

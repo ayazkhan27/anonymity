@@ -34,8 +34,9 @@ A draft under 100 words gives noisy measures. Treat its flags as hints.
 
 Tested on machine-written essays against student essays on the same assignments (see the paper in the repository):
 
-- A revision that saw the report ended closer to the centre of human essays than a revision without it, and it fixed what the report named, the over-positive ending. The pre-registered test of that advantage was undecided.
-- When a model was given exact targets for every measure, it hit them. Its essays did not read more like student writing for that, and a blind judge found them less student-like than plain revisions.
+- A revision that saw the report fixed what the report named, the over-positive ending. On a classifier's score it ended no closer to student essays than a plain revision did.
+- Being close to the average of human texts is not the same as reading like one. Real student essays lie farther from their own centre than any machine draft or revision did.
+- When a model was given exact targets for every measure, it hit them. Its essays did not read more like student writing for that, and a model judge found them less student-like than plain revisions.
 
 So use the report to catch tone problems. Matching the numbers does not make a text human.
 

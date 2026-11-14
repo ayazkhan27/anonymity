@@ -70,5 +70,15 @@ def main():
     save("speed", out)
 
 
+def readout():
+    """Cost of the calibrated readout relative to the level readout that main() times. A ratio, so any machine will do."""
+    reviews = LOADERS["yelp"]()["train"].text.values[:40000]
+    sents = [s for r in reviews for s in SENT.split(r.replace("\n", " ")) if len(s) > 2][:200000]
+    lvl = min(timed(lambda x: sgw.level(sgw.sketch(x)), sents) for _ in range(3))
+    val = min(timed(lambda x: sgw.valence(sgw.sketch(x)), sents) for _ in range(3))
+    save("speed_readout", {"n_sentences": len(sents), "level_per_s": len(sents) / lvl, "valence_per_s": len(sents) / val, "valence_over_level_time": val / lvl})
+    print(f"level {len(sents) / lvl:,.0f}/s, calibrated valence {len(sents) / val:,.0f}/s, time ratio {val / lvl:.3f}")
+
+
 if __name__ == "__main__":
-    main()
+    readout() if sys.argv[1:] == ["readout"] else main()

@@ -212,6 +212,111 @@ def tree():
     return out
 
 
+def parts():
+    """How two parts combine, with their lengths held fixed (exploratory; added after a referee showed that
+    the later part of a treebank phrase is usually the longer one, which confounds the registered contrasts)."""
+    out = {}
+    SHARE = np.linspace(0, 1, 11)
+    for name, which in (("held_out", ["validation", "test"]), ("training", ["train"]), ("all", ["train", "validation", "test"])):
+        d, _ = tree_nodes(which)
+        two = d[(d.nl >= 2) & (d.nr >= 2)].reset_index(drop=True)
+        g, y, l, r = two.sid.values, two.p.values, two.l.values, two.r.values
+        sL = (two.nl / (two.nl + two.nr)).values
+        bL, bR = np.clip(np.digitize(sL, SHARE) - 1, 0, 9), np.clip(np.digitize(1 - sL, SHARE) - 1, 0, 9)
+        rows = np.arange(len(two))
+        strata = [(two.nr > two.nl).values, (two.nr == two.nl).values, (two.nr < two.nl).values]
+
+        def by_stratum(i):
+            res = []
+            for m in strata:
+                j = i[m[i]]
+                b = np.linalg.lstsq(np.column_stack([np.ones(len(j)), l[j], r[j]]), y[j], rcond=None)[0]
+                res += [b[1], b[2], b[2] - b[1]]
+            return np.array(res)
+
+        def by_share(i, split=False):
+            X = np.zeros((len(i), 22 if split else 12)); X[:, 0] = 1
+            ii = np.arange(len(i))
+            if split:                                                   # separate curves for the earlier and the later part
+                X[ii, 1 + bL[i]] = l[i]; X[ii, 11 + bR[i]] = r[i]
+            else:                                                       # one curve, plus an extra weight for the later part
+                X[ii, 1 + bL[i]] += l[i]; X[ii, 1 + bR[i]] += r[i]; X[:, 11] = r[i]
+            return np.linalg.lstsq(X, y[i], rcond=None)[0][1:]
+        st, sh, sp = boot(by_stratum, g, 1000), boot(by_share, g, 1000), boot(lambda i: by_share(i, True), g, 300)
+        fit = lambda Z: 1 - np.sum((y - Z @ np.linalg.lstsq(Z, y, rcond=None)[0]) ** 2) / np.sum((y - y.mean()) ** 2)
+        one = np.ones(len(two))
+        tri = lambda e, k: [fmt(e[0][k]), fmt(e[1][k]), fmt(e[2][k])]
+        res = dict(n=int(len(two)), sentences=int(two.sid.nunique()), words_earlier=float(two.nl.mean()), words_later=float(two.nr.mean()), later_longer=float((two.nr > two.nl).mean()),
+                   strata={nm: dict(n=int(m.sum()), earlier=tri(st, 3 * q), later=tri(st, 3 * q + 1), diff=tri(st, 3 * q + 2)) for q, (nm, m) in enumerate(zip(("later longer", "equal", "earlier longer"), strata))},
+                   share_weight=[tri(sh, q) for q in range(10)], order_term=tri(sh, 10),
+                   share_weight_earlier=[tri(sp, q) for q in range(10)], share_weight_later=[tri(sp, 10 + q) for q in range(10)],
+                   r2=dict(plain_mean=float(fit(np.column_stack([one, (l + r) / 2]))), length_weighted=float(fit(np.column_stack([one, sL * l + (1 - sL) * r]))), free_weights=float(fit(np.column_stack([one, l, r])))))
+        # dilution: a rated part joined to a neutral part, by side, with the rated part's length held fixed
+        rec = []
+        for side, (c, o, nc, no) in (("after", ("l", "r", "nl", "nr")), ("before", ("r", "l", "nr", "nl"))):
+            x = d[(d[c].abs() >= 0.15) & (d[o].abs() <= 0.05)]
+            rec.append(pd.DataFrame({"sid": x.sid, "num": x.p * np.sign(x[c]), "den": x[c].abs(), "rated": x[nc], "m": x[no], "after": side == "after"}))
+        x = pd.concat(rec).reset_index(drop=True)
+        cut = lambda v: np.digitize(v, [2, 3, 5, 9])                    # 1, 2, 3-4, 5-8, 9+
+        x["cr"], x["cm"] = cut(x.rated.values), cut(x.m.values)
+        x["share"] = x.rated / (x.rated + x.m)
+        num, den, aft, cr, cm, sid = x.num.values, x.den.values, x.after.values, x.cr.values, x.cm.values, x.sid.values
+        cells = [(a, b) for a in range(5) for b in range(5) if ((cr == a) & (cm == b) & aft).sum() >= 20 and ((cr == a) & (cm == b) & ~aft).sum() >= 20]
+
+        def matched(i, two_plus=False):
+            tot, wsum = 0.0, 0.0
+            for a, b in cells:
+                if two_plus and b == 0:
+                    continue
+                c1 = (cr[i] == a) & (cm[i] == b)
+                ia, ib = c1 & aft[i], c1 & ~aft[i]
+                if ia.sum() < 5 or ib.sum() < 5:
+                    continue
+                wgt = min(ia.sum(), ib.sum())
+                tot += wgt * (num[i][ib].sum() / den[i][ib].sum() - num[i][ia].sum() / den[i][ia].sum()); wsum += wgt
+            return tot / max(wsum, 1)
+        ma, mb = boot(matched, sid, 500), boot(lambda i: matched(i, True), sid, 500)
+        sb = [0, 0.2, 0.35, 0.5, 0.65, 0.8, 1.0001]
+        curve = {}
+        for side, mask in (("after", aft), ("before", ~aft)):
+            pts = []
+            for lo, hi in zip(sb[:-1], sb[1:]):
+                mm = mask & (x.share.values >= lo) & (x.share.values < hi)
+                if mm.sum() >= 30:
+                    e = boot(lambda i: num[mm][i].sum() / den[mm][i].sum(), sid[mm], 300)
+                    pts.append(dict(share=float(x.share.values[mm].mean()), kept=[fmt(e[0]), fmt(e[1]), fmt(e[2])], n=int(mm.sum())))
+            curve[side] = pts
+        def kept(mask):                                                 # share kept in one cell, sentences resampled
+            e = boot(lambda i: num[mask][i].sum() / den[mask][i].sum(), sid[mask], 300)
+            return [fmt(e[0]), fmt(e[1]), fmt(e[2])]
+        LAB = ("1", "2", "3-4", "5-8", "9+")
+        by_rated = {side: {LAB[a]: [dict(m=LAB[b], n=int(mm.sum()), kept=kept(mm)) for b in range(5) for mm in [(cr == a) & (cm == b) & mask] if mm.sum() >= 30]
+                           for a in range(5)} for side, mask in (("after", aft), ("before", ~aft))}
+        res["dilution"] = dict(n_after=int(aft.sum()), n_before=int((~aft).sum()), rated_words_after=float(x.rated[aft].mean()), rated_words_before=float(x.rated[~aft].mean()),
+                               matched_before_minus_after=[fmt(ma[0]), fmt(ma[1]), fmt(ma[2])], matched_neutral_two_plus=[fmt(mb[0]), fmt(mb[1]), fmt(mb[2])], by_share=curve, by_rated=by_rated,
+                               rated_words_two_plus=dict(after=float(x.rated[aft & (x.m.values >= 2)].mean()), before=float(x.rated[~aft & (x.m.values >= 2)].mean())))
+        out[name] = res
+        print(f"{name:9s} n={res['n']:6d}  order term at equal share {res['order_term'][0]:+.3f} [{res['order_term'][1]:+.3f}, {res['order_term'][2]:+.3f}]  "
+              f"equal-length: earlier {res['strata']['equal']['earlier'][0]:.2f} later {res['strata']['equal']['later'][0]:.2f} diff {res['strata']['equal']['diff'][0]:+.3f} [{res['strata']['equal']['diff'][1]:+.3f}, {res['strata']['equal']['diff'][2]:+.3f}]  "
+              f"matched dilution before-after {ma[0]:+.3f} [{ma[1]:+.3f}, {ma[2]:+.3f}]  R2 plain {res['r2']['plain_mean']:.3f} weighted {res['r2']['length_weighted']:.3f} free {res['r2']['free_weights']:.3f}", flush=True)
+    # where the verdict sits in a review: IMDB by fifths (the registered R3 used the first and the last fifth)
+    from sklearn.metrics import roc_auc_score
+    df = pd.read_parquet(os.path.join(HERE, "..", "data", "imdb", "test.parquet"))
+    t = sgw.scan(list(df.text)); n = t["words"]
+    xr = (t["pos"] + 0.5) / n[t["doc"]]
+    ok = n >= 100
+    yb = df.label.values[ok]
+    fifths = []
+    for q in range(5):
+        m = (xr >= q / 5) & (xr < (q + 1) / 5)
+        dens = (np.bincount(t["doc"][m], weights=t["c"][m], minlength=len(n)) / np.maximum(np.bincount(t["doc"][m], minlength=len(n)), 1))[ok]
+        e = boot(lambda i: roc_auc_score(yb[i], dens[i]), np.arange(len(yb)), 300)
+        fifths.append([fmt(e[0]), fmt(e[1]), fmt(e[2])])
+    out["imdb_auc_by_fifth"] = fifths
+    print("IMDB AUC by fifth:", [round(f[0], 3) for f in fifths])
+    return out
+
+
 def confirm():
     """Addendum 2: the recency hypothesis on data that did not suggest it."""
     from sklearn.metrics import roc_auc_score
@@ -261,5 +366,5 @@ if __name__ == "__main__":
     res = json.load(open(path)) if os.path.exists(path) else {}
     for name in todo:
         print(f"\n== {name}")
-        res[name] = tree() if name == "tree" else confirm() if name == "confirm" else dict(where=where, kernel=kernel, emobank=emobank, dilute=dilute)[name](corpora)
+        res[name] = tree() if name == "tree" else confirm() if name == "confirm" else parts() if name == "parts" else dict(where=where, kernel=kernel, emobank=emobank, dilute=dilute)[name](corpora)
         save("position", res)

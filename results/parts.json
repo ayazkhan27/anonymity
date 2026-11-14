@@ -17,5 +17,13 @@
   "r_rating_sentence_mean": 0.5205368034148186,
   "saturated_whole": 0.006666666666666667
  },
+ "VADER": {
+  "r_between": 0.7650339989928986,
+  "sign_differs": 0.05333333333333334,
+  "abs_gap_median": 0.8385765644955301,
+  "r_rating_whole": 0.16921664902485653,
+  "r_rating_sentence_mean": 0.23057040474563364,
+  "saturated_whole": 0.48333333333333334
+ },
  "SGW density r with rating": 0.23231027843329552
 }

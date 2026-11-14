@@ -99,9 +99,56 @@ if acc:
         "\\begin{tabular}{@{}lr@{}}\n\\toprule\nSignature entry (per unit exposure) & Coefficient \\\\\n\\midrule\n"
         + "\n".join(f"{f} & {v:+.3f} \\\\" for f, v in zip(feats, b)) + "\n\\bottomrule\n\\end{tabular}\n")
 
+if acc:
+    from scipy.stats import t as tdist
+    P5 = CORPORA[:5]                                                # the primary set: continuous human ratings
+    for key, tag in (("SGW", "Sgw"), ("VADER", "Vader"), ("SGW level", "Level"), ("DistilBERT (SST-2)", "Distil"), ("Twitter-RoBERTa", "Roberta")):
+        M("rho" + tag, np.mean([acc[c]["methods"][key]["rho"] for c in P5]), "{:.3f}")
+        M("mean" + tag + "Three", acc["mean_r_primary"][key], "{:.3f}"); M("mean" + tag + "Six", acc["mean_r"][key], "{:.2f}")
+    d = np.array([acc[c]["methods"]["VADER"]["sgw_minus"] for c in P5])
+    h = tdist.ppf(0.975, len(d) - 1) * d.std(ddof=1) / np.sqrt(len(d))
+    macros["dVaderMean"] = f"{d.mean():+.3f}"; macros["dVaderMeanCI"] = f"[{d.mean() - h:+.3f}, {d.mean() + h:+.3f}]"
+    M("winsVaderPrimary", sum(acc[c]["methods"]["VADER"]["sgw_minus_ci"][0] > 0 for c in P5))
+    M("winsDistil", sum(acc[c]["methods"]["DistilBERT (SST-2)"]["sgw_minus_ci"][0] > 0 for c in CORPORA))
+    M("locoLevelA", " or ".join(sorted({f"{acc[c]['loco']['level_a']:g}" for c in CORPORA}, key=float))); M("locoLevelKappa", " or ".join(sorted({f"{acc[c]['loco']['level_kappa']:g}" for c in CORPORA}, key=float)))
+    M("ownAMax", max(acc[c]["own"]["a"] for c in CORPORA), "{:g}")
+    rows = []
+    for key in order:                                               # the registered secondary outcome
+        if key in acc["emobank"]["methods"]:
+            cells = [f"{acc[c]['methods'][key]['rho']:.2f} {{\\scriptsize[{acc[c]['methods'][key]['rho_ci'][0]:.2f}, {acc[c]['methods'][key]['rho_ci'][1]:.2f}]}}" for c in CORPORA]
+            rows.append(f"{label.get(key, key)} & " + " & ".join(cells) + f" & {np.mean([acc[c]['methods'][key]['rho'] for c in P5]):.2f} \\\\")
+    open(os.path.join(PAPER, "table_spearman.tex"), "w").write(
+        "\\begin{tabular}{@{}l" + "c" * 7 + "@{}}\n\\toprule\n & " + " & ".join(f"{CN[c]}" for c in CORPORA) + " & Mean \\\\\n\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
+
+    def readings(b):                                                # the plain readings of a coefficient vector, as in exp_uncertainty.constants_ci
+        base = (b[1] - b[2]) / 2
+        return [-b[2] / b[1], 1 + b[6] / b[1], 1 + b[7] / b[2], b[8] / base]
+    loco = np.array([readings(acc[c]["loco"]["coef"]) for c in CORPORA])
+    for j, tag in enumerate(("Dolor", "NegH", "NegD", "Boost")):
+        f = "{:.2f}" if tag == "Dolor" else "{:+.2f}"
+        M("loco" + tag + "Lo", loco[:, j].min(), f); M("loco" + tag + "Hi", loco[:, j].max(), f)
+    cell = lambda v: " & ".join(f"{x:+.2f}" for x in v)
+    cc0 = R("constants_ci")                                         # the shipped row uses the same estimates as the text
+    ship = [cc0[k][0] for k in ("dolor_over_hedon", "negated_hedon_multiplier", "negated_dolor_multiplier", "intensifier_gain")] if cc0 else readings(acc["shipped"]["coef"])
+    rows = [f"Shipped fit, six corpora ($a={acc['shipped']['a']:g}$, $\\kappa={acc['shipped']['kappa']:g}$) & " + cell(ship) + " \\\\", "\\midrule"]
+    rows += [f"Other five corpora, {CN[c]} left out ($a={acc[c]['loco']['a']:g}$, $\\kappa={acc[c]['loco']['kappa']:g}$) & " + cell(loco[k]) + " \\\\" for k, c in enumerate(CORPORA)]
+    rows += ["\\midrule"] + [f"{CN[c]} alone ($a={acc[c]['own']['a']:g}$, $\\kappa={acc[c]['own']['kappa']:g}$) & " + cell(readings(acc[c]["own"]["coef"])) + " \\\\" for c in CORPORA]
+    open(os.path.join(PAPER, "table_readings.tex"), "w").write(
+        "\\begin{tabular}{@{}lrrrr@{}}\n\\toprule\nFit & Dolor / hedon & Negated hedon & Negated dolor & Intensifier \\\\\n\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
+
 ref = R("refine")
 if ref:
     M("refWords", ref["shipped"]["n_words"], "{:,}"); M("refNew", ref["shipped"]["n_new"], "{:,}")
+    if "group_terms" in ref:
+        G = ref["group_terms"]
+        M("grpTerms", len(G)); M("grpDown", ref["group_terms_down"]); M("grpUp", ref["group_terms_up"])
+        for w in ("women", "muslim", "gay", "obama"):
+            M("grp" + w.title() + "Norm", G[w][0], "{:+.2f}"); M("grp" + w.title() + "Fit", G[w][1], "{:+.2f}")
+        ws = list(G)
+        half = (len(ws) + 1) // 2
+        rows = [" & ".join(f"\\emph{{{w}}} & {G[w][0]:+.2f} & {G[w][1]:+.2f}" for w in pair) + " \\\\" for pair in zip(ws[:half], ws[half:])]
+        open(os.path.join(PAPER, "table_groups.tex"), "w").write(
+            "\\begin{tabular}{@{}lrr@{\\hspace{2em}}lrr@{}}\n\\toprule\nWord & Norm & Refined & Word & Norm & Refined \\\\\n\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
 
 sp = R("speed")
 if sp:
@@ -114,7 +161,7 @@ if sp:
     M("billionHours", 1e9 / sp["sgw"] / 3600, "{:.1f}"); M("billionMinutesAll", 1e9 / sp["sgw_all_cores"] / 60, "{:.0f}")
     M("billionDaysDistil", 1e9 / sp["distilbert_1"] / 86400, "{:,.0f}"); M("billionDaysDistilAll", 1e9 / sp[f"distilbert_{sp['cores']}"] / 86400, "{:.0f}")
     M("streamMillions", sp["stream"]["sentences"] / 1e6, "{:.0f}"); M("streamSeconds", sp["stream"]["seconds"], "{:.0f}"); M("streamGb", sp["stream"]["peak_rss_gb"], "{:.1f}")
-    M("wordsPerSentence", sp["words_per_sentence"], "{:.0f}")
+    M("wordsPerSentence", sp["words_per_sentence"], "{:.0f}"); M("parSpeedup", sp["sgw_all_cores"] / sp["sgw"], "{:.1f}"); M("speedTimes", " and ".join(f"{round(sp['sgw'] / sp[k], -2):,.0f}" for k in ("distilbert_1", "roberta_1")))
     t, n = np.array([s[1] for s in sp["scaling"]]), np.array([s[0] for s in sp["scaling"]])
     M("scalingSlope", np.polyfit(np.log(n[1:]), np.log(t[1:]), 1)[0], "{:.2f}")
 tm = R("transformers_meta")
@@ -178,6 +225,13 @@ if bk:
     M("vaderFlipFive", 100 * v["pair_flip_vs_sentence"]["5"], "{:.0f}"); M("vaderFlipChapter", 100 * v["pair_flip_vs_sentence"]["chapter"], "{:.0f}")
     M("densFlipFive", 100 * v["sgw_mean_flip_vs_sentence"]["5"], "{:.0f}"); M("densFlipMax", 100 * max(v["sgw_mean_flip_vs_sentence"].values()), "{:.0f}")
     macros["sgwSpread"] = "$" + sci(max(v["sgw_merged_spread"], 1e-17)) + "$"
+    M("vaderFlipLast", 100 * v["pair_flip_vs_sentence"]["125"], "{:.0f}"); M("densFlipLast", 100 * v["sgw_mean_flip_vs_sentence"]["125"], "{:.0f}")
+    M("vaderRise", sum(r[-1] > r[0] for r in v["book_scores"])); M("svdVarOne", 100 * s["svd_var_top3"][0], "{:.0f}"); M("svdVarSecond", 100 * s["svd_var_top3"][1], "{:.0f}")
+    first = bk["books"][:v["n_books"]]                              # the same books, in the same order, as the chunking comparison
+    assert np.allclose([b["micro"] for b in first], np.array(v["sgw_merged"])[:, 0])
+    GM, mac = np.array(v["sgw_mean_of_chunks"])[:, 0], np.array([b["macro"] for b in first])
+    i, j = np.triu_indices(len(first), 1)
+    M("densFlipChapter", 100 * np.mean(np.sign(GM[i] - GM[j]) != np.sign(mac[i] - mac[j])), "{:.0f}")
 
 tl = R("tales")
 if tl:
@@ -201,6 +255,8 @@ if un:
     M("coverMin", min(cov), "{:.0f}"); M("coverMax", max(cov), "{:.0f}")
     M("errRankMin", min(un[c]["corr_abs_err_sd"] for c in CORPORA), "{:+.2f}"); M("errRankMax", max(un[c]["corr_abs_err_sd"] for c in CORPORA), "{:+.2f}")
     M("errRankPos", sum(un[c]["corr_abs_err_sd"] > 0 for c in CORPORA))
+    fall = [c for c in CORPORA if un[c]["bands"][-1]["rmse"] < un[c]["bands"][0]["rmse"]]
+    M("errFall", len(fall)); M("errRise", len(CORPORA) - len(fall)); M("errFallNames", " and ".join(CN[c] if c != "yelp" else "Yelp" for c in fall))
 
 cc = R("constants_ci")
 if cc:
@@ -224,7 +280,10 @@ if pt:
     for key, tag in (("DistilBERT (SST-2)", "Distil"), ("Twitter-RoBERTa", "Roberta")):
         M(f"parts{tag}Sign", 100 * pt[key]["sign_differs"], "{:.0f}"); M(f"parts{tag}Sent", pt[key]["r_rating_sentence_mean"], "{:.2f}")
         M(f"parts{tag}Whole", pt[key]["r_rating_whole"], "{:.2f}"); M(f"parts{tag}Saturated", 100 * pt[key]["saturated_whole"], "{:.0f}")
-    M("partsSentences", pt["sentences"], "{:,}")
+    M("partsSentences", pt["sentences"], "{:,}"); M("partsReviews", pt["n_reviews"]); M("partsSgwDensity", pt["SGW density r with rating"], "{:.2f}")
+    if "VADER" in pt:
+        M("partsVaderSign", 100 * pt["VADER"]["sign_differs"], "{:.0f}"); M("partsVaderSent", pt["VADER"]["r_rating_sentence_mean"], "{:.2f}")
+        M("partsVaderWhole", pt["VADER"]["r_rating_whole"], "{:.2f}"); M("partsVaderSaturated", 100 * pt["VADER"]["saturated_whole"], "{:.0f}")
 if tl:
     ci("taleStoryCal", tl["story_r"]["SGW calibrated, merged"]); M("taleSaturated", 100 * tl["vader_whole_saturated"], "{:.0f}")
     M("taleWholeVader", tl["story_r"]["VADER whole story"][0], "{:.2f}")
@@ -241,6 +300,9 @@ try:                                                              # the worked e
 except Exception as e:
     print("Moby-Dick numbers skipped:", e)
 
+ro = R("speed_readout")
+if ro:
+    M("readoutOverhead", 100 * (ro["valence_over_level_time"] - 1), "{:.0f}")
 gp = R("speed_gpu")
 if gp and sp:
     M("gpuName", gp["device"].replace("NVIDIA GeForce ", "")); M("distilGpu", round(gp["distilbert_fp32"], -2), "{:,.0f}"); M("distilGpuHalf", round(gp["distilbert_fp16"], -2), "{:,.0f}")
@@ -259,6 +321,32 @@ if pos and "confirm" in pos:
     M("confReviews", c["R3"]["n_reviews"], "{:,}"); ci("confAucFirst", c["R3"]["auc_first"], "{:.3f}"); ci("confAucLast", c["R3"]["auc_last"], "{:.3f}"); ci("confAuc", c["R3"]["diff"], "{:+.3f}")
     M("confSupported", sum(c[r]["verdict"] == "supported" for r in ("R1", "R2", "R3")))
 
+if pos and "parts" in pos:
+    for name, tag in (("all", ""), ("held_out", "Held"), ("training", "Train")):
+        q = pos["parts"][name]
+        M("ptN" + tag, q["n"], "{:,}"); M("ptSentences" + tag, q["sentences"], "{:,}")
+        ci("ptOrder" + tag, q["order_term"], "{:+.3f}")
+        for st, s in (("equal", "Eq"), ("later longer", "LL"), ("earlier longer", "EL")):
+            ci(f"pt{s}Diff{tag}", q["strata"][st]["diff"], "{:+.3f}"); M(f"pt{s}Earlier{tag}", q["strata"][st]["earlier"][0], "{:.2f}"); M(f"pt{s}Later{tag}", q["strata"][st]["later"][0], "{:.2f}")
+            M(f"pt{s}N{tag}", q["strata"][st]["n"], "{:,}")
+        ci("ptDil" + tag, q["dilution"]["matched_before_minus_after"], "{:+.3f}")
+    q = pos["parts"]["all"]
+    M("ptWordsEarlier", q["words_earlier"], "{:.1f}"); M("ptWordsLater", q["words_later"], "{:.1f}"); M("ptLaterLonger", 100 * q["later_longer"], "{:.0f}")
+    M("ptShareLo", q["share_weight"][0][0], "{:.2f}"); M("ptShareHi", q["share_weight"][-1][0], "{:.2f}")
+    M("ptRsqPlain", q["r2"]["plain_mean"], "{:.2f}"); M("ptRsqLength", q["r2"]["length_weighted"], "{:.2f}"); M("ptRsqFree", q["r2"]["free_weights"], "{:.2f}")
+    M("ptDilNAfter", q["dilution"]["n_after"], "{:,}"); M("ptDilNBefore", q["dilution"]["n_before"], "{:,}")
+    if "by_rated" in q["dilution"]:
+        for side, s in (("after", "After"), ("before", "Before")):
+            cells = q["dilution"]["by_rated"][side]["1"]             # rated part of one word, by number of neutral words
+            ci("ptKept" + s + "First", cells[0]["kept"]); ci("ptKept" + s + "Last", cells[-1]["kept"]); M("ptKept" + s + "LastM", cells[-1]["m"].replace("-", " to ").replace("9+", "nine or more"))
+            M("ptKept" + s + "LastN", cells[-1]["n"], "{:,}")
+    if "rated_words_two_plus" in pos["parts"]["held_out"]["dilution"]:
+        rw = pos["parts"]["held_out"]["dilution"]["rated_words_two_plus"]
+        M("ptRatedAfter", rw["after"], "{:.1f}"); M("ptRatedBefore", rw["before"], "{:.1f}")
+    for k, tag in enumerate(("One", "Two", "Three", "Four", "Five")):
+        M("imdbFifth" + tag, pos["parts"]["imdb_auc_by_fifth"][k][0], "{:.3f}")
+    M("imdbMiddleLo", min(f[0] for f in pos["parts"]["imdb_auc_by_fifth"][1:4]), "{:.3f}"); M("imdbMiddleHi", max(f[0] for f in pos["parts"]["imdb_auc_by_fifth"][1:4]), "{:.3f}")
+
 mc = R("machine")
 if mc:
     if "hc3" in mc:
@@ -267,6 +355,25 @@ if mc:
         for m in ("net", "dolors", "clustering", "ending_lift", "negated", "intensified", "after_contrast", "hedons"):
             ci("hc" + m.title().replace("_", ""), [h["measures"][m][k] for k in ("d", "d_lo", "d_hi")], "{:+.2f}")
         M("hcSupported", sum(v == "supported" for v in h["decisions"].values()))
+        M("hcWordsHuman", h["words_human"], "{:.0f}"); M("hcWordsMachine", h["words_machine"], "{:.0f}")
+        if "by_source" in h:
+            SRC = dict(reddit_eli5="Reddit, explain like I'm five", finance="Finance", medicine="Medicine", wiki_csai="Wikipedia, computer science", open_qa="Open questions")
+            B = h["by_source"]
+            M("hcSources", len(B)); M("hcSourcesAll", sum(all(v == "supported" for v in s["decisions"].values()) for s in B.values()))
+            M("hcRedditShare", 100 * B["reddit_eli5"]["n"] / h["n"], "{:.0f}"); M("hcRedditClustering", B["reddit_eli5"]["d"]["clustering"], "{:+.2f}")
+            M("hcMedNet", B["medicine"]["d"]["net"], "{:+.2f}"); M("hcMedDolors", B["medicine"]["d"]["dolors"], "{:+.2f}"); M("hcMedLift", B["medicine"]["d"]["ending_lift"], "{:+.2f}")
+            M("hcBoostPositive", sum(s["d"]["intensified"] > 0 for s in B.values())); M("hcNegPositive", sum(s["d"]["negated"] > 0 for s in B.values()))
+            mark = dict(supported="", refuted="$^{\\dagger}$", undecided="$^{\\circ}$")
+            rows = []
+            for s in sorted(B, key=lambda s: -B[s]["n"]):
+                d, dec = B[s]["d"], B[s]["decisions"]
+                rows.append(f"{SRC.get(s, s)} & {B[s]['n']:,} & " + " & ".join(f"{d[m]:+.2f}{mark[dec[hyp]]}" for m, hyp in (("net", "HL1"), ("dolors", "HL2"), ("clustering", "HL3"), ("ending_lift", "HL4")))
+                            + f" & {d['negated']:+.2f} & {d['intensified']:+.2f} \\\\")
+            m_ = h["measures"]
+            rows.append("\\midrule\nAll sources & " + f"{h['n']:,} & " + " & ".join(f"{m_[m]['d']:+.2f}" for m in ("net", "dolors", "clustering", "ending_lift", "negated", "intensified")) + " \\\\")
+            open(os.path.join(PAPER, "table_sources.tex"), "w").write(
+                "\\begin{tabular}{@{}lrrrrrrr@{}}\n\\toprule\nSource & Pairs & Net (HL1) & Dolors (HL2) & Clustering (HL3) & Ending lift (HL4) & Negated & Intensified \\\\\n\\midrule\n"
+                + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
     if "essays" in mc:
         e = mc["essays"]
         M("esN", e["n_sampled"])
@@ -276,6 +383,11 @@ if mc:
             for m in ("net", "dolors", "clustering", "ending_lift", "negated", "intensified", "after_contrast", "hedons"):
                 ci("es" + m.title().replace("_", "") + c, [x["measures"][m][k] for k in ("d", "d_lo", "d_hi")], "{:+.2f}")
             M("esLiftHuman" + c, x["measures"]["ending_lift"]["human"], "{:.0f}"); M("esLiftMachine" + c, x["measures"]["ending_lift"]["machine"], "{:.0f}")
+            M("esWordsHuman" + c, x["words_human"], "{:.0f}"); M("esWordsMachine" + c, x["words_machine"], "{:.0f}")
+            for m in x.get("d_jackknife", {}):                      # delete-one-assignment jackknife, t reference: the intervals printed in the text
+                ci("ej" + m.title().replace("_", "") + c, x["d_jackknife"][m], "{:+.2f}")
+            for hyp, v in x.get("decisions_jackknife", {}).items():
+                M("ejDec" + hyp.replace("HL", "").replace("1", "one").replace("2", "two").replace("3", "three").replace("4", "four") + c, v)
             for hyp, v in x["decisions"].items():
                 M("es" + hyp.replace("1", "one").replace("2", "two").replace("3", "three").replace("4", "four") + c, v)
     if "revise" in mc:
@@ -284,19 +396,23 @@ if mc:
         for k, tag in (("report_minus_control", "RvRC"), ("control_minus_draft", "RvCD"), ("report_minus_draft", "RvRD")):
             M("d" + tag, r[k]["diff"], "{:+.2f}"); macros["d" + tag + "CI"] = f"[{r[k]['ci_prompts'][0]:+.2f}, {r[k]['ci_prompts'][1]:+.2f}]"
             macros["d" + tag + "CIessays"] = f"[{r[k]['ci_essays'][0]:+.2f}, {r[k]['ci_essays'][1]:+.2f}]"
+            macros["d" + tag + "CIjack"] = f"[{r[k]['ci_jackknife'][0]:+.2f}, {r[k]['ci_jackknife'][1]:+.2f}]"
         M("rvVerdict", r["HT1"])
         for arm in ("draft", "control", "report", "human"):
             M("rvScore" + arm.title(), r["machine_score"][arm], "{:.2f}")
         for arm in ["draft"] + r.get("arms", ["control", "report"]):
             M("rvLift" + arm.title(), r["per_measure_z"][arm]["ending_lift"], "{:+.2f}"); M("rvBoost" + arm.title(), r["per_measure_z"][arm]["intensified"], "{:+.2f}")
             M("rvNeg" + arm.title(), r["per_measure_z"][arm]["negated"], "{:+.2f}")
-        M("rvDeclined", sum(r.get("declined", {}).values()))
+        M("rvDeclined", sum(r.get("declined", {}).values())); M("rvAssignments", r.get("n_assignments", "?"))
+        rev = [r["machine_score"][a_] for a_ in r.get("arms", ["control", "report"])]
+        M("rvScoreLo", min(rev), "{:.2f}"); M("rvScoreHi", max(rev), "{:.2f}")
         for arm, tag in (("humanizer", "H"), ("sepia", "S")):
             if arm in r.get("arms", []):
                 M("rv" + arm.title(), r["distance"][arm], "{:.2f}"); M("rvScore" + arm.title(), r["machine_score"][arm], "{:.2f}"); M("rvVerdict" + arm.title(), r["HS1"][arm])
                 for k, t in ((f"{arm}_minus_control", "C"), (f"{arm}_minus_draft", "D"), (f"report_minus_{arm}", "R")):
                     M("dRv" + tag + t, r[k]["diff"], "{:+.2f}"); macros["dRv" + tag + t + "CI"] = f"[{r[k]['ci_prompts'][0]:+.2f}, {r[k]['ci_prompts'][1]:+.2f}]"
                     macros["dRv" + tag + t + "CIessays"] = f"[{r[k]['ci_essays'][0]:+.2f}, {r[k]['ci_essays'][1]:+.2f}]"
+                    macros["dRv" + tag + t + "CIjack"] = f"[{r[k]['ci_jackknife'][0]:+.2f}, {r[k]['ci_jackknife'][1]:+.2f}]"
 
 def tex(x):
     for a, b in (("\\", " "), ("&", "\\&"), ("%", "\\%"), ("$", "\\$"), ("#", "\\#"), ("_", "\\_"), ("{", ""), ("}", ""), ("~", " "), ("^", " "), ("\u2019", "'"), ("\u201c", "``"), ("\u201d", "''"), ("\u2014", ", ")):
@@ -312,6 +428,9 @@ if mc and "dial" in mc:
     for k, tag in (("corr_dial_minus_control", "dDlCorr"), ("gap_dial_minus_control", "dDlGap"), ("score_dial_minus_control", "dDlScore")):
         M(tag, d[k]["diff"], "{:+.2f}"); macros[tag + "CI"] = f"[{d[k]['ci_prompts'][0]:+.2f}, {d[k]['ci_prompts'][1]:+.2f}]"
         macros[tag + "CIessays"] = f"[{d[k]['ci_essays'][0]:+.2f}, {d[k]['ci_essays'][1]:+.2f}]"
+        macros[tag + "CIjack"] = f"[{d[k]['ci_jackknife'][0]:+.2f}, {d[k]['ci_jackknife'][1]:+.2f}]"
+    M("dlModels", len(d["mean_corr_by_model"])); M("dlCorrModelLo", min(v["dial"] for v in d["mean_corr_by_model"].values()), "{:.2f}"); M("dlCorrModelHi", max(v["dial"] for v in d["mean_corr_by_model"].values()), "{:.2f}")
+    M("dlAssignments", d.get("n_assignments", "?")); M("dlTrain", d["classifier_training_essays"]); M("dlMissingControl", d["missing_dial"]["missing_control"])
     for a, t in (("draft", "Draft"), ("control_r1", "ControlOne"), ("dial_r1", "DialOne"), ("control", "Control"), ("dial", "Dial")):
         M("dlGap" + t, d["gap"][a], "{:.2f}")
     for a in ("draft", "control", "dial", "human"):
@@ -325,12 +444,15 @@ if mc and "dial" in mc:
     if "judge_better" in d:
         for k, t in (("judge_better", "dlJudge"), ("judge_student", "dlJudgeStudent")):
             M(t, 100 * d[k]["share"], "{:.0f}"); macros[t + "CI"] = f"[{100 * d[k]['ci_prompts'][0]:.0f}, {100 * d[k]['ci_prompts'][1]:.0f}]"
-        M("dlJudgeN", d["judge_better"]["n"]); M("dlHDthree", d["HD3"])
+            macros[t + "Exact"] = f"[{100 * d[k]['ci_exact'][0]:.0f}, {100 * d[k]['ci_exact'][1]:.0f}]"; M(t + "Wins", d[k]["wins"])
+        M("dlJudgeN", d["judge_better"]["n"]); M("dlHDthree", d["HD3"]); M("dlJudgeBoth", d["judge_both"])
+        for tier, v in d["judge_by_model"].items():
+            macros["dlJudge" + tier.title()] = f"{v['better']} of {v['n']}"; macros["dlJudgeStudent" + tier.title()] = f"{v['student']} of {v['n']}"
     e = d["excerpt"]
     v, tg = e["values"], e["target"]
     row = lambda name, key, f="{:.1f}": f"{name} & {f.format(v['draft'][key])} & {f.format(tg[key])} & {f.format(v['dial'][key])} & {f.format(v['control'][key])} \\\\"
     open(os.path.join(PAPER, "excerpt.tex"), "w").write(
-        "\\begin{tabular}{@{}p{0.31\\textwidth}p{0.31\\textwidth}p{0.31\\textwidth}@{}}\n\\toprule\nMachine draft & After two rounds with the dial & After two plain revisions \\\\\n\\midrule\n"
+        "\\begin{tabular}{@{}p{0.31\\textwidth}p{0.31\\textwidth}p{0.31\\textwidth}@{}}\n\\toprule\nAI first draft & After two rounds with the dial & After two plain revisions \\\\\n\\midrule\n"
         + " & ".join("\\emph{Opening.} " + tex(e[a]["opening"]) + " \\ldots" for a in ("draft", "dial", "control")) + " \\\\[4pt]\n"
         + " & ".join("\\emph{Closing.} \\ldots " + tex(e[a]["closing"]) for a in ("draft", "dial", "control")) + " \\\\\n\\bottomrule\n\\end{tabular}\n\n\\vspace{6pt}\n"
         + "\\begin{tabular}{@{}lrrrr@{}}\n\\toprule\nMeasure & Draft & Target & Dial & Plain \\\\\n\\midrule\n"
@@ -338,28 +460,50 @@ if mc and "dial" in mc:
                      row("Charge intensified (\\%)", "intensified"), row("Ending lift (per 1,000 words)", "ending_lift")]) + "\n\\bottomrule\n\\end{tabular}\n")
     M("exTier", e["tier"].title()); M("exPrompt", tex(e["prompt"]))
 
+try:                                                              # words that carry charge in the scorer (operator words are given none), and the level's own constants
+    macros["nChargedScorer"] = f"{int((sgw.CHARGE != 0).sum()):,}"
+    k_ = json.load(open(os.path.join(HERE, "..", "sgw", "constants.json")))
+    M("shipLevelA", k_["level_a"], "{:g}"); M("shipLevelKappa", k_["level_kappa"], "{:g}")
+except Exception as e:
+    print("scorer numbers skipped:", e)
+if pos and "dilute" in pos:
+    gains = [float(macros["gainKappa" + tag]) for tag in ("Emo", "Tw", "Fb", "Sst", "Yelp")]
+    M("gainKappaLo", min(gains), "{:.3f}"); M("gainKappaHi", max(gains), "{:.3f}")
+if pos and "parts" in pos:
+    M("ptLaterLongerHeld", 100 * pos["parts"]["held_out"]["later_longer"], "{:.0f}")
+
 if not sp:
     macros["speedParagraph"] = "\\textcolor{red}{Throughput benchmark pending.}"
 
+if acc and cr and mc and "dial" in mc:
+    assert [c for c in CORPORA if acc[c]["methods"]["SGW, no dilution"]["sgw_minus_ci"][0] > 0] == ["semeval", "fb", "sst", "yelp"], "text names the corpora where the dilution test is supported"
+    assert macros["critReversals"] == "0" and macros["dlJudgeBoth"] == "0" and macros["dlMissing"] == macros["dlMissingHaiku"], "text says none / never / all"
+    assert macros["lossesNoShrink"] == "1" and acc["scale"]["methods"]["SGW, no shrinkage"]["sgw_minus_ci"][1] < 0, "text says the neutral prior costs a little in film reviews"
+
+minus = lambda s: re.sub(r"(?<![A-Za-z0-9}\\])-(?=[\d.])", lambda m: "\\ensuremath{-}", s)   # a hyphen before a number becomes a minus sign
 with open(os.path.join(PAPER, "numbers.tex"), "w") as f:
     f.write("% Generated by scripts/make_numbers.py. Do not edit.\n")
     f.write("\\providecommand{\\num}[1]{\\textcolor{red}{??}}\n")
     for k in sorted(macros):
         assert re.fullmatch(r"[A-Za-z]+", k), f"macro name {k!r} must be letters only"
-        f.write(f"\\newcommand{{\\{k}}}{{{macros[k]}}}\n")
+        f.write(f"\\newcommand{{\\{k}}}{{{minus(macros[k])}}}\n")
+for name in glob.glob(os.path.join(PAPER, "table_*.tex")) + [os.path.join(PAPER, "excerpt.tex")]:
+    body = open(name).read()
+    open(name, "w").write(minus(body))
 # ---- the "Results in brief" block of the README
 g = lambda k: re.sub(r"(\d)\\times10\^\{(-?\d+)\}", r"\1e\2", macros.get(k, "?").replace("\\%", "%").replace("$", ""))
 block = f"""| | |
 |---|---|
 | Mean Pearson r with human ratings (five rated corpora, constants fitted on other corpora) | signature {g('meanSgw')}; VADER {g('meanVader')}; TextBlob {g('meanBlob')}; hedonometer {g('meanHedo')}; DistilBERT {g('meanDistil')}; Twitter-RoBERTa {g('meanRoberta')} |
 | Sentences per second on one processor core | signature {g('sgwRate')}; VADER {g('vaderRate')}; DistilBERT {g('distilRate')}; DistilBERT on an RTX 3090 {g('distilGpuHalf')} |
-| One billion sentences | {g('billionHours')} hours on one core, {g('billionMinutesAll')} minutes on twelve |
+| One billion sentences | {g('billionHours')} hours on one core, {g('billionMinutesAll')} minutes with twelve processes on six cores |
 | Merged against single-pass signatures, {g('nNovels')} novels | relative difference below {g('mergeErr')} in floating point; exact in integers |
 | Chapters of novels | between-chapter variance {g('heteroMedian')} times the shuffled-sentence value (median) |
 | VADER book score by chunk size | {g('vaderOne')} with one-sentence chunks, {g('vaderChapter')} with whole chapters |
-| Recency, three confirmatory tests | {g('confSupported')} of 3 supported |
+| Order of two parts of a phrase, length held fixed | weight of the later part minus the earlier at equal length {g('ptEqDiff')} {g('ptEqDiffCI')}; the raw later-part advantage is a length effect |
+| Neutral words | dilute on either side of the feeling; planned test supported in {g('winsNoDil')} of 6 corpora |
 | Human against machine essays, ten tone measures | AUC {g('esAucA')} plain, {g('esAucB')} when the model writes as a student; {g('hcAuc')} for ChatGPT answers |
-| The dial | target against achieved value, mean r {g('dlCorrDial')} with the dial and {g('dlCorrControl')} without; a blind judge found the dial revision more student-like in {g('dlJudgeStudent')}% of pairs |"""
+| The dial | target against achieved value, mean r {g('dlCorrDial')} with the dial and {g('dlCorrControl')} without; a model judge found the dial revision more student-like in {g('dlJudgeStudentWins')} of {g('dlJudgeN')} pairs |"""
 readme = os.path.join(HERE, "..", "README.md")
 t = open(readme).read()
 a, b = t.index("<!-- results:start -->") + len("<!-- results:start -->"), t.index("<!-- results:end -->")

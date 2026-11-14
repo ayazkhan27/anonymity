@@ -129,7 +129,7 @@ def fig5():
     ax.text(0.015, 0.04, "cubic arc from the signature", color=INK, transform=ax.transAxes, fontsize=6.3)
     ax.text(0.995, per_k(book) + 2.5, "whole book", color="#6F6F6F", fontsize=6.3, ha="right")
     h, d, n = sgw.totals(book)
-    ax.set_title(f"Moby-Dick: {n:,.0f} words, {h:,.0f} hedons, {d:,.0f} dolors, {len(ch)} chapters", fontsize=7, loc="left", pad=4)
+    ax.set_title(f"Moby-Dick: {n:,.0f} words, {h:,.0f} hedons, {d:,.0f} dolors, {len(ch)} sections", fontsize=7, loc="left", pad=4)
     panel(ax, "a", x=-0.07)
     # zoom: the last chapter in 12 equal runs of sentences, each read from two prefix rows
     k = len(ch) - 1
@@ -143,7 +143,7 @@ def fig5():
     bx.errorbar(np.arange(12), per_k(seg), yerr=1.96 * se_k(seg), fmt="none", ecolor=INK, elinewidth=0.5)
     bx.axhline(base, color="#6F6F6F", lw=0.5, ls=(0, (3, 2))); bx.set_xticks([0, 11]); bx.set_xticklabels(["start", "end"])
     bx.text(11.45, base + 2.5, "whole book", color="#6F6F6F", fontsize=6.3, ha="right")
-    bx.set_title(f"final chapter ({C[k, sgw.L]:,.0f} words), twelve spans", fontsize=7, loc="left", pad=4)
+    bx.set_title(f"last section ({C[k, sgw.L]:,.0f} words), twelve spans", fontsize=7, loc="left", pad=4)
     panel(bx, "b", x=-0.14)
     # all novels
     B = R("books")
@@ -318,17 +318,17 @@ def fig3():
         ax.set_title(title, fontsize=6.8, loc="left", pad=3)
         if j == 0:
             ax.set_ylabel("charge per word (text mean = 1)"); panel(ax, "a", x=-0.22)
-    # treebank composition
-    T = P["tree"]
+    # treebank composition with length held fixed: weight of a part against its share of the phrase's words
+    Q = P["parts"]["all"]
     cx = fig.add_axes([0.815, 0.56, 0.175, 0.36])
-    sets = [("all nodes", "all phrases"), ("both parts two or more words", "both parts\n2+ words"), ("top node of each sentence", "whole\nsentences")]
-    for k, (key, lab) in enumerate(sets):
-        for side, col, dx in (("left", BLUE, -0.13), ("right", RED, 0.13)):
-            e, lo, hi = T[key][side]
-            cx.plot([k + dx, k + dx], [lo, hi], color=col, lw=0.9); cx.plot(k + dx, e, "o", color=col, ms=3.2)
-    cx.set_xticks(range(3)); cx.set_xticklabels([s[1] for s in sets], fontsize=6); cx.set_xlim(-0.5, 2.5)
-    cx.set_ylabel("weight in the phrase's human rating"); cx.set_ylim(0.55, 0.85)
-    cx.text(-0.4, 0.835, "later part", color=RED, fontsize=6.3); cx.text(-0.4, 0.812, "earlier part", color=BLUE, fontsize=6.3)
+    xs = (np.arange(10) + 0.5) / 10
+    for key, col, dx in (("share_weight_earlier", BLUE, -0.012), ("share_weight_later", RED, 0.012)):
+        e = np.array(Q[key])
+        cx.plot(np.stack([xs + dx, xs + dx]), np.clip(e[:, 1:], -0.2, 1.1).T, color=col, lw=0.8)
+        cx.plot(xs + dx, e[:, 0], color=col, lw=0.8, marker="o", ms=2.4)
+    cx.set_xlim(0, 1); cx.set_ylim(-0.15, 1.0); cx.set_xticks([0, 0.5, 1]); cx.set_xticklabels(["0", "0.5", "1"])
+    cx.set_xlabel("part's share of the words"); cx.set_ylabel("weight in the phrase's human rating")
+    cx.text(0.05, 0.93, "earlier part", color=BLUE, fontsize=6.3, transform=cx.transAxes); cx.text(0.05, 0.85, "later part", color=RED, fontsize=6.3, transform=cx.transAxes)
     panel(cx, "b", x=-0.25)
     # fitted kernels
     names = ["EmoBank", "SemEval-2018 tweets", "Facebook posts", "SST sentences", "Film reviews", "Yelp reviews"]
@@ -340,7 +340,7 @@ def fig3():
         ax.axhline(1, color=GREY, lw=0.5, ls=(0, (3, 2)))
         ax.set_ylim(0, 2.2); ax.set_xticks([0, 1]); ax.set_xticklabels(["start", "end"]); ax.set_title(LONG[name], fontsize=6.8, pad=3)
         c = k["contrast"]
-        ax.set_xlabel(f"{c[0]:+.2f} [{c[1]:+.2f}, {c[2]:+.2f}]", fontsize=6, labelpad=1)
+        ax.set_xlabel(f"{c[0]:+.2f} [{c[1]:+.2f}, {c[2]:+.2f}]".replace("-", "$-$"), fontsize=6, labelpad=1)
         if j == 0:
             ax.set_ylabel("fitted weight of a word's charge"); panel(ax, "c", x=-0.30)
         else:
@@ -350,18 +350,20 @@ def fig3():
 
 def fig4():
     """Dilution: human phrase ratings, rated intensity against buffer words, fit along kappa."""
-    P = R("position"); T = P["tree"]["dilution"]
+    P = R("position"); T = P["parts"]["all"]["dilution"]["by_rated"]
     fig = plt.figure(figsize=(FULL, 2.45))
     ax = fig.add_axes([0.065, 0.17, 0.255, 0.72])
-    xs = np.arange(5)
-    for side, col, lab, dx in (("neutral words after", RED, "neutral words after the rated part", 0.06), ("neutral words before", BLUE, "neutral words before it", -0.06)):
-        e = np.array([c["kept"] for c in T[side]])
-        ax.plot(np.stack([xs + dx, xs + dx]), e[:, 1:].T, color=col, lw=0.9)
-        ax.plot(xs + dx, e[:, 0], color=col, lw=1, marker="o", ms=3)
-    ax.text(0.03, 0.10, "neutral words after the rated part", color=RED, fontsize=6.3, transform=ax.transAxes)
-    ax.text(0.03, 0.03, "neutral words before it", color=BLUE, fontsize=6.3, transform=ax.transAxes)
-    ax.set_xticks(xs); ax.set_xticklabels([c["words"] for c in T["either"]]); ax.set_ylim(0.45, 0.9)
-    ax.set_xlabel("neutral words joined to a rated phrase"); ax.set_ylabel("share of the phrase's rating kept")
+    LAB = ["1", "2", "3-4", "5-8", "9+"]
+    for side, col, dx in (("after", RED, 0.06), ("before", BLUE, -0.06)):
+        cells = T[side]["1"]                                        # the rated part is one word, so its length is held fixed
+        xs = np.array([LAB.index(c["m"]) for c in cells]) + dx
+        e = np.array([c["kept"] for c in cells])
+        ax.plot(np.stack([xs, xs]), e[:, 1:].T, color=col, lw=0.9)
+        ax.plot(xs, e[:, 0], color=col, lw=1, marker="o", ms=3)
+    ax.text(0.97, 0.93, "neutral words after the rated word", color=RED, fontsize=6.3, transform=ax.transAxes, ha="right")
+    ax.text(0.97, 0.86, "neutral words before it", color=BLUE, fontsize=6.3, transform=ax.transAxes, ha="right")
+    ax.set_xticks(range(5)); ax.set_xticklabels(["1", "2", "3 to 4", "5 to 8", "9 or more"]); ax.set_ylim(0, 0.8); ax.set_xlim(-0.4, 4.4)
+    ax.set_xlabel("neutral words joined to one rated word"); ax.set_ylabel("share of the word's rating kept")
     panel(ax, "a", x=-0.17)
     names = ["EmoBank", "SemEval-2018 tweets", "Facebook posts", "SST sentences", "Film reviews", "Yelp reviews"]
     bx = fig.add_axes([0.475, 0.17, 0.16, 0.72])
@@ -391,42 +393,44 @@ def fig4():
 
 
 def figE1():
-    """Extended data: are the error bars honest, and do merged signatures track human story labels?"""
+    """Extended data: error of the calibrated score by exposure, and merged signatures against human story labels."""
     U, Tl = R("uncertainty"), R("tales")
     fig = plt.figure(figsize=(FULL, 2.35))
-    ax = fig.add_axes([0.065, 0.18, 0.21, 0.70])
+    ax = fig.add_axes([0.065, 0.18, 0.27, 0.70])
     cols = [BLUE, RED, GREEN, PURPLE, INK, GREY]
+    ends = []
     for c, col in zip(CORPORA, cols):
-        b = U[c]["bands"]
-        ax.plot([x["predicted"] for x in b], [x["rmse"] for x in b], color=col, lw=0.8, marker="o", ms=2.5)
-    ax.plot([0.55, 1.15], [0.55, 1.15], color=GREY, lw=0.5, ls=(0, (3, 2)))
-    ax.set_xlabel("predicted error (s.d. units)"); ax.set_ylabel("observed error on the test portion")
-    panel(ax, "a", x=-0.20)
-    bx = fig.add_axes([0.40, 0.18, 0.15, 0.70])
-    cov = [100 * U[c]["coverage90"] for c in CORPORA]
-    bx.barh(range(6), cov[::-1], color=cols[::-1], height=0.62, lw=0)
-    bx.axvline(90, color=INK, lw=0.6, ls=(0, (3, 2))); bx.set_xlim(70, 100); bx.set_yticks(range(6)); bx.set_yticklabels([CNAME[c] for c in CORPORA][::-1]); bx.tick_params(axis="y", length=0)
-    bx.set_xlabel("ratings inside the\n90\% interval (\%)")
-    panel(bx, "b", x=-0.72)
-    cx = fig.add_axes([0.655, 0.18, 0.33, 0.70])
+        y = [x["rmse"] for x in U[c]["bands"]]
+        ax.plot(range(4), y, color=col, lw=0.9, marker="o", ms=2.5)
+        ends.append([y[-1], CNAME[c], col])
+    ends.sort()
+    for k in range(1, len(ends)):
+        ends[k][0] = max(ends[k][0], ends[k - 1][0] + 0.024)
+    for yv, lab, col in ends:
+        ax.text(3.12, yv, lab, color=col, fontsize=6.3, va="center")
+    ax.set_xticks(range(4)); ax.set_xticklabels(["lowest", "2", "3", "highest"]); ax.set_xlim(-0.2, 3.05)
+    ax.set_xlabel("quartile of exposure within the corpus"); ax.set_ylabel("error against human ratings (s.d. units)")
+    panel(ax, "a", x=-0.16)
+    cx = fig.add_axes([0.56, 0.18, 0.40, 0.70])
     cx.hist(Tl["arc_r"], bins=np.linspace(-1, 1, 21), color=GREY, lw=0)
     cx.axvline(0, color=INK, lw=0.5); cx.axvline(Tl["arc_r_median"], color=BLUE, lw=1)
     cx.text(Tl["arc_r_median"] + 0.04, cx.get_ylim()[1] * 0.93, "median", color=BLUE, fontsize=6.3)
-    cx.set_xlabel("correlation between the signature arc and the arc of human labels, per tale"); cx.set_ylabel("fairy tales")
-    panel(cx, "c", x=-0.11)
+    cx.set_xlabel("correlation of the signature arc with the arc of human labels, per tale"); cx.set_ylabel("fairy tales")
+    panel(cx, "b", x=-0.09)
     save(fig, "figE1_uncertainty_tales")
 
 
 def fig7():
-    """Human and machine writing on the same prompts, and the tone-check test."""
+    """Human and machine writing on the same prompts; revisions against the students; the dial."""
     Mc = R("machine")
     order = ["ending_lift", "intensified", "negated", "after_contrast", "net", "hedons", "dolors", "gross", "charged", "clustering"]
     names = {"ending_lift": "ending lift", "intensified": "share of charge intensified", "negated": "share of charge negated", "after_contrast": "share of charge after a contrast word",
              "net": "net density", "hedons": "hedon density", "dolors": "dolor density", "gross": "total charge density", "charged": "share of words charged", "clustering": "sentence clustering"}
-    fig = plt.figure(figsize=(FULL, 3.0))
-    ax = fig.add_axes([0.235, 0.15, 0.30, 0.70])
-    series = [("ChatGPT answers (2023)", Mc["hc3"]["measures"], INK, 0.24, "o"), ("Claude essays, plain instruction", Mc["essays"]["A"]["measures"], BLUE, 0.0, "s"),
-              ("Claude essays, told to write as a student", Mc["essays"]["B"]["measures"], RED, -0.24, "D")]
+    fig = plt.figure(figsize=(FULL, 5.3))
+    ax = fig.add_axes([0.235, 0.565, 0.36, 0.355])
+    essays = lambda c: {m: dict(d=v[0], d_lo=v[1], d_hi=v[2]) for m, v in Mc["essays"][c]["d_jackknife"].items()}
+    series = [("ChatGPT answers (2023)", Mc["hc3"]["measures"], INK, 0.24, "o"), ("Claude essays, plain instruction", essays("A"), BLUE, 0.0, "s"),
+              ("Claude essays, told to write as a student", essays("B"), RED, -0.24, "D")]
     for k, m in enumerate(order):
         y = len(order) - 1 - k
         for lab, res, col, dy, mk in series:
@@ -434,30 +438,46 @@ def fig7():
             ax.plot(res[m]["d"], y + dy, mk, color=col, ms=2.8)
     ax.axvline(0, color=GREY, lw=0.5)
     ax.set_yticks(range(len(order))); ax.set_yticklabels([names[m] for m in order][::-1]); ax.tick_params(axis="y", length=0)
-    ax.set_ylim(-0.6, len(order) - 0.4); ax.set_xlim(-0.95, 1.0)
+    ax.set_ylim(-0.6, len(order) - 0.4); ax.set_xlim(-1.0, 1.15)
     ax.set_xlabel("machine minus human, in human standard deviations")
     for j, (lab, _, col, _, _) in enumerate(series):
-        fig.text(0.235 + 0.0, 0.985 - 0.035 * j, lab, color=col, fontsize=6.2, ha="left", va="top")
-    panel(ax, "a", x=-0.76, y=1.13)
-    bx = fig.add_axes([0.625, 0.15, 0.145, 0.75])
-    groups = [("ChatGPT\nanswers", Mc["hc3"], None), ("Claude,\nplain", Mc["essays"]["A"], Mc["essays"]["A"]["auc_trained_on_hc3"]), ("Claude,\nas student", Mc["essays"]["B"], Mc["essays"]["B"]["auc_trained_on_hc3"])]
-    for k, (lab, r, cross) in enumerate(groups):
+        fig.text(0.235, 0.992 - 0.020 * j, lab, color=col, fontsize=6.2, ha="left", va="top")
+    panel(ax, "a", x=-0.62, y=1.10)
+    bx = fig.add_axes([0.70, 0.565, 0.18, 0.375])
+    groups = [("ChatGPT\nanswers", Mc["hc3"]), ("Claude,\nplain", Mc["essays"]["A"]), ("Claude,\nas student", Mc["essays"]["B"])]
+    for k, (lab, r) in enumerate(groups):
         bx.plot([k - 0.12] * 2, r["auc"][1:], color=BLUE, lw=0.9); bx.plot(k - 0.12, r["auc"][0], "o", color=BLUE, ms=3.2)
         bx.plot([k + 0.12] * 2, r["auc_words"][1:], color=GREY, lw=0.9); bx.plot(k + 0.12, r["auc_words"][0], "o", color=GREY, ms=3.2, mfc="white", mew=0.8)
     bx.axhline(0.5, color=INK, lw=0.5, ls=(0, (3, 2)))
     bx.set_xticks(range(3)); bx.set_xticklabels([g[0] for g in groups], fontsize=6); bx.set_xlim(-0.5, 2.5); bx.set_ylim(0.45, 0.95)
     bx.set_ylabel("AUC, human versus machine")
     bx.text(0.04, 0.95, "ten tone measures", color=BLUE, fontsize=6, transform=bx.transAxes); bx.text(0.04, 0.89, "word count alone", color="#6F6F6F", fontsize=6, transform=bx.transAxes)
-    panel(bx, "b", x=-0.38)
+    panel(bx, "b", x=-0.30)
+    # revisions of the same drafts, with the student essays themselves on the same two scales
     rv = Mc["revise"]
-    cx = fig.add_axes([0.855, 0.15, 0.135, 0.75])
-    arms = [("draft", "draft", BLUE), ("control", "plain\nrevision", GREY), ("report", "revision\nwith\nreport", RED)]
-    cx.bar(range(3), [rv["distance"][a] for a, _, _ in arms], color=[c for _, _, c in arms], width=0.62, lw=0)
-    cx.set_xticks(range(3)); cx.set_xticklabels([l for _, l, _ in arms], fontsize=6); cx.set_ylabel("distance from the centre of human essays"); cx.tick_params(axis="x", length=0)
-    cx.set_ylim(0, 0.8)
-    for k, (a, _, _) in enumerate(arms):
-        cx.text(k, rv["distance"][a] + 0.015, f"{rv['distance'][a]:.2f}", ha="center", fontsize=6)
-    panel(cx, "c", x=-0.42)
+    arms = [("draft", "AI first draft", BLUE), ("control", "plain revision", GREY), ("report", "revision with tone report", RED),
+            ("humanizer", "revision with humanizer skill", GREEN), ("sepia", "revision with sepia skill", PURPLE), ("human", "student essays", "white")]
+    yy = np.arange(len(arms))[::-1]
+    for left, key, xl, lim, letter in ((0.235, "distance", "distance from the centre\nof student essays", 1.38, "c"), (0.47, "machine_score", "classifier's mean score\n(0 student, 1 machine)", 0.78, "d")):
+        cx = fig.add_axes([left, 0.085, 0.185, 0.33])
+        cx.barh(yy, [rv[key][a] for a, _, _ in arms], color=[c for _, _, c in arms], edgecolor=[INK if c == "white" else c for _, _, c in arms], height=0.6, lw=0.6)
+        for y, (a, _, _) in zip(yy, arms):
+            cx.text(rv[key][a] + lim * 0.02, y, f"{rv[key][a]:.2f}", va="center", fontsize=6)
+        cx.set_yticks(yy); cx.set_yticklabels([l for _, l, _ in arms] if letter == "c" else []); cx.tick_params(axis="y", length=0)
+        cx.set_xlim(0, lim); cx.set_xlabel(xl)
+        panel(cx, letter, x=-0.92 if letter == "c" else -0.05)
+    # the dial: does the achieved value of a measure follow its assigned target?
+    dl = Mc["dial"]["corr"]
+    ex = fig.add_axes([0.80, 0.085, 0.19, 0.33])
+    for k, m in enumerate(order):
+        y = len(order) - 1 - k
+        ex.plot([dl["control"][m], dl["dial"][m]], [y, y], color="#D9D9D9", lw=0.8, zorder=1)
+        ex.plot(dl["control"][m], y, "o", color=GREY, ms=3, mfc="white", mew=0.8); ex.plot(dl["dial"][m], y, "o", color=RED, ms=3)
+    ex.axvline(0, color=GREY, lw=0.5)
+    ex.set_yticks(range(len(order))); ex.set_yticklabels([names[m].replace("share of charge ", "").replace("share of ", "") for m in order][::-1], fontsize=6); ex.tick_params(axis="y", length=0)
+    ex.set_ylim(-0.6, len(order) - 0.4); ex.set_xlim(-0.15, 1.0); ex.set_xlabel("correlation of achieved value\nwith assigned target")
+    ex.text(0.98, 1.02, "with the dial", color=RED, fontsize=6, transform=ex.transAxes, ha="right"); ex.text(0.98, 1.08, "plain revisions", color="#6F6F6F", fontsize=6, transform=ex.transAxes, ha="right")
+    panel(ex, "e", x=-0.62, y=1.04)
     save(fig, "fig7_machine")
 
 

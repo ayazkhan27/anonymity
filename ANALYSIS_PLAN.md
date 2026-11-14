@@ -156,3 +156,25 @@ Excerpts for the paper are taken from the essay at the median of the improvement
 4. The dial sheet lists eight measures (net and total charge follow from hedons and dolors); HD1 is evaluated on all ten, as written.
 5. The judge for HD3 was Claude Opus 5.5, or Claude Sonnet 5.5 for drafts written by Opus. It was asked a second question, which of the two reads more like a student's own work, that the addendum did not list; it is reported as a secondary outcome.
 6. The `remove-ai-marks` skill was left out of addendum 3 because it strips provenance marks and is not a writing skill.
+
+## Deviations and corrections recorded after review (13 November 2026)
+
+Added after AI referee agents reviewed the draft. Nothing above this line was edited; where an earlier line is wrong, the correction is here.
+
+1. Recency (addendum 2) is withdrawn. R1, R2 and R3 each passed by the rule written above. R1 and R2 do not hold length fixed: in the held-out trees the later part is the longer one in 63% of pairs, and the rated parts compared in R2 averaged 3.8 words on one side and 9.1 on the other. With length held fixed both reverse (`scripts/exp_position.py parts`, exploratory; `results/position.json`, key `parts`). R3 stands as a result about where reviewers place their verdict.
+2. Lexicon scale. The VADER list was put on the labMT scale by the ratio of root-mean-square values over shared words (slope 1.059), not by the regression the plan names (slope 1.002).
+3. Resample counts. Pearson r and differences between methods use 2,000 bootstrap resamples as planned. Spearman rho uses 500, and the position, dilution, treebank and machine-writing analyses use 100 to 1,000.
+4. Run 1. The results of the first scoring run were not saved, so deviations 1 to 3 of the first list cannot be checked against it.
+5. Splits. For corpora without an official split the test portion is 50% as planned; the other half was divided 40/10 into training and development portions.
+6. H2. The planned test (held-out r with fitted kappa against kappa = 0) is supported in four of six corpora and undecided in EmoBank and film reviews. The partial rank correlations and the curves against kappa are unplanned.
+7. H3. The share of documents whose score differs in sign from the mean of their sentence scores was first computed for the transformers only. VADER was added later (5% of 300 film reviews).
+8. Essay intervals. The planned bootstrap over eight assignments is too narrow for eight clusters. The paper prints delete-one-assignment jackknife intervals with a t reference and states the planned verdicts where they differ: HL1 was "refuted" for plain essays and "supported" for essays written as a student under the planned rule, and is undecided for both under the jackknife.
+9. Timing of a record. The note "Deviation from the addendum (13 November 2026, before any essay was generated)" was committed in `77d4fa2`, after the essays had been written. The job files show that the eight-assignment sample was fixed before generation; the written record of it post-dates them.
+10. HT1 and HS1. The planned outcome, distance to the centre of student essays, measures how typical a text is. Student essays themselves score 1.16 on it, above every machine draft and revision. The classifier's score is reported beside it.
+11. HD2. The classifier was first trained on essays that excluded only the 48 complete pairs, then retrained excluding all 60 sampled essays. The second is reported.
+12. HD3. The rule "not wholly below 0.5" is passed by any share whose interval reaches 0.5 and carries little information. Exact binomial intervals and the split by writer model are reported.
+13. Blinding. Every writing, revising and judging agent received, besides its task, the harness's standing context, including the author's most recent message; for the dial revisions and the judges that message stated the hoped-for result. Output paths named the arm. The addendum's phrase "told nothing about this study" was not achieved.
+14. Samples. The 60 drafts of the tone check and the 60 of the dial were each drawn 15 per model with one seed and cover seven of the eight assignments.
+15. Refined charges are not shipped. A check of 20 words about groups of people and public figures, added after review, found that 14 moved down under refinement.
+16. Chapters. The heading rule drops sections under 300 words and can keep front matter; in Moby-Dick it finds 129 sections for 135 chapters and an epilogue.
+17. Pre-specification. All commits of the plan and its addenda were made locally on 13 November 2026 and pushed when the study was complete. They are the author's record and not an independent registration.
