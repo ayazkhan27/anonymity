@@ -147,3 +147,12 @@ Hypotheses, on the round-2 texts. Decision rule as before, resampling assignment
 - HD3, the prose survives. A judge model that does not know the arms reads the control and dial revisions of the same draft in random order and answers which is better written. The dial arm is not chosen less often than half the time (the interval of its share of wins is not wholly below 0.5).
 
 Excerpts for the paper are taken from the essay at the median of the improvement in gap, not chosen by eye.
+
+## Deviations in the addenda (13 November 2026)
+
+1. Throughput was measured on a rented machine (Ryzen 5 5600X, RTX 3090), not on the laptop the plan implied, because long runs overheated the laptop. Processor and graphics-card timings come from that one host.
+2. Essays. 318 of the 320 requested machine essays were written; two condition-A requests produced no file (one agent declined because the task did not match the request relayed to it). Condition A therefore has 158 pairs.
+3. Declined requests. In the tone check the model declined 3 of 240 revision requests, and in the dial arm 11 of 60 essays were left without a second-round text, all by the smallest model, on the ground that making machine text read as a student's work misrepresents authorship. Declined requests were not retried; those essays leave the paired comparisons (57 of 60 and 48 of 60 remain).
+4. The dial sheet lists eight measures (net and total charge follow from hedons and dolors); HD1 is evaluated on all ten, as written.
+5. The judge for HD3 was Claude Opus 5.5, or Claude Sonnet 5.5 for drafts written by Opus. It was asked a second question, which of the two reads more like a student's own work, that the addendum did not list; it is reported as a secondary outcome.
+6. The `remove-ai-marks` skill was left out of addendum 3 because it strips provenance marks and is not a writing skill.
