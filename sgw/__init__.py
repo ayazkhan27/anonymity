@@ -1,4 +1,4 @@
-"""Sentiment Gummy Worm. Everything lives in sgw.core; names are looked up there on access,
+"""Felicific signatures (first called the Sentiment Gummy Worm). Everything lives in sgw.core; names are looked up there on access,
 so tables rebuilt by load_lexicon() are never stale."""
 from . import core
 

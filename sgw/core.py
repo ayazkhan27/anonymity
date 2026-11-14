@@ -1,11 +1,11 @@
-"""Sentiment Gummy Worm: sentiment as an additive charge with positional moments.
+"""Felicific signatures (package sgw, first called the Sentiment Gummy Worm): sentiment as an additive charge with positional moments.
 
 Every word carries a charge from human word ratings: positive charge in hedons (hd),
 negative charge in dolors (dl), both >= 0, at most 1 per word. A span of text is
 summarised by a fixed-size signature (counts and power sums of charge over word
-position). Signatures of adjacent spans merge exactly into the signature of their
-concatenation, so a book is scored in one pass and any chapter, page or sentence
-can be read off afterwards without rescoring.
+position). Signatures of adjacent spans cut at sentence ends merge exactly into the
+signature of their concatenation, so a book is scored in one pass and any sentence,
+paragraph or chapter can be read off afterwards without rescoring.
 
     S = sketch(["A lovely day.", "Not good, but the pasta was wonderful."])
     totals(S)            # hedons, dolors, words

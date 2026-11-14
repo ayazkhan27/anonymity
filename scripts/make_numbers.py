@@ -335,7 +335,9 @@ if pos and "parts" in pos:
     q = pos["parts"]["all"]
     md = q["dilution"]["matched_before_minus_after"]                # printed as a positive amount "lower"
     assert md[2] < 0; M("ptDilAbs", -md[0], "{:.3f}"); M("ptDilAbsLo", -md[2], "{:.3f}"); M("ptDilAbsHi", -md[1], "{:.3f}")
-    M("ptWordsEarlier", q["words_earlier"], "{:.1f}"); M("ptWordsLater", q["words_later"], "{:.1f}"); M("ptLaterLonger", 100 * q["later_longer"], "{:.0f}")
+    M("ptWordsEarlier", q["words_earlier"], "{:.1f}")
+    M("ptEqAbs", abs(q["strata"]["equal"]["diff"][0]), "{:.2f}"); M("ptOrderAbs", abs(q["order_term"][0]), "{:.2f}")
+    ci("ptDilTwoHeld", pos["parts"]["held_out"]["dilution"]["matched_neutral_two_plus"], "{:+.3f}"); M("ptWordsLater", q["words_later"], "{:.1f}"); M("ptLaterLonger", 100 * q["later_longer"], "{:.0f}")
     M("ptShareLo", q["share_weight"][0][0], "{:.2f}"); M("ptShareHi", q["share_weight"][-1][0], "{:.2f}")
     M("ptRsqPlain", q["r2"]["plain_mean"], "{:.2f}"); M("ptRsqLength", q["r2"]["length_weighted"], "{:.2f}"); M("ptRsqFree", q["r2"]["free_weights"], "{:.2f}")
     M("ptDilNAfter", q["dilution"]["n_after"], "{:,}"); M("ptDilNBefore", q["dilution"]["n_before"], "{:,}")
@@ -453,6 +455,8 @@ if mc and "dial" in mc:
         M("dlClusters", ", ".join(str(v) for v in d["cluster_sizes"]))
         for arm in ("draft", "human", "dial", "control"):
             M("dlSlips" + arm.title(), d["slips_per_1000"][arm], "{:.1f}")
+    by = d["mean_corr_by_model"]
+    M("dlPairsOpus", by["opus"]["n"]); M("dlPairsFable", by["fable"]["n"]); M("dlPairsSonnet", by["sonnet"]["n"]); M("hkPairs", d["n"] - sum(v["n"] for v in by.values()))
     M("dlAssignments", d.get("n_assignments", "?")); M("dlTrain", d["classifier_training_essays"]); M("dlMissingControl", d["missing_dial"]["missing_control"])
     for a, t in (("draft", "Draft"), ("control_r1", "ControlOne"), ("dial_r1", "DialOne"), ("control", "Control"), ("dial", "Dial")):
         M("dlGap" + t, d["gap"][a], "{:.2f}")
@@ -502,6 +506,18 @@ if os.path.exists(dcl):                                           # requests tha
     M("dcTotal", len(D_)); M("dcAuthorship", sum(why(o) == "auth" for o in D_)); M("dcRelay", sum(why(o) == "relay" for o in D_)); M("dcSilent", sum(why(o) == "silent" for o in D_))
     M("dcDialFirst", sum(o["experiment"] == "dial, round 1" and o["arm"] == "dial" for o in D_)); M("dcDialSecond", sum(o["experiment"] == "dial, round 2" and o["arm"] == "dial" for o in D_))
     assert all(o["model"] == "haiku" for o in D_ if why(o) == "auth") and all(o["experiment"] == "essays" for o in D_ if why(o) == "relay"), "text says who declined and why"
+    import pandas as pd
+    mt = os.path.join(HERE, "..", "machine_text")
+    rs, ds = pd.read_csv(os.path.join(mt, "revision_sample.csv")), pd.read_csv(os.path.join(mt, "dial_sample.csv"))
+    files = lambda pat: len(glob.glob(os.path.join(mt, pat)))
+    hk = dict(hkToneControl=int((rs.tier == "haiku").sum()), hkToneControlDone=files("revisions/control/*_haiku.txt"), hkReport=int((rs.tier == "haiku").sum()),
+              hkReportDone=files("revisions/report/*_haiku.txt"), hkControlDial=files("dial/r?/control/*_haiku.txt"), hkDialFirst=int((ds.tier == "haiku").sum()),
+              hkDialSecond=files("dial/r1/dial/*_haiku.txt"))
+    hk.update(hkReportDeclined=hk["hkReport"] - hk["hkReportDone"], hkControlAll=hk["hkToneControl"] + 2 * hk["hkDialFirst"], hkControlDone=hk["hkToneControlDone"] + hk["hkControlDial"],
+              hkDialRequests=hk["hkDialFirst"] + hk["hkDialSecond"])
+    for k_, v_ in hk.items():
+        M(k_, v_)
+    assert hk["hkReportDeclined"] == sum(o["experiment"] == "tone check" and o["arm"] == "report" and o["model"] == "haiku" for o in D_)
     M("dcHaikuControl", len(glob.glob(os.path.join(HERE, "..", "machine_text", "dial", "r?", "control", "*_haiku.txt"))))
     M("dcHaikuSkill", len(glob.glob(os.path.join(HERE, "..", "machine_text", "revisions", "humanizer", "*_haiku.txt"))) + len(glob.glob(os.path.join(HERE, "..", "machine_text", "revisions", "sepia", "*_haiku.txt"))))
 try:                                                              # how much of the charged lexicon comes from VADER's list (needs the downloaded lists)
@@ -528,7 +544,7 @@ WORDS = "zero one two three four five six seven eight nine ten".split()
 COUNTS = """whereUnits whereDolorLater wherePositive partialNeg partialPos winsNoDil winsVader lossesVader winsVaderSent lossesVaderSent winsVaderPrimary
     winsDistil winsNoShrink lossesNoShrink errFall errRise errRankPos hcSourcesAll hcSources hcBoostPositive hcNegPositive hcSupported critPairs
     kernSupport kernAgainst kernUndecided dlModels dlAssignments rvAssignments rvDeclined dcRelay dcSilent dcDialFirst dcDialSecond emoCatsNeg emoCats
-    emoCatsPos grpUp dlMissingControl""".split()
+    emoCatsPos grpUp dlMissingControl hkPairs hkDialSecond hkReportDeclined dcDialSecond""".split()
 for k in COUNTS:                                                  # small counts in running text are set as words
     if k in macros and macros[k].isdigit() and 1 <= int(macros[k]) <= 10:
         macros[k] = WORDS[int(macros[k])]

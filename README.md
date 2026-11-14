@@ -1,6 +1,6 @@
 # Felicific signatures
 
-A measure of sentiment for which granularity holds. Every word carries a positive charge, in hedons, and a negative charge, in dolors, taken from human word ratings. A span of text is summarised by 19 numbers, its signature. Signatures of adjacent spans merge exactly, so one pass over a book gives the score of every chapter, page and sentence, and no result depends on how the text was cut. The name comes from the felicific calculus, Bentham's proposal to measure and add pleasures and pains, whose units, hedons and dolors, the measure uses. The project began as the Sentiment Gummy Worm, which is why the Python package is called `sgw`.
+A measure of sentiment for which granularity holds. Every word carries a positive charge, in hedons, and a negative charge, in dolors, taken from human word ratings. A span of text is summarised by 19 numbers, its signature. Signatures of adjacent spans cut at sentence ends merge exactly, so one pass over a book gives the score of every sentence, paragraph and chapter, and no result depends on where the text is cut between sentences. The name comes from the felicific calculus, Bentham's proposal to measure and add pleasures and pains, whose units, hedons and dolors, the measure uses. The project began as the Sentiment Gummy Worm, which is why the Python package is called `sgw`.
 
 - Paper: [paper/sgw.pdf](paper/sgw.pdf), "A mergeable measure of sentiment"
 - Analysis plan, committed before any evaluation data were scored: [ANALYSIS_PLAN.md](ANALYSIS_PLAN.md)
@@ -108,7 +108,7 @@ python3 scripts/exp_transformers.py    # slow on a CPU; scores are cached in dat
 python3 scripts/exp_refine.py
 python3 scripts/exp_accuracy.py        # also writes sgw/constants.json; `exp_accuracy.py vader_sentences` adds one comparator without refitting
 python3 scripts/exp_position.py where kernel emobank dilute tree confirm parts
-python3 scripts/exp_books.py novels tales critics parts
+python3 scripts/exp_books.py novels tales critics footer parts
 python3 scripts/exp_uncertainty.py
 python3 scripts/exp_machine.py prepare samplejobs hc3 essays reference revise dial
 python3 scripts/exp_speed.py           # throughput; scripts/exp_gpu.py for a CUDA graphics card

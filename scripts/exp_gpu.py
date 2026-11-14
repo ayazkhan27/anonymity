@@ -1,8 +1,9 @@
-"""Transformer throughput on an AMD GPU through the ROCm build of PyTorch (run inside data/venv_rocm).
+"""Transformer throughput on a graphics card. The paper's figures come from an NVIDIA RTX 3090 (CUDA, PyTorch 2.3.1):
 
-    HSA_OVERRIDE_GFX_VERSION=10.3.0 data/venv_rocm/bin/python scripts/exp_gpu.py
+    python3 scripts/exp_gpu.py
 
-The override makes ROCm treat an RX 6600-class card (gfx1032) as the supported gfx1030 target.
+The ROCm build of PyTorch also works; the override below makes ROCm treat an RX 6600-class card (gfx1032) as the
+supported gfx1030 target and has no effect on NVIDIA cards.
 Same sentences, models and score as scripts/exp_speed.py; only the device differs.
 """
 import json, os, re, sys, time
@@ -20,7 +21,7 @@ SENT = re.compile(r"(?<=[.!?])\s+")
 
 
 def main():
-    assert torch.cuda.is_available(), "ROCm device not available"
+    assert torch.cuda.is_available(), "no CUDA or ROCm device"
     dev = torch.device("cuda")
     tr = pd.read_parquet(os.path.join(HERE, "..", "data", "yelp", "train.parquet")).sample(110000, random_state=0)
     sents = [s for r in tr.text.values[:40000] for s in SENT.split(r.replace("\n", " ")) if len(s) > 2][:200000]

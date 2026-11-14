@@ -451,8 +451,9 @@ def fig7():
     bx = fig.add_axes([0.70, 0.565, 0.18, 0.375])
     groups = [("ChatGPT\nanswers", Mc["hc3"]), ("Claude,\nplain", Mc["essays"]["A"]), ("Claude,\nas student", Mc["essays"]["B"])]
     for k, (lab, r) in enumerate(groups):
-        bx.plot([k - 0.12] * 2, r["auc"][1:], color=BLUE, lw=0.9); bx.plot(k - 0.12, r["auc"][0], "o", color=BLUE, ms=3.2)
-        bx.plot([k + 0.12] * 2, r["auc_words"][1:], color=GREY, lw=0.9); bx.plot(k + 0.12, r["auc_words"][0], "o", color=GREY, ms=3.2, mfc="white", mew=0.8)
+        ci = lambda key: r.get(key + "_jackknife", r[key])[1:]          # essays: jackknife over assignments; HC3: bootstrap over questions
+        bx.plot([k - 0.12] * 2, ci("auc"), color=BLUE, lw=0.9); bx.plot(k - 0.12, r["auc"][0], "o", color=BLUE, ms=3.2)
+        bx.plot([k + 0.12] * 2, ci("auc_words"), color=GREY, lw=0.9); bx.plot(k + 0.12, r["auc_words"][0], "o", color=GREY, ms=3.2, mfc="white", mew=0.8)
     bx.axhline(0.5, color=INK, lw=0.5, ls=(0, (3, 2)))
     bx.set_xticks(range(3)); bx.set_xticklabels([g[0] for g in groups], fontsize=6); bx.set_xlim(-0.5, 2.5); bx.set_ylim(0.45, 0.95)
     bx.set_ylabel("AUC, human versus machine")
