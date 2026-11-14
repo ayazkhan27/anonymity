@@ -114,6 +114,7 @@ python3 scripts/exp_machine.py prepare samplejobs hc3 essays reference revise di
 python3 scripts/exp_speed.py           # throughput; scripts/exp_gpu.py for a CUDA graphics card
 python3 scripts/exp_speed.py readout   # cost of the calibrated readout relative to the level
 python3 scripts/make_numbers.py && python3 scripts/make_figures.py
+python3 scripts/make_overview.py        # Fig. 1; needs figcraft-cli on the PATH
 cd paper && pdflatex sgw && bibtex sgw && pdflatex sgw && pdflatex sgw
 ```
 
@@ -157,4 +158,4 @@ Word ratings describe words and know nothing of events, so narrative text is bes
 
 ## Tools
 
-Figures use Matplotlib with SciencePlots. The analysis procedure drew on the scientific-critical-thinking, scientific-writing and scientific-brainstorming skills of Scientific Agent Skills (Kassis et al. 2026, arXiv:2609.00065). Code, analyses and the manuscript draft were produced with Claude under the author's direction; see the paper's Methods.
+Figures use Matplotlib with SciencePlots; the overview diagram (Fig. 1) is drawn with the FigCraft command-line tool by `scripts/make_overview.py`. The analysis procedure drew on the scientific-critical-thinking, scientific-writing and scientific-brainstorming skills of Scientific Agent Skills (Kassis et al. 2026, arXiv:2609.00065). Code, analyses and the manuscript draft were produced with Claude under the author's direction; see the paper's Methods.

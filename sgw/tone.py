@@ -96,6 +96,8 @@ def reference(genre=None):
     global _REF
     if _REF is None:
         _REF = json.load(open(os.path.join(_HERE, "reference.json")))
+    if genre is not None and genre not in _REF:
+        raise ValueError(f"Unknown genre {genre!r}. Choose one of: {', '.join(sorted(_REF))}.")
     return _REF if genre is None else _REF[genre]
 
 

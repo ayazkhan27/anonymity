@@ -4,16 +4,23 @@
     python3 -m sgw tone draft.txt --genre essay   compare a draft with human writing of one kind
     python3 -m sgw tone draft.txt --json          the same as numbers
 """
-import json, os, sys
+import json, os, re, sys
 
 from . import core, tone
 
 
 def _text(arg):
-    return open(arg, encoding="utf-8", errors="ignore").read() if os.path.isfile(arg) else arg
+    if os.path.isfile(arg):
+        return open(arg, encoding="utf-8", errors="ignore").read()
+    if re.fullmatch(r"\S+\.(txt|md|text)", arg):
+        sys.exit(f"sgw: no such file: {arg}")
+    return arg
 
 
 def main(argv):
+    if argv[:1] in (["-h"], ["--help"]):
+        print(__doc__.strip())
+        return
     if argv and argv[0] == "tone":
         import argparse
         p = argparse.ArgumentParser(prog="python3 -m sgw tone", description="Compare a draft with human writing of one kind.")
