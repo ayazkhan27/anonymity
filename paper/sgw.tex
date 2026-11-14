@@ -1,0 +1,38 @@
+\input{preamble}
+\input{numbers}
+\providecommand{\speedParagraph}{\textcolor{red}{Throughput benchmark pending.}}
+\providecommand{\speedMethods}{\textcolor{red}{Pending.}}
+\providecommand{\machineMethods}{}
+\providecommand{\machineCaption}{}
+\input{figures}
+
+\begin{document}
+\twocolumn[
+\begin{@twocolumnfalse}
+\vspace*{-6pt}
+{\sffamily\bfseries\fontsize{19}{22}\selectfont\raggedright A mergeable measure of sentiment for text of any length\par}
+\vspace{9pt}
+{\sffamily\normalsize Ayaz Khan\par}
+\vspace{2pt}
+{\sffamily\footnotesize\color{black!65} Department of Statistics, Columbia University, New York, NY, USA. Code and data: \url{https://github.com/ayazkhan27/anonymity}\par}
+\vspace{11pt}
+{\fontsize{10}{13.2}\selectfont\noindent\input{abstract}\par}
+\vspace{16pt}
+\end{@twocolumnfalse}
+]
+
+\input{body_a}
+\figSchematic
+\input{body_b}
+\input{body_c}
+\input{methods}
+
+\bibliographystyle{naturemag}
+\bibliography{refs}
+
+\clearpage
+\onecolumn
+\section*{Extended data}
+\input{extended}
+
+\end{document}

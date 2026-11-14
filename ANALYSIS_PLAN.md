@@ -98,3 +98,19 @@ Hypotheses. Direction fixed here; decision rule as above, on paired differences 
 Tone check. For 60 condition-A essays, two revisions by a subagent: a control instruction (revise so that it reads as written by a student in that grade) and the same instruction plus a report of how the draft's measures sit against human essays on other prompts. HT1: the mean squared standardised distance to the human reference is smaller after the revision that saw the report than after the control revision (paired). Secondary: the HL5 classifier's score for each revision.
 
 These analyses are exploratory extensions of the main study. Prior work already reports that model output is less negative than human text; the tests here ask whether the signature recovers that and adds position and clustering.
+
+Deviation from the addendum (13 November 2026, before any essay was generated). The seven text-dependent prompts ask students to argue from source passages that the corpus does not include, so a model could not be given the same task. The sample therefore uses the eight independent prompts, 20 student essays each (160 essays of 150 to 800 words), and four Claude tiers in rotation. One prompt has no grade recorded; its condition-B instruction says "high school student".
+
+## Addendum 2: a revised hypothesis, tested on data that did not suggest it
+
+Written and committed on 13 November 2026, after the planned tests refuted front-loading and before any of the data named below were examined.
+
+The planned tests point the other way from front-loading. Stated as a hypothesis of its own:
+
+Recency. What comes last in a text counts most toward a reader's judgement of it.
+
+- R1, composition. In binary nodes of the treebank's development and test trees (the training trees suggested the hypothesis and are excluded), with both parts of two or more words, the later part has the larger weight in the regression of the phrase's human rating on the ratings of its two parts. Supported if the 95% interval of the later weight minus the earlier weight is above zero.
+- R2, one-sided dilution. In the same trees, a rated part joined to a neutral part of two or more words keeps a smaller share of its rating when the neutral words follow it than when they come before it. Supported if the interval of the share kept with neutral words before, minus the share kept with neutral words after, is above zero.
+- R3, documents. In IMDB film reviews of 100 or more words (test portion, binary labels, not used so far), the net charge per word of the last fifth of a review separates positive from negative reviews better than that of the first fifth. Supported if the interval of AUC(last fifth) minus AUC(first fifth) is above zero.
+
+Intervals by bootstrap, resampling sentences for R1 and R2 and reviews for R3. These three tests are confirmatory for the revised hypothesis.

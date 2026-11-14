@@ -1,0 +1,18 @@
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+ & EmoBank & Tweets & Facebook & SST & Film reviews & Yelp & Mean \\
+$n$ (test portion) & 1,000 & 937 & 1,448 & 2,210 & 2,503 & 5,000 & \\
+\midrule
+Signature, calibrated & 0.48 {\scriptsize[0.43, 0.54]} & 0.70 {\scriptsize[0.67, 0.73]} & 0.62 {\scriptsize[0.58, 0.65]} & 0.44 {\scriptsize[0.40, 0.47]} & 0.29 {\scriptsize[0.26, 0.33]} & 0.61 {\scriptsize[0.59, 0.62]} & 0.51 \\
+Signature, level only & 0.44 {\scriptsize[0.39, 0.49]} & 0.71 {\scriptsize[0.67, 0.74]} & 0.57 {\scriptsize[0.54, 0.60]} & 0.42 {\scriptsize[0.39, 0.46]} & 0.26 {\scriptsize[0.22, 0.29]} & 0.54 {\scriptsize[0.52, 0.56]} & 0.48 \\
+Signature, constants from the same corpus & 0.48 {\scriptsize[0.43, 0.55]} & 0.73 {\scriptsize[0.70, 0.76]} & 0.62 {\scriptsize[0.58, 0.65]} & 0.46 {\scriptsize[0.43, 0.49]} & 0.40 {\scriptsize[0.37, 0.44]} & 0.63 {\scriptsize[0.61, 0.64]} & 0.54 \\
+Signature, refined charges & 0.41 {\scriptsize[0.36, 0.46]} & 0.71 {\scriptsize[0.68, 0.74]} & 0.58 {\scriptsize[0.55, 0.61]} & 0.55 {\scriptsize[0.52, 0.58]} & 0.49 {\scriptsize[0.47, 0.52]} & 0.64 {\scriptsize[0.62, 0.65]} & 0.55 \\
+VADER & 0.46 {\scriptsize[0.41, 0.50]} & 0.71 {\scriptsize[0.68, 0.75]} & 0.58 {\scriptsize[0.54, 0.62]} & 0.45 {\scriptsize[0.42, 0.48]} & 0.25 {\scriptsize[0.21, 0.29]} & 0.55 {\scriptsize[0.54, 0.57]} & 0.49 \\
+Hedonometer & 0.44 {\scriptsize[0.40, 0.48]} & 0.59 {\scriptsize[0.55, 0.63]} & 0.49 {\scriptsize[0.45, 0.52]} & 0.34 {\scriptsize[0.30, 0.37]} & 0.24 {\scriptsize[0.20, 0.28]} & 0.54 {\scriptsize[0.52, 0.56]} & 0.42 \\
+TextBlob & 0.31 {\scriptsize[0.24, 0.36]} & 0.51 {\scriptsize[0.46, 0.56]} & 0.53 {\scriptsize[0.49, 0.57]} & 0.41 {\scriptsize[0.37, 0.44]} & 0.46 {\scriptsize[0.43, 0.49]} & 0.60 {\scriptsize[0.58, 0.61]} & 0.44 \\
+Bag-of-words ridge, other corpora & 0.32 {\scriptsize[0.27, 0.40]} & 0.64 {\scriptsize[0.60, 0.67]} & 0.58 {\scriptsize[0.54, 0.61]} & 0.56 {\scriptsize[0.53, 0.58]} & 0.64 {\scriptsize[0.61, 0.66]} & 0.67 {\scriptsize[0.65, 0.68]} & 0.55 \\
+Bag-of-words ridge, same corpus & 0.51 {\scriptsize[0.47, 0.55]} & 0.59 {\scriptsize[0.55, 0.63]} & 0.53 {\scriptsize[0.50, 0.57]} & 0.66 {\scriptsize[0.64, 0.68]} & 0.77 {\scriptsize[0.75, 0.78]} & 0.83 {\scriptsize[0.83, 0.84]} & 0.61 \\
+DistilBERT (SST-2) & 0.50 {\scriptsize[0.46, 0.53]} & 0.60 {\scriptsize[0.56, 0.64]} & 0.54 {\scriptsize[0.50, 0.57]} & 0.78 {\scriptsize[0.76, 0.79]} & 0.56 {\scriptsize[0.53, 0.58]} & 0.75 {\scriptsize[0.73, 0.76]} & 0.59 \\
+Twitter-RoBERTa & 0.73 {\scriptsize[0.70, 0.76]} & 0.81 {\scriptsize[0.78, 0.83]} & 0.78 {\scriptsize[0.76, 0.80]} & 0.77 {\scriptsize[0.75, 0.79]} & 0.31 {\scriptsize[0.27, 0.34]} & 0.76 {\scriptsize[0.75, 0.77]} & 0.68 \\
+\bottomrule
+\end{tabular}

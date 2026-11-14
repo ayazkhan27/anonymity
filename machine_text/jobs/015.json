@@ -1,0 +1,4 @@
+{
+ "instructions": "Write an essay in response to the assignment below, the way a US grade 8 student would write it in class for a timed writing test. Aim for about 330 words. The file must contain only the essay itself: no notes, no commentary, no word count.\n\nAssignment: Your principal is reconsidering the school's cell phone policy. She is considering two possible policies: \nPolicy 1: Allow students to bring phones to school and use them during lunch periods and other free times, as long as the phones are turned off during class time. \nPolicy 2: Do not allow students to have phones at school at all.\nWrite a letter to your principal convincing her which policy you believe is better. Support your position with specific reasons.",
+ "output_path": "machine_text/essays/B/007_opus.txt"
+}

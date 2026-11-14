@@ -1,0 +1,79 @@
+% Results after the first two sections. Numbers come from numbers.tex (generated).
+
+\subsection{Agreement with human ratings}
+
+I compared scores with human ratings on six corpora: sentences from six genres (EmoBank\cite{buechel2017}), tweets (SemEval-2018\cite{mohammad2018semeval}), Facebook posts\cite{preotiuc2016}, film-review sentences (the Stanford Sentiment Treebank, SST\cite{socher2013}), whole film reviews with the critic's rating\cite{pang2005}, and Yelp reviews with star ratings\cite{zhang2015}. The first five carry continuous ratings and form the primary set. Every constant was fitted leave-one-corpus-out: for each target corpus, $a$, $\kappa$ and the ten coefficients came from the other five, and scores were then computed on the target's held-out test portion (Methods). Each of the six fits chose $a=\locoA$ and $\kappa=\locoKappa$.
+
+Averaged over the five primary corpora, the calibrated score correlates with human ratings at $r=\meanSgw$, against \meanVader{} for VADER\cite{hutto2014}, \meanBlob{} for TextBlob and \meanHedo{} for the hedonometer\cite{dodds2011} (\figref{fig:accuracy}a; all values with intervals in Extended Data Table~\ref{tab:accuracy}). The paired difference from VADER excludes zero in favour of the signature in \winsVader{} of six corpora and in favour of VADER in \lossesVader. The level of equation~(\ref{eq:level}), which has no fitted coefficients, reaches \meanLevel. This meets a criterion that an earlier version of the method failed (Methods), by a small margin.
+
+Methods trained on labelled text do better. A bag-of-words ridge regression trained on each corpus's own training portion averages \meanTfidf. DistilBERT fine-tuned on SST-2\cite{sanh2019} averages \meanDistil{} and a RoBERTa model fine-tuned on tweets\cite{loureiro2022} \meanRoberta. The signature is not a replacement for these where accuracy on one text matters most.
+
+Removing parts of the signature shows what earns its place (\figref{fig:accuracy}c). Without the operator channels the mean correlation falls by \lossNoShift; without dilution ($\kappa=0$) by \lossNoDil; without the neutral prior ($a=0$) by \lossNoShrink. Merging hedons and dolors into one channel costs \lossOneChan{} and dropping the position moments \lossNoPos: neither matters for agreement with raters, though both are needed for the readouts below.
+
+The fitted coefficients have plain readings (shipped model, fitted on all six corpora; bootstrap intervals). A dolor moves the predicted rating \constDolor{} \constDolorCI{} times as far as a hedon. A negated positive word counts as \constNegH{} \constNegHCI{} times its charge, about what the same amount of negative charge would do, while a negated negative word counts as \constNegD{} \constNegDCI: \emph{not good} is bad, and \emph{not bad} is neutral. An intensifier adds \constBoost{} \constBoostCI{} times the charge of the word it modifies. The data do not settle the effect of diminishers (\constDamp{} \constDampCI) or of contrast words (\constPost{} \constPostCI); in particular they give no support to the rule that the clause after \emph{but} counts for more\cite{hutto2014}.
+
+Word charges can also be fitted. With the exposure and the operator constants held fixed, the predicted rating is linear in the vector of charges, so the charges that best predict ratings, pulled toward the human word norms by a ridge penalty, solve one convex problem (Methods). Fitted leave-one-corpus-out, these refined charges raise the mean correlation to \meanRefined, the same as a bag-of-words ridge trained on the same five corpora (\meanBowPool). The gain is uneven. It is large on review text (SST \rSgwSst{} to \rRefinedSst, film reviews \rSgwFilm{} to \rRefinedFilm) and negative on the mixed genres of EmoBank (\rSgwEmo{} to \rRefinedEmo) and on Facebook posts (\rSgwFb{} to \rRefinedFb). Charges learned from ratings carry the genre of the texts they were learned from; human word norms travel better.
+
+One hoped-for property did not hold. The standard error of a level shrinks with exposure, but the error of the calibrated score against human raters does not: in none of the six corpora did squared error fall as exposure rose (Extended Data Fig.~\ref{fig:extended}a). The standard error says how well a text's own words pin down its level. It is not a prediction interval for a human rating.
+
+\figAccuracy
+
+\subsection{Cost}
+
+\speedParagraph
+
+\subsection{Where the feeling sits}
+
+Front-loading makes three predictions, and I tested each (\figref{fig:position}).
+
+The first is that charged words come early. They do not. The charge-weighted mean position, on a scale from $-1$ at the first word to $+1$ at the last, is above zero in all \whereUnits{} kinds of text examined, from \whereMin{} in Yelp reviews to \whereMax{} in tweets, with every interval excluding zero (Extended Data Table~\ref{tab:where}). In EmoBank sentences, SST sentences and tweets the first tenth of the words carries \firstDecileLo{} to \firstDecileHi{} of the text's mean charge per word, and in those three and in Facebook posts the last tenth carries \lastDecileLo{} to \lastDecileHi{} (\figref{fig:position}a). English sentences tend to open with determiners and pronouns and close on content. Facebook posts open at the mean (\fbFirst). Yelp reviews are the one place with a charged opening, at \yelpFirst{} times the mean, matched by the close at \yelpLast. Negative charge sits later than positive charge in \whereDolorLater{} of the \whereUnits.
+
+The second prediction is that readers weigh early words more. The position kernel fitted in each corpus puts more weight on the first third of a text than on the last third in SST sentences (difference \kernSst{} \kernSstCI), less in tweets (\kernTw{} \kernTwCI) and Yelp reviews (\kernYelp{} \kernYelpCI), and is undecided in the other three (\figref{fig:position}c). In the shipped model, fitted on all six corpora, the last third outweighs the first (\constPos{} \constPosCI).
+
+The third test uses human ratings alone. The SST gives a human rating to every phrase of its parse trees\cite{socher2013}, so the rating of a phrase can be regressed on the ratings of its two parts. Across \treeNodes{} phrase pairs the later part gets the larger weight: \wRightTwo{} against \wLeftTwo{} when both parts have at least two words (difference \wDiffTwo{} \wDiffTwoCI; \figref{fig:position}b). The later part of an English phrase is often its predicate, so this is a fact about where evaluation sits in syntax as much as about order. Either way the early words do not dominate. Within EmoBank documents, rated intensity does not fall with sentence position either (slope \emoSlope{} \emoSlopeCI{} per document length; \emoDocs{} documents).
+
+Front-loading is therefore refuted as a general rule. Earlier work on reviews found the same for whole documents, where the closing sentences carry the verdict\cite{pang2004,taboada2004,raychev2009,becker2010}, and it fits the recency effects known from memory and from retrospective judgements of experience\cite{murdock1962,fredrickson1993}.
+
+\figPosition
+
+\subsection{Neutral words dilute, when they follow the feeling}
+
+Dilution fares better (\figref{fig:dilution}). Holding a text's total charge fixed, rated intensity falls as the number of buffer words rises in \partialNeg{} of six corpora, with partial rank correlations from \partialEmo{} in EmoBank to \partialSst{} in SST sentences. Whole film reviews show no effect (\partialFilm{} \partialFilmCI). Held-out agreement peaks at a buffer weight $\kappa$ between \kappaLo{} and \kappaHi{} in the same five corpora and at zero for film reviews (\figref{fig:dilution}c).
+
+Human phrase ratings show the effect without any scorer. Take a phrase with a clear rating and join it to a neutral phrase of $m$ words. When the neutral words come after the rated phrase, the joined phrase keeps \keptAfterOne{} of the rating for $m=1$ and \keptAfterNine{} \keptAfterNineCI{} for $m\geq 9$. When they come before it, the share kept is \keptBeforeOne{} for $m=1$ and \keptBeforeNine{} \keptBeforeNineCI{} for $m\geq 9$: no decline (\figref{fig:dilution}a). The level of these shares is pulled down by regression to the mean, because the rated phrase was selected for a strong rating; the comparison between the two orders, and the trend with $m$, are not.
+
+So the 2024 manuscript had dilution right and its direction of travel wrong. Trailing neutral words weaken a judgement and leading ones do not, which is recency once more: what a reader meets last counts most, and if that is neutral the feeling fades.
+
+\figDilution
+
+\subsection{A book at every scale}
+
+I scored \nNovels{} novels from Project Gutenberg (\novelWords{} million words, median \novelChapters{} chapters) sentence by sentence and merged the signatures up to chapters and books. \figref{fig:book}a,b shows \emph{Moby-Dick}: \mobyWords{} words carrying \mobyHedons\hd{} and \mobyDolors\dl, a density of \mobyDensity{} per thousand words, with each of its \mobyChapters{} chapters and twelve spans of its final chapter read from the same pass.
+
+Chapters differ by more than chance. The variance of chapter densities is \heteroMedian{} times (median; interquartile range \heteroLo{} to \heteroHi) what results when a novel's sentences are shuffled across its chapters, and exceeds the shuffled value at $p\leq0.01$ in \heteroSig\% of novels (\figref{fig:book}c). One number for a book hides most of what its chapters do.
+
+The cubic arc read from a book's signature captures \arcShareThree\% (median) of the variance of an arc drawn with a moving window one tenth of the book wide; keeping moments up to degree nine would capture \arcShareNine\% (\figref{fig:book}d). The two leading modes of variation among the window arcs of the \nNovels{} novels are close to the first two Legendre polynomials (cosine similarity \svdCosOne{} and \svdCosTwo), the rise or fall and the single turn that earlier studies of story shapes found\cite{reagan2016}; the third mode is not close to the cubic (\svdCosThree).
+
+Human labels exist for one body of narrative. Alm and colleagues labelled every sentence of \nTales{} fairy tales with an emotion\cite{alm2005}. The cubic arc of each tale's merged signature agrees in sign with the cubic arc of its human labels in \taleArcPos\% of tales (median correlation \taleArc; sign test $p=$~\taleArcP; Extended Data Fig.~\ref{fig:extended}c). For a tale's overall valence the picture is less favourable. The calibrated score of the merged signature correlates with the mean human label at \taleStoryCal{} \taleStoryCalCI, and VADER averaged over sentences does better (\taleStoryVader{} \taleStoryVaderCI). The human target here is itself a mean of sentence labels, which an average of sentence scores mirrors. VADER applied to the whole tale saturates beyond $\pm0.99$ for \taleSaturated\% of tales and falls to \taleWholeVader.
+
+A caution applies to every number in this section. Word norms rate words, not events. The final chapter of \emph{Moby-Dick}, in which the ship is destroyed, scores near the book's own level, because \emph{whale}, \emph{sea} and \emph{boat} are pleasant words to raters. Densities of narrative text are best read against the text's own baseline.
+
+\figBook
+
+\subsection{Pooling, averaging and chunking}
+
+Bounded scores depend on how a long text is cut (\figref{fig:aggregation}a--c). For \vaderBooks{} of the novels I computed a book score as the mean VADER compound score over chunks. The mean across books rises from \vaderOne{} with one-sentence chunks to \vaderChapter{} with whole chapters, and \vaderFlipChapter\% of pairs of books swap order between the two. Two transformer classifiers behave the same way on 300 whole film reviews: the score of the review and the mean score of its sentences differ in sign for \partsDistilSign\% of reviews with DistilBERT and \partsRobertaSign\% with the RoBERTa model, and in both cases the mean of sentence scores predicts the critic's rating better than the score of the whole review does ($r=\partsDistilSent$ against \partsDistilWhole, and \partsRobertaSent{} against \partsRobertaWhole); \truncShare\% of the reviews exceed the models' 512-token window and are truncated.
+
+Averaging is the problem, whatever is averaged. If the densities of chunks are averaged, \densFlipMax\% of pairs of books swap order as the chunk size changes. If the chunks' signatures are merged, the book's density is the same for every chunking, to a relative difference below \sgwSpread.
+
+How far apart are a pooled value and a mean of parts? For parts with exposures $D_p$ and densities $\lambda_p$,
+\begin{equation}
+\frac{\sum_p D_p\lambda_p}{\sum_p D_p}=\overline{\lambda}+\frac{\Cov(D,\lambda)}{\overline{D}},
+\label{eq:pooled}
+\end{equation}
+an identity familiar from the decomposition of aggregate productivity\cite{olley1996}. The two differ when long parts differ in density from short ones. In novels they rarely do: the median gap between a novel's pooled density and the mean of its chapter densities is \gapOverSd\% of the standard deviation of density between novels, and \pairFlip\% of the \nPairs{} pairs of novels are ordered differently by the two (\figref{fig:aggregation}d).
+
+A difference between two bodies of text splits in the same spirit. Kitagawa's decomposition\cite{kitagawa1955} writes a difference in pooled density as a part due to differences within strata plus a part due to the mix of strata. Four film critics in the review corpus\cite{pang2005} illustrate it, with the critic's own rating as the stratum (\figref{fig:aggregation}e). Pooled, Berardinelli's and Renshaw's reviews have the same density (difference \critBerRenTotal{} per thousand words). Within the same rating Berardinelli's prose is the more negative by \critBerRenWithin, an interval that reaches zero, and his mix of ratings adds back \critBerRenMix. The decomposition is bookkeeping, and which part answers a question depends on the question\cite{pearl2014}; the point is that a signature kept per stratum makes both parts available, and a pooled bounded score does not.
+
+
+\figAggregation

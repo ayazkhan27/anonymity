@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentiment-gummy-worm"
+version = "4.0.0"
+description = "A mergeable measure of sentiment for text of any length"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+dependencies = ["numpy"]
+
+[project.optional-dependencies]
+refine = ["scipy", "scikit-learn"]
+mcp = ["mcp"]
+
+[tool.setuptools]
+packages = ["sgw"]
+
+[tool.setuptools.package-data]
+sgw = ["*.tsv", "*.json"]

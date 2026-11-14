@@ -1,0 +1,61 @@
+k,essay_id,prompt,grade,words,tier
+8,E83B8BD5D5A4,Cell phones at school,8.0,322,fable
+9,7C1FF9F7C5C8,Cell phones at school,8.0,211,sonnet
+10,A3E8BB69CC48,Cell phones at school,8.0,182,haiku
+11,6DFF43AD5171,Cell phones at school,8.0,315,opus
+16,5C7D64170E32,Cell phones at school,8.0,253,fable
+17,B18624117239,Cell phones at school,8.0,316,sonnet
+19,18A38B04783D,Cell phones at school,8.0,191,opus
+40,34F016931102,Distance learning,12.0,403,fable
+41,EC1D25B7A42E,Distance learning,11.0,695,sonnet
+42,B5C606F0A883,Distance learning,12.0,678,haiku
+43,4DB01BAEA36B,Distance learning,10.0,270,opus
+44,26E36C5938C1,Distance learning,10.0,226,fable
+45,4604BEF875BC,Distance learning,11.0,401,sonnet
+46,32D3B300954A,Distance learning,11.0,448,haiku
+47,AA40C0B9B536,Distance learning,11.0,396,opus
+60,39E08058C7B8,Grades for extracurricular activities,8.0,159,fable
+61,640315EA64A3,Grades for extracurricular activities,8.0,257,sonnet
+62,F2081C903659,Grades for extracurricular activities,8.0,175,haiku
+63,8248E7E6E2A0,Grades for extracurricular activities,8.0,224,opus
+66,F3222AB6C1AD,Grades for extracurricular activities,8.0,418,haiku
+72,7B64BC831CD9,Grades for extracurricular activities,8.0,302,fable
+73,3410CE477160,Grades for extracurricular activities,8.0,423,sonnet
+75,5BEEB3F5D022,Grades for extracurricular activities,8.0,186,opus
+80,7DA61B775AB2,Mandatory extracurricular activities,8.0,317,fable
+81,67D58F9FA53C,Mandatory extracurricular activities,8.0,664,sonnet
+83,14D67698786D,Mandatory extracurricular activities,8.0,348,opus
+86,6726B4680CA6,Mandatory extracurricular activities,8.0,584,haiku
+88,A48C41EEA09B,Mandatory extracurricular activities,8.0,615,fable
+89,FC15D48EB587,Mandatory extracurricular activities,8.0,543,sonnet
+91,0C386AFA6EB4,Mandatory extracurricular activities,8.0,202,opus
+94,949D00C575AE,Mandatory extracurricular activities,8.0,519,haiku
+100,89183CAB903F,Phones and driving,,416,fable
+101,53B50E488C81,Phones and driving,,372,sonnet
+103,BE090988C5A1,Phones and driving,,320,opus
+108,BEBB31733A38,Phones and driving,,371,fable
+109,D709095146B0,Phones and driving,,623,sonnet
+110,179A2FE8AF05,Phones and driving,,611,haiku
+111,24FCC5A84ED7,Phones and driving,,201,opus
+112,1B4AFEB6E86E,Phones and driving,,671,fable
+113,D7946F0C2A83,Phones and driving,,318,sonnet
+114,8BBA4BC818BA,Phones and driving,,187,haiku
+115,14F71871BF94,Phones and driving,,455,opus
+116,C1CB555641B6,Phones and driving,,555,fable
+117,5FD1A8FB7F6C,Phones and driving,,405,sonnet
+119,011DDBA781B0,Phones and driving,,413,opus
+126,4F225B82A62C,Seeking multiple opinions,8.0,458,haiku
+134,F4280C0353B0,Seeking multiple opinions,8.0,459,haiku
+138,2558BFD73442,Seeking multiple opinions,8.0,571,haiku
+140,1202C1C507A0,Summer projects,11.0,670,fable
+141,C068F7168129,Summer projects,11.0,737,sonnet
+142,60C9C0AC9F48,Summer projects,11.0,157,haiku
+143,9A79069BB83A,Summer projects,11.0,467,opus
+148,A09916887199,Summer projects,10.0,566,fable
+149,386F96C2DCE1,Summer projects,11.0,584,sonnet
+150,D99A8FDB17D8,Summer projects,11.0,573,haiku
+151,C8C6FF614971,Summer projects,11.0,488,opus
+156,0BCBCD2D4FEA,Summer projects,11.0,636,fable
+157,2E7FA51C438D,Summer projects,11.0,628,sonnet
+158,C06AB6F566C8,Summer projects,11.0,407,haiku
+159,1D7E734B4A3D,Summer projects,11.0,482,opus
