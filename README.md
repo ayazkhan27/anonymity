@@ -63,7 +63,7 @@ One hedon is the charge of a word that every rater places at the top of the rati
 | Chapters of novels | between-chapter variance 5.9 times the shuffled-sentence value (median) |
 | VADER book score by chunk size | 0.11 with one-sentence chunks, 0.76 with whole chapters |
 | Order of two parts of a phrase, length held fixed | weight of the later part minus the earlier at equal length -0.138 [-0.182, -0.090]; the raw later-part advantage is a length effect |
-| Neutral words | dilute on either side of the feeling; planned test supported in 4 of 6 corpora |
+| Neutral words | dilute on either side of the feeling; planned test supported in four of six corpora |
 | Human against machine essays, ten tone measures | AUC 0.74 plain, 0.64 when the model writes as a student; 0.63 for ChatGPT answers |
 | The dial | target against achieved value, mean r 0.64 with the dial and 0.08 without; no gain in resemblance to student essays over a plain revision was detected |
 <!-- results:end -->
