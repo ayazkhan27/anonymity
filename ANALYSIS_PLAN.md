@@ -63,4 +63,38 @@ Position moments off; dilution off (kappa = 0); shrinkage off (a = 0); shifter c
 
 ## Deviations
 
-None yet.
+All dated 13 November 2026. Test portions were first scored in run 1, with the plan exactly as written above.
+
+1. Grid. In run 1 the chosen a sat at the top of its grid (a = 4). The grids were widened to a up to 32 and kappa up to 2. Development data then put the optimum inside the grid at the same values (a = 4, kappa = 0.5), so the choice did not change.
+2. Tokeniser. After run 1 the tokeniser was rewritten with plain string operations, because a regular expression for emoji made large batches slow. Behaviour differs slightly: a URL becomes a few unknown words, an emoticon counts only after a space, and every sentence-ending mark maps to one token. The change was made for speed and was not tuned on test data. Every reported number comes from the rewritten tokeniser.
+3. Bug. The selection of (a, kappa) for the uncalibrated level readout overwrote its best value whenever the calibrated readout improved. Fixed after run 1.
+4. Design checks on development data only (`scripts/dev_explore.py`): neutral band 0, 0.125, 0.25, 0.375; negation window 2 to 4; modifier window 1 or 2; the extended lexicon. The planned values were kept.
+5. Additions after run 1, not planned, reported as secondary: (a) refined word charges, one ridge problem centred on the norm charges, fitted leave-one-corpus-out; (b) a bag-of-words ridge trained on the same out-of-corpus pool, as the fair comparator for (a).
+6. Transformers are scored on a seeded 5,000-review subsample of the Yelp test portion to bound CPU time. For Yelp, every method is compared on that subsample.
+7. Addition, exploratory: how two parts combine and what neutral words do, measured on the human phrase ratings of the Stanford Sentiment Treebank (training trees). No scorer is involved.
+8. H1b, H1c and the dilution partial correlation estimate a quantity and are not held-out predictions, so they use all portions of each corpus. Position analyses keep texts of ten or more words.
+
+## Addendum: human and machine writing
+
+Written and committed before any machine-written text was generated or scored.
+
+Question. On the same prompt, does the signature of text written by a language model differ from the signature of text written by people, and in which measurable ways? A second question follows from the first: can a report of those differences help a model revise its own draft toward the human range?
+
+Data.
+
+- HC3 (Guo et al. 2023): questions with answers from people and from ChatGPT. One human and one ChatGPT answer per question (the first of each), both at least 30 words.
+- PERSUADE 2.0: argumentative essays by US students in grades 6 to 12, 15 prompts, collected before 2021. A seeded sample of 10 essays per prompt (150 essays). For each sampled essay, two new essays written by Claude models through subagents that are told nothing about this study: (A) the assignment text and a word count matched to the student's essay; (B) the same, plus an instruction to write as a student in the same grade would. Three Claude model tiers in rotation.
+
+Measures, all read from signatures and free of text length: hedon density, dolor density, net density, gross density (per 1,000 words); share of words charged; share of charge that is negated, intensified, or after a contrast word; ending lift (the cubic arc averaged over the last fifth of the text minus the text's mean density); sentence clustering (between-sentence variance of density divided by its expectation if words were dealt to sentences at random).
+
+Hypotheses. Direction fixed here; decision rule as above, on paired differences (machine minus human, same prompt or question), resampling prompts for PERSUADE and questions for HC3.
+
+- HL1. Machine text has higher net density.
+- HL2. Machine text has lower dolor density.
+- HL3. Machine text has lower sentence clustering (charge spread more evenly over sentences).
+- HL4. Machine text has higher ending lift (it closes on a more positive note).
+- HL5. A logistic regression on these measures alone tells the two apart: AUC above 0.5, interval excluding 0.5, cross-validated with all texts of a prompt or question in one fold. Reported next to the same model given word count alone, and separately for condition B.
+
+Tone check. For 60 condition-A essays, two revisions by a subagent: a control instruction (revise so that it reads as written by a student in that grade) and the same instruction plus a report of how the draft's measures sit against human essays on other prompts. HT1: the mean squared standardised distance to the human reference is smaller after the revision that saw the report than after the control revision (paired). Secondary: the HL5 classifier's score for each revision.
+
+These analyses are exploratory extensions of the main study. Prior work already reports that model output is less negative than human text; the tests here ask whether the signature recovers that and adds position and clustering.

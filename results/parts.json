@@ -1,0 +1,21 @@
+{
+ "n_reviews": 300,
+ "sentences": 10665,
+ "DistilBERT (SST-2)": {
+  "r_between": 0.590813462273387,
+  "sign_differs": 0.27666666666666667,
+  "abs_gap_median": 0.7592011839151382,
+  "r_rating_whole": 0.528453694142877,
+  "r_rating_sentence_mean": 0.6134570020676183,
+  "saturated_whole": 0.75
+ },
+ "Twitter-RoBERTa": {
+  "r_between": 0.4063957023093953,
+  "sign_differs": 0.5066666666666667,
+  "abs_gap_median": 0.22075892195062735,
+  "r_rating_whole": 0.22524480405158354,
+  "r_rating_sentence_mean": 0.5205368034148186,
+  "saturated_whole": 0.006666666666666667
+ },
+ "SGW density r with rating": 0.23231027843329552
+}

@@ -1,0 +1,33 @@
+{
+ "a": 4,
+ "kappa": 0.5,
+ "level_a": 1,
+ "level_kappa": 0.2,
+ "coef": [
+  -0.35615507049678424,
+  5.850114275716692,
+  -9.553672293630934,
+  0.8797340704518181,
+  1.329067121505859,
+  1.2593773371692727,
+  -15.19550067806497,
+  9.642748829127736,
+  7.816976741846043,
+  -2.53340395086845,
+  -0.4702949110113661
+ ],
+ "features": [
+  "intercept",
+  "hedons",
+  "dolors",
+  "net x P1(position)",
+  "net x P2(position)",
+  "net x P3(position)",
+  "negated hedons",
+  "negated dolors",
+  "intensified net",
+  "diminished net",
+  "net after contrast"
+ ],
+ "note": "Calibrated readout predicts a human valence rating in standard-deviation units, pooled over six corpora."
+}
