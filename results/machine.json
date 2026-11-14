@@ -687,15 +687,31 @@
  },
  "revise": {
   "n": 57,
+  "arms": [
+   "control",
+   "report",
+   "humanizer",
+   "sepia"
+  ],
+  "declined": {
+   "control": 1,
+   "report": 2,
+   "humanizer": 0,
+   "sepia": 0
+  },
   "words": {
    "draft": 448.0,
    "control": 479.0,
-   "report": 468.0
+   "report": 468.0,
+   "humanizer": 463.0,
+   "sepia": 457.0
   },
   "distance": {
    "draft": 0.6601105218143829,
    "control": 0.5284425824279674,
    "report": 0.4133188026288717,
+   "humanizer": 0.5352137714770695,
+   "sepia": 0.48563622867678974,
    "human": 1.1575921044099176
   },
   "report_minus_control": {
@@ -731,7 +747,77 @@
     -0.14557934071296025
    ]
   },
+  "humanizer_minus_control": {
+   "diff": 0.00677118904910209,
+   "ci_prompts": [
+    -0.0735550664922648,
+    0.06626370517380532
+   ],
+   "ci_essays": [
+    -0.05159807877996149,
+    0.06539055855072173
+   ]
+  },
+  "sepia_minus_control": {
+   "diff": -0.04280635375117757,
+   "ci_prompts": [
+    -0.15733175336298713,
+    0.041842276549255236
+   ],
+   "ci_essays": [
+    -0.12713314865144493,
+    0.0326273330241727
+   ]
+  },
+  "humanizer_minus_draft": {
+   "diff": -0.1248967503373135,
+   "ci_prompts": [
+    -0.24548954424744068,
+    -0.014092157111509906
+   ],
+   "ci_essays": [
+    -0.21009422371555106,
+    -0.048005475401819916
+   ]
+  },
+  "sepia_minus_draft": {
+   "diff": -0.17447429313759316,
+   "ci_prompts": [
+    -0.3201053140324385,
+    -0.05274084309959751
+   ],
+   "ci_essays": [
+    -0.26738133822795845,
+    -0.09234534820489526
+   ]
+  },
+  "report_minus_humanizer": {
+   "diff": -0.12189496884819767,
+   "ci_prompts": [
+    -0.261912964377069,
+    0.011364758995073875
+   ],
+   "ci_essays": [
+    -0.21827797937276786,
+    -0.03149394181609665
+   ]
+  },
+  "report_minus_sepia": {
+   "diff": -0.07231742604791802,
+   "ci_prompts": [
+    -0.1676808232105259,
+    0.01987173343080836
+   ],
+   "ci_essays": [
+    -0.14253144038130375,
+    -0.004673607749405889
+   ]
+  },
   "HT1": "undecided",
+  "HS1": {
+   "humanizer": "undecided",
+   "sepia": "undecided"
+  },
   "per_measure_z": {
    "draft": {
     "hedons": -0.11316440816491478,
@@ -768,12 +854,38 @@
     "after_contrast": -0.3454822143945625,
     "ending_lift": 0.019207630788581814,
     "clustering": -0.1404223252361257
+   },
+   "humanizer": {
+    "hedons": -0.06804822046572978,
+    "dolors": 0.22326909559108093,
+    "net": -0.13657663153504052,
+    "gross": 0.014749166925069975,
+    "charged": 0.05155753827704196,
+    "negated": -0.14066060344848152,
+    "intensified": -0.44445916677123803,
+    "after_contrast": -0.35933056960633686,
+    "ending_lift": 0.17807895184172803,
+    "clustering": 0.059747164074287575
+   },
+   "sepia": {
+    "hedons": -0.09255201819437643,
+    "dolors": 0.20547539650215552,
+    "net": -0.15193717536875365,
+    "gross": -0.01620098366367824,
+    "charged": 0.016596750050441995,
+    "negated": -0.02948513483015128,
+    "intensified": -0.41529739670108134,
+    "after_contrast": -0.3487104466383846,
+    "ending_lift": 0.1565953312205823,
+    "clustering": -0.1590796384725144
    }
   },
   "machine_score": {
    "draft": 0.6171821258192277,
    "control": 0.550225974286748,
    "report": 0.5305190069405825,
+   "humanizer": 0.5577113911704846,
+   "sepia": 0.5506582784859898,
    "human": 0.3789618408277219
   }
  },
@@ -782,6 +894,199 @@
   "skills": {
    "humanizer": "humanizer:humanizer",
    "sepia": "sepia:sepia-recreate"
+  }
+ },
+ "dialjobs": {
+  "n": 60
+ },
+ "dialjobs2": {
+  "jobs": 109
+ },
+ "judgejobs": {
+  "pairs": 48
+ },
+ "dial": {
+  "n": 48,
+  "declined": 12,
+  "corr": {
+   "dial": {
+    "hedons": 0.7257752920833722,
+    "dolors": 0.815778623294672,
+    "net": 0.7468843543124737,
+    "gross": 0.7237085935519916,
+    "charged": 0.6283720132591183,
+    "negated": 0.7381522953719164,
+    "intensified": 0.4310666572160557,
+    "after_contrast": 0.8264056555206899,
+    "ending_lift": 0.5537079899663324,
+    "clustering": 0.23976853908709456
+   },
+   "control": {
+    "hedons": -0.020671828200661168,
+    "dolors": 0.057027914074168976,
+    "net": 0.0037704116775639507,
+    "gross": -0.036539029823471736,
+    "charged": 0.07148332947913237,
+    "negated": 0.061071980664203135,
+    "intensified": 0.03999418520872776,
+    "after_contrast": 0.43347458943313094,
+    "ending_lift": 0.12330312250515417,
+    "clustering": 0.10357116790335932
+   },
+   "draft": {
+    "hedons": -0.02260554817766161,
+    "dolors": 0.1454201421440008,
+    "net": 0.02382657217049615,
+    "gross": -0.04700220353265895,
+    "charged": -0.06566869510681382,
+    "negated": 0.1344166445637581,
+    "intensified": -0.1585579683829731,
+    "after_contrast": 0.11745545592554751,
+    "ending_lift": 0.09692754198849914,
+    "clustering": 0.004010519687908682
+   }
+  },
+  "gap": {
+   "draft": 1.6676663084243029,
+   "control_r1": 1.6117015865407145,
+   "dial_r1": 1.0698468372354146,
+   "control": 1.552810456154667,
+   "dial": 0.7857985579583233
+  },
+  "distance_to_centre": {
+   "draft": 0.6328586174037637,
+   "control": 0.5732403847255317,
+   "dial": 0.7985465612644903,
+   "human": 1.2828120220517916
+  },
+  "corr_dial_minus_control": {
+   "diff": 0.559313417074241,
+   "ci_prompts": [
+    0.3943822483659081,
+    0.7097806064520016
+   ],
+   "ci_essays": [
+    0.43051083379772237,
+    0.6736463473522708
+   ]
+  },
+  "gap_dial_minus_control": {
+   "diff": -0.7670118981963435,
+   "ci_prompts": [
+    -1.1563119152805093,
+    -0.44056574521602465
+   ],
+   "ci_essays": [
+    -0.995324185058368,
+    -0.5589554129880104
+   ]
+  },
+  "mean_corr": {
+   "dial": 0.6429620013663717,
+   "control": 0.08364858429213076,
+   "draft": 0.02282224612801029
+  },
+  "missing_dial": {
+   "total": 11,
+   "haiku": 11,
+   "requested": 60,
+   "missing_control": 1
+  },
+  "HD1": "supported",
+  "machine_score": {
+   "draft": 0.6350794084185715,
+   "control": 0.42564811828995824,
+   "dial": 0.4886040045610325,
+   "human": 0.40722413432828913
+  },
+  "auc_vs_matched_students": {
+   "draft": 0.7161458333333334,
+   "control": 0.5338541666666666,
+   "dial": 0.5872395833333333
+  },
+  "score_dial_minus_control": {
+   "diff": 0.06295588627107429,
+   "ci_prompts": [
+    -0.0369137589146348,
+    0.16666809542871378
+   ],
+   "ci_essays": [
+    -0.0344802653527011,
+    0.15822396642467945
+   ]
+  },
+  "HD2": "undecided",
+  "judge_better": {
+   "share": 0.625,
+   "ci_prompts": [
+    0.42857142857142855,
+    0.7402717652717652
+   ],
+   "ci_essays": [
+    0.4791666666666667,
+    0.75
+   ],
+   "n": 48
+  },
+  "judge_student": {
+   "share": 0.10416666666666667,
+   "ci_prompts": [
+    0.05128205128205128,
+    0.1458460365853658
+   ],
+   "ci_essays": [
+    0.020833333333333332,
+    0.20833333333333334
+   ],
+   "n": 48
+  },
+  "HD3": "supported",
+  "excerpt": {
+   "k": 129,
+   "tier": "sonnet",
+   "prompt": "Seeking multiple opinions",
+   "draft": {
+    "opening": "When I had to choose between two summer programs last year, my first instinct was to ask my mom and go with whatever she said. She thought the robotics camp was a safe bet because it looked good for college. But then I talked to",
+    "closing": "it. But asking a few trusted people, especially people with different experiences, gives you more information, exposes hidden bias, and sharpens your own thinking. That is why I would always rather ask several people than rely on one, even when the first answer sounds convincing."
+   },
+   "dial": {
+    "opening": "When I had to choose between two summer programs last year, my first idea was to ask my mom and do whatever she said. She thought the robotics camp was a safe choice because it would look great for college. Then I talked to my",
+    "closing": "the end the choice belongs to the person who has to live with it. I feel glad I did not ask just one person. Kids who ask a few trusted people get a fair chance to choose, and that makes for a fun, wonderful summer."
+   },
+   "control": {
+    "opening": "Last summer I had to choose between two summer programs. At first I just wanted to ask my mom and do whatever she said. She told me the robotics camp was the safe choice because it would look good on my college applications. But then",
+    "closing": "you ask a few people you trust, especially people who have had different experiences, you get more information and you can spot bias. That is why I would always ask a few people instead of just one, even if the first answer sounds really good."
+   },
+   "values": {
+    "draft": {
+     "intensified": 0.7856097957414536,
+     "negated": 4.662187787831179,
+     "ending_lift": 8.17419273605935,
+     "hedons": 90.1105398457583,
+     "dolors": 4.784061696658098
+    },
+    "dial": {
+     "intensified": 0.0,
+     "negated": 7.553907742698573,
+     "ending_lift": 12.653218836464461,
+     "hedons": 113.50408719346049,
+     "dolors": 6.2888283378746594
+    },
+    "control": {
+     "intensified": 3.6979032748182608,
+     "negated": 5.666066711858068,
+     "ending_lift": -0.2031452747139617,
+     "hedons": 94.3094688221709,
+     "dolors": 4.4919168591224015
+    }
+   },
+   "target": {
+    "intensified": 1.9613567114889894,
+    "negated": 7.294422448867887,
+    "ending_lift": -19.650531015901862,
+    "hedons": 105.58590308370044,
+    "dolors": 15.138766519823786
+   }
   }
  }
 }

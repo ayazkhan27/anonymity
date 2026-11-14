@@ -259,9 +259,173 @@ def revise():
     return out
 
 
+# ---------------------------------------------------------------- addendum 4: the dial
+
+SHEET = [("hedons", "positive words such as good, love, fun"), ("dolors", "negative words such as bad, hate, problem"),
+         ("charged", "share of all words that carry any feeling"), ("negated", "feeling words placed under not, never or n't"),
+         ("intensified", "feeling words placed right after very, really or so"), ("after_contrast", "feeling words placed after but or however in the same sentence"),
+         ("ending_lift", "how much more positive the last fifth is than the essay as a whole; negative means a more downbeat ending"),
+         ("clustering", "above 1 means the feeling is bunched into some sentences while others are plain; below 1 means it is spread evenly")]
+CONTROL = ("Below is a draft essay. Revise it so that it reads as if {who} wrote it in class for a timed writing test. "
+           "Keep the position it argues and keep it at about {n} words. The file must contain only the revised essay.")
+
+
+def sheet(current, target, again=False):
+    head = ("A measurement tool scored your last revision. " if again else "A measurement tool scored the draft on how it carries feeling. ") + \
+           "For each measure below it gives the current value and a target. Revise the essay so that its measures move to the targets; the tool will score the result again.\n"
+    rows = []
+    for m, hint in SHEET:
+        j = M.index(m)
+        name, unit = tone.LABEL[m]
+        rows.append(f"- {name} ({unit}): now {current[j]:.1f}, target {target[j]:.1f}. Counts {hint}.")
+    return head + "\n".join(rows)
+
+
+def who(grade):
+    return f"a US grade {int(grade)} student" if not np.isnan(grade) else "a US high school student"
+
+
+def dial_sample():
+    s = load_essays()
+    used = pd.read_csv(f"{MT}/revision_sample.csv").k
+    rest = s[s.A.notna() & ~s.k.isin(used)]
+    pick = pd.concat([g.sample(min(15, len(g)), random_state=1) for _, g in rest.groupby("tier")]).sort_values("k").reset_index(drop=True)
+    corpus = pd.read_parquet(f"{DATA}/persuade/essays.parquet")
+    X, n = tone.profiles(corpus.full_text)
+    ok = (n >= 100) & ~np.isnan(X).any(1)
+    rng = np.random.default_rng(0)
+    targets = np.array([X[rng.choice(np.flatnonzero(ok & (corpus.prompt_name != p).values))] for p in pick.prompt])
+    return pick, targets
+
+
+def dialjobs():
+    """Round 1: dial arm (control instruction plus the sheet) and control arm, on fresh condition-A drafts."""
+    pick, targets = dial_sample()
+    root = os.path.abspath(MT)
+    for d in ("dial_jobs/r1", "dial_jobs/r2", "dial/r1/dial", "dial/r1/control", "dial/r2/dial", "dial/r2/control"):
+        os.makedirs(f"{MT}/{d}", exist_ok=True)
+    cur, _ = tone.profiles(pick.A)
+    tiers = []
+    for i, r in enumerate(pick.itertuples()):
+        base = CONTROL.format(who=who(r.grade), n=len(r.A.split()))
+        for j, arm in enumerate(("dial", "control")):
+            extra = "\n\n" + sheet(cur[i], targets[i]) if arm == "dial" else ""
+            json.dump({"instructions": base + extra + "\n\nDraft:\n\n" + r.A, "output_path": f"{root}/dial/r1/{arm}/{r.k:03d}_{r.tier}.txt"},
+                      open(f"{MT}/dial_jobs/r1/{2 * i + j:03d}.json", "w"), indent=1)
+            tiers.append(r.tier)
+    pick[["k", "essay_id", "prompt", "grade", "words", "tier"]].to_csv(f"{MT}/dial_sample.csv", index=False)
+    np.save(f"{MT}/dial_targets.npy", targets)
+    print(json.dumps(tiers))
+    return {"n": int(len(pick))}
+
+
+def dialjobs2():
+    """Round 2: each arm revises its own round-1 text; the dial arm gets a fresh sheet."""
+    pick, targets = pd.read_csv(f"{MT}/dial_sample.csv"), np.load(f"{MT}/dial_targets.npy")
+    root, tiers, n = os.path.abspath(MT), [], 0
+    for i, r in enumerate(pick.itertuples()):
+        for j, arm in enumerate(("dial", "control")):
+            p1 = f"{MT}/dial/r1/{arm}/{r.k:03d}_{r.tier}.txt"
+            path = f"{MT}/dial_jobs/r2/{2 * i + j:03d}.json"
+            tiers.append(r.tier)
+            if not os.path.exists(p1):
+                json.dump({"instructions": "Reply with the single word: skipped. Write no file.", "output_path": ""}, open(path, "w"))
+                continue
+            text = open(p1, encoding="utf-8").read()
+            base = CONTROL.format(who=who(r.grade), n=len(text.split())).replace("Below is a draft essay.", "Below is an essay you revised once.")
+            extra = "\n\n" + sheet(tone.profiles([text])[0][0], targets[i], again=True) if arm == "dial" else ""
+            json.dump({"instructions": base + extra + "\n\nEssay:\n\n" + text, "output_path": f"{root}/dial/r2/{arm}/{r.k:03d}_{r.tier}.txt"}, open(path, "w"), indent=1)
+            n += 1
+    print(json.dumps(tiers))
+    return {"jobs": n}
+
+
+def judgejobs():
+    """HD3: blind pairs. The judge sees the two round-2 revisions of one draft in a seeded random order."""
+    pick = pd.read_csv(f"{MT}/dial_sample.csv")
+    corpus = pd.read_parquet(f"{DATA}/persuade/essays.parquet").drop_duplicates("prompt_name").set_index("prompt_name")
+    os.makedirs(f"{MT}/judge_jobs", exist_ok=True)
+    rng = np.random.default_rng(0)
+    key, judges = [], []
+    for i, r in enumerate(pick.itertuples()):
+        paths = {arm: f"{MT}/dial/r2/{arm}/{r.k:03d}_{r.tier}.txt" for arm in ("dial", "control")}
+        if not all(os.path.exists(p) for p in paths.values()):
+            continue
+        order = ["dial", "control"] if rng.random() < 0.5 else ["control", "dial"]
+        texts = [open(paths[a], encoding="utf-8").read() for a in order]
+        json.dump({"assignment": corpus.loc[r.prompt].assignment, "writer": who(r.grade), "essay_1": texts[0], "essay_2": texts[1]},
+                  open(f"{MT}/judge_jobs/{len(key):03d}.json", "w"), indent=1)
+        key.append(dict(job=len(key), k=int(r.k), first=order[0]))
+        judges.append("opus" if r.tier != "opus" else "sonnet")
+    pd.DataFrame(key).to_csv(f"{MT}/judge_key.csv", index=False)
+    print(json.dumps(judges))
+    return {"pairs": len(key)}
+
+
+def dial():
+    """Score the round-2 texts against the assigned targets (HD1), the classifier (HD2) and the judges (HD3)."""
+    pick, targets = pd.read_csv(f"{MT}/dial_sample.csv"), np.load(f"{MT}/dial_targets.npy")
+    s = load_essays().set_index("k")
+    texts = {arm: [open(p, encoding="utf-8").read() if os.path.exists(p) else None for p in (f"{MT}/dial/r2/{arm}/{k:03d}_{t}.txt" for k, t in zip(pick.k, pick.tier))] for arm in ("dial", "control")}
+    r1 = {arm: [open(p, encoding="utf-8").read() if os.path.exists(p) else None for p in (f"{MT}/dial/r1/{arm}/{k:03d}_{t}.txt" for k, t in zip(pick.k, pick.tier))] for arm in ("dial", "control")}
+    ok = np.array([a is not None and b is not None for a, b in zip(texts["dial"], texts["control"])])
+    pick, T = pick[ok].reset_index(drop=True), targets[ok]
+    g = pick.prompt.values
+    ref = stats(tone.profiles(pd.read_parquet(f"{DATA}/persuade/essays.parquet").full_text)[0])
+    sd = np.array([ref[m]["sd"] for m in M]); mu = np.array([ref[m]["mean"] for m in M])
+    P = {"draft": tone.profiles(s.loc[pick.k].A)[0], "human": tone.profiles(s.loc[pick.k].human)[0]}
+    for arm in ("dial", "control"):
+        P[arm] = tone.profiles([t for t, keep in zip(texts[arm], ok) if keep])[0]
+        P[arm + "_r1"] = tone.profiles([t if t is not None else "" for t, keep in zip(r1[arm], ok) if keep])[0]
+    corr = lambda X, i: np.array([pearson(T[i, j], np.nan_to_num(X[i, j], nan=np.nanmean(X[:, j]))) for j in range(len(M))])
+    gap = lambda X: np.nanmean(((X - T) / sd) ** 2, 1)
+    out = dict(n=int(len(pick)), declined=int((~ok).sum()), corr={a: {m: float(c) for m, c in zip(M, corr(P[a], np.arange(len(pick))))} for a in ("dial", "control", "draft")},
+               gap={a: float(gap(P[a]).mean()) for a in ("draft", "control_r1", "dial_r1", "control", "dial")},
+               distance_to_centre={a: float(np.nanmean(((P[a] - mu) / sd) ** 2)) for a in ("draft", "control", "dial", "human")})
+    for name, stat in (("corr_dial_minus_control", lambda i: float(np.mean(corr(P["dial"], i) - corr(P["control"], i)))),
+                       ("gap_dial_minus_control", lambda i: float(np.mean(gap(P["dial"])[i] - gap(P["control"])[i])))):
+        e, e2 = boot(stat, g), boot(stat, np.arange(len(pick)))
+        out[name] = dict(diff=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])])
+    out["mean_corr"] = {a: float(np.mean(list(out["corr"][a].values()))) for a in out["corr"]}
+    full = pd.read_csv(f"{MT}/dial_sample.csv")
+    gone = [t for t, x in zip(full.tier, texts["dial"]) if x is None]
+    out["missing_dial"] = dict(total=len(gone), haiku=gone.count("haiku"), requested=int(len(full)), missing_control=int(sum(x is None for x in texts["control"])))
+    out["HD1"] = "supported" if out["corr_dial_minus_control"]["ci_prompts"][0] > 0 else "refuted" if out["corr_dial_minus_control"]["ci_prompts"][1] < 0 else "undecided"
+    rest = load_essays(); rest = rest[rest.A.notna() & ~rest.k.isin(pick.k)]
+    clf = classifier().fit(np.vstack([tone.profiles(rest.human)[0], tone.profiles(rest.A)[0]]), np.r_[np.zeros(len(rest)), np.ones(len(rest))])
+    sc = {a: clf.predict_proba(P[a])[:, 1] for a in ("draft", "control", "dial", "human")}
+    out["machine_score"] = {a: float(v.mean()) for a, v in sc.items()}
+    from sklearn.metrics import roc_auc_score
+    out["auc_vs_matched_students"] = {a: float(roc_auc_score(np.r_[np.zeros(len(pick)), np.ones(len(pick))], np.r_[sc["human"], sc[a]])) for a in ("draft", "control", "dial")}
+    e, e2 = boot(lambda i: float(np.mean(sc["dial"][i] - sc["control"][i])), g), boot(lambda i: float(np.mean(sc["dial"][i] - sc["control"][i])), np.arange(len(pick)))
+    out["score_dial_minus_control"] = dict(diff=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])])
+    out["HD2"] = "supported" if e[2] < 0 else "refuted" if e[1] > 0 else "undecided"
+    jpath = f"{MT}/judge_results.json"
+    if os.path.exists(jpath):
+        key, res = pd.read_csv(f"{MT}/judge_key.csv"), json.load(open(jpath))
+        rows = [(k.k, (k.first == "dial") == (r["better_written"] == 1), (k.first == "dial") == (r["more_like_a_student"] == 1)) for k, r in zip(key.itertuples(), res) if r]
+        J = pd.DataFrame(rows, columns=["k", "better", "student"]).merge(pick[["k", "prompt"]], on="k")
+        for col in ("better", "student"):
+            e, e2 = boot(lambda i: float(J[col].values[i].mean()), J.prompt.values), boot(lambda i: float(J[col].values[i].mean()), np.arange(len(J)))
+            out["judge_" + col] = dict(share=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])], n=int(len(J)))
+        out["HD3"] = "supported" if out["judge_better"]["ci_prompts"][1] >= 0.5 else "refuted"
+    # excerpt: the essay at the median improvement in gap (dial round 2 against draft)
+    imp = gap(P["draft"]) - gap(P["dial"])
+    m = int(np.argsort(imp)[len(imp) // 2])
+    k, t = int(pick.k[m]), pick.tier[m]
+    cut = lambda x: {"opening": " ".join(x.split()[:45]), "closing": " ".join(x.split()[-45:])}
+    out["excerpt"] = dict(k=k, tier=t, prompt=pick.prompt[m], draft=cut(s.loc[k].A), dial=cut(open(f"{MT}/dial/r2/dial/{k:03d}_{t}.txt", encoding="utf-8").read()),
+                          control=cut(open(f"{MT}/dial/r2/control/{k:03d}_{t}.txt", encoding="utf-8").read()),
+                          values={a: {mm: float(P[a][m, M.index(mm)]) for mm in ("intensified", "negated", "ending_lift", "hedons", "dolors")} for a in ("draft", "dial", "control")},
+                          target={mm: float(T[m, M.index(mm)]) for mm in ("intensified", "negated", "ending_lift", "hedons", "dolors")})
+    print(json.dumps({k2: v for k2, v in out.items() if k2 not in ("corr", "excerpt")}, indent=1))
+    print("corr by measure:", {m2: (round(out["corr"]["dial"][m2], 2), round(out["corr"]["control"][m2], 2)) for m2 in M})
+    return out
+
+
 if __name__ == "__main__":
     path = os.path.join(RESULTS, "machine.json")
     res = json.load(open(path)) if os.path.exists(path) else {}
     for name in sys.argv[1:] or ("hc3", "essays", "reference"):
-        res[name] = dict(hc3=hc3, essays=essays, reference=reference, jobs=jobs, skilljobs=skilljobs, revise=revise)[name]()
+        res[name] = dict(hc3=hc3, essays=essays, reference=reference, jobs=jobs, skilljobs=skilljobs, revise=revise, dialjobs=dialjobs, dialjobs2=dialjobs2, judgejobs=judgejobs, dial=dial)[name]()
         save("machine", res)

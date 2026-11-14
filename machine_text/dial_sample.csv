@@ -1,0 +1,61 @@
+k,essay_id,prompt,grade,words,tier
+2,C97AF423A6AA,Cell phones at school,8.0,393,haiku
+4,F4C2261D0379,Cell phones at school,8.0,377,fable
+5,D396045E2CAA,Cell phones at school,8.0,208,sonnet
+6,F08130204554,Cell phones at school,8.0,295,haiku
+7,42B977C6E77F,Cell phones at school,8.0,331,opus
+12,A138DF27F153,Cell phones at school,8.0,154,fable
+13,75D006293D7F,Cell phones at school,8.0,321,sonnet
+14,6621856784A9,Cell phones at school,8.0,206,haiku
+15,9ABAA03ACB4B,Cell phones at school,8.0,261,opus
+18,C55E6125411D,Cell phones at school,8.0,265,haiku
+20,1136D95D28E7,Community service,8.0,356,fable
+21,4CDEB518A777,Community service,8.0,319,sonnet
+22,77BD30EC277D,Community service,8.0,217,haiku
+23,F21ACF702D35,Community service,8.0,358,opus
+24,49EE99F5B6B4,Community service,8.0,225,fable
+25,B3526897360F,Community service,8.0,311,sonnet
+27,8C887CDDBA32,Community service,8.0,180,opus
+30,6C2B5C74A377,Community service,8.0,400,haiku
+32,59E8C8BE4ACA,Community service,8.0,356,fable
+33,BA2C7291BBFA,Community service,8.0,344,sonnet
+34,7EEC55B04308,Community service,8.0,167,haiku
+35,9E6D1C0F5762,Community service,8.0,245,opus
+36,92E97E947628,Community service,8.0,161,fable
+37,709BFAD9491B,Community service,8.0,238,sonnet
+39,94E5097F7B12,Community service,8.0,376,opus
+54,C55EA5FFDB2D,Distance learning,11.0,605,haiku
+56,1B9E20C72CD3,Distance learning,11.0,412,fable
+57,4E6D9C9F9318,Distance learning,11.0,280,sonnet
+59,56AC4BE71C2F,Distance learning,12.0,246,opus
+76,AB1F3BA8AED2,Grades for extracurricular activities,8.0,254,fable
+77,69DE06E31D1D,Grades for extracurricular activities,8.0,266,sonnet
+78,EAD7F1F02A93,Grades for extracurricular activities,8.0,174,haiku
+79,9647C328B8CA,Grades for extracurricular activities,8.0,267,opus
+82,CAE7D71D66A3,Mandatory extracurricular activities,8.0,429,haiku
+84,3C2E56DBA570,Mandatory extracurricular activities,8.0,416,fable
+85,C9966CF28678,Mandatory extracurricular activities,8.0,425,sonnet
+87,0E6BB199BF93,Mandatory extracurricular activities,8.0,387,opus
+102,1CF9D84E94C1,Phones and driving,,401,haiku
+104,019328A0D7A3,Phones and driving,,620,fable
+105,2022539CFE3E,Phones and driving,,532,sonnet
+106,E07EA4606938,Phones and driving,,226,haiku
+107,9664FB49D053,Phones and driving,,384,opus
+118,2BAB4CB3573E,Phones and driving,,295,haiku
+120,C4DFB24CF0DB,Seeking multiple opinions,8.0,324,fable
+121,9A45943A21D5,Seeking multiple opinions,8.0,272,sonnet
+122,AF651D592CBE,Seeking multiple opinions,8.0,445,haiku
+123,2189471C5C78,Seeking multiple opinions,8.0,767,opus
+124,51E6646E0733,Seeking multiple opinions,8.0,531,fable
+125,15B1386353B7,Seeking multiple opinions,8.0,474,sonnet
+127,D16B647E363E,Seeking multiple opinions,8.0,605,opus
+128,76D459CE0410,Seeking multiple opinions,8.0,578,fable
+129,39E98ECA8354,Seeking multiple opinions,8.0,346,sonnet
+130,7DA14E1D6FA0,Seeking multiple opinions,8.0,651,haiku
+131,04810832D23A,Seeking multiple opinions,8.0,176,opus
+132,B286E6029ECB,Seeking multiple opinions,8.0,492,fable
+133,EF478C3A8264,Seeking multiple opinions,8.0,559,sonnet
+135,B3CF4188DC2F,Seeking multiple opinions,8.0,444,opus
+136,42997AC50E1D,Seeking multiple opinions,8.0,556,fable
+137,D5FABAF8F84A,Seeking multiple opinions,8.0,652,sonnet
+139,0CF568439ADB,Seeking multiple opinions,8.0,403,opus

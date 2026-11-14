@@ -94,6 +94,15 @@
 \newcommand{\dDistilSst}{-0.339 [-0.374, -0.303]}
 \newcommand{\dDistilTw}{+0.103 [+0.062, +0.145]}
 \newcommand{\dDistilYelp}{-0.137 [-0.155, -0.120]}
+\newcommand{\dDlCorr}{+0.56}
+\newcommand{\dDlCorrCI}{[+0.39, +0.71]}
+\newcommand{\dDlCorrCIessays}{[+0.43, +0.67]}
+\newcommand{\dDlGap}{-0.77}
+\newcommand{\dDlGapCI}{[-1.16, -0.44]}
+\newcommand{\dDlGapCIessays}{[-1.00, -0.56]}
+\newcommand{\dDlScore}{+0.06}
+\newcommand{\dDlScoreCI}{[-0.04, +0.17]}
+\newcommand{\dDlScoreCIessays}{[-0.03, +0.16]}
 \newcommand{\dHedoEmo}{+0.044 [+0.015, +0.080]}
 \newcommand{\dHedoFb}{+0.128 [+0.100, +0.155]}
 \newcommand{\dHedoFilm}{+0.053 [+0.039, +0.068]}
@@ -157,12 +166,30 @@
 \newcommand{\dRvCD}{-0.13}
 \newcommand{\dRvCDCI}{[-0.30, +0.03]}
 \newcommand{\dRvCDCIessays}{[-0.22, -0.05]}
+\newcommand{\dRvHC}{+0.01}
+\newcommand{\dRvHCCI}{[-0.07, +0.07]}
+\newcommand{\dRvHCCIessays}{[-0.05, +0.07]}
+\newcommand{\dRvHD}{-0.12}
+\newcommand{\dRvHDCI}{[-0.25, -0.01]}
+\newcommand{\dRvHDCIessays}{[-0.21, -0.05]}
+\newcommand{\dRvHR}{-0.12}
+\newcommand{\dRvHRCI}{[-0.26, +0.01]}
+\newcommand{\dRvHRCIessays}{[-0.22, -0.03]}
 \newcommand{\dRvRC}{-0.12}
 \newcommand{\dRvRCCI}{[-0.25, +0.01]}
 \newcommand{\dRvRCCIessays}{[-0.20, -0.03]}
 \newcommand{\dRvRD}{-0.25}
 \newcommand{\dRvRDCI}{[-0.48, -0.05]}
 \newcommand{\dRvRDCIessays}{[-0.36, -0.15]}
+\newcommand{\dRvSC}{-0.04}
+\newcommand{\dRvSCCI}{[-0.16, +0.04]}
+\newcommand{\dRvSCCIessays}{[-0.13, +0.03]}
+\newcommand{\dRvSD}{-0.17}
+\newcommand{\dRvSDCI}{[-0.32, -0.05]}
+\newcommand{\dRvSDCIessays}{[-0.27, -0.09]}
+\newcommand{\dRvSR}{-0.07}
+\newcommand{\dRvSRCI}{[-0.17, +0.02]}
+\newcommand{\dRvSRCIessays}{[-0.14, -0.00]}
 \newcommand{\dSgwEmo}{+0.000 [+0.000, +0.000]}
 \newcommand{\dSgwFb}{+0.000 [+0.000, +0.000]}
 \newcommand{\dSgwFilm}{+0.000 [+0.000, +0.000]}
@@ -188,6 +215,52 @@
 \newcommand{\distilGpuHalf}{12,200}
 \newcommand{\distilRate}{37}
 \newcommand{\distilRateAll}{160}
+\newcommand{\dlAucControl}{0.53}
+\newcommand{\dlAucDial}{0.59}
+\newcommand{\dlAucDraft}{0.72}
+\newcommand{\dlCentreControl}{0.57}
+\newcommand{\dlCentreDial}{0.80}
+\newcommand{\dlCentreDraft}{0.63}
+\newcommand{\dlCentreHuman}{1.28}
+\newcommand{\dlCorrBoostControl}{0.04}
+\newcommand{\dlCorrBoostDial}{0.43}
+\newcommand{\dlCorrCluControl}{0.10}
+\newcommand{\dlCorrCluDial}{0.24}
+\newcommand{\dlCorrControl}{0.08}
+\newcommand{\dlCorrDial}{0.64}
+\newcommand{\dlCorrDolControl}{0.06}
+\newcommand{\dlCorrDolDial}{0.82}
+\newcommand{\dlCorrDraft}{0.02}
+\newcommand{\dlCorrHedControl}{-0.02}
+\newcommand{\dlCorrHedDial}{0.73}
+\newcommand{\dlCorrLiftControl}{0.12}
+\newcommand{\dlCorrLiftDial}{0.55}
+\newcommand{\dlCorrMax}{0.83}
+\newcommand{\dlCorrMin}{0.24}
+\newcommand{\dlCorrNegControl}{0.06}
+\newcommand{\dlCorrNegDial}{0.74}
+\newcommand{\dlDeclined}{12}
+\newcommand{\dlGapControl}{1.55}
+\newcommand{\dlGapControlOne}{1.61}
+\newcommand{\dlGapDial}{0.79}
+\newcommand{\dlGapDialOne}{1.07}
+\newcommand{\dlGapDraft}{1.67}
+\newcommand{\dlHDone}{supported}
+\newcommand{\dlHDthree}{supported}
+\newcommand{\dlHDtwo}{undecided}
+\newcommand{\dlJudge}{62}
+\newcommand{\dlJudgeCI}{[43, 74]}
+\newcommand{\dlJudgeN}{48}
+\newcommand{\dlJudgeStudent}{10}
+\newcommand{\dlJudgeStudentCI}{[5, 15]}
+\newcommand{\dlMissing}{11}
+\newcommand{\dlMissingHaiku}{11}
+\newcommand{\dlN}{48}
+\newcommand{\dlRequested}{60}
+\newcommand{\dlScoreControl}{0.43}
+\newcommand{\dlScoreDial}{0.49}
+\newcommand{\dlScoreDraft}{0.64}
+\newcommand{\dlScoreHuman}{0.41}
 \newcommand{\dlTerrible}{0.55}
 \newcommand{\dolorOverHedon}{1.63}
 \newcommand{\emoCats}{6}
@@ -226,14 +299,14 @@
 \newcommand{\esEndingLiftACI}{[+0.24, +0.93]}
 \newcommand{\esEndingLiftB}{+0.52}
 \newcommand{\esEndingLiftBCI}{[+0.22, +0.75]}
-\newcommand{\esHL1A}{refuted}
-\newcommand{\esHL1B}{supported}
-\newcommand{\esHL2A}{undecided}
-\newcommand{\esHL2B}{undecided}
-\newcommand{\esHL3A}{undecided}
-\newcommand{\esHL3B}{undecided}
-\newcommand{\esHL4A}{supported}
-\newcommand{\esHL4B}{supported}
+\newcommand{\esHLfourA}{supported}
+\newcommand{\esHLfourB}{supported}
+\newcommand{\esHLoneA}{refuted}
+\newcommand{\esHLoneB}{supported}
+\newcommand{\esHLthreeA}{undecided}
+\newcommand{\esHLthreeB}{undecided}
+\newcommand{\esHLtwoA}{undecided}
+\newcommand{\esHLtwoB}{undecided}
 \newcommand{\esHcA}{0.67}
 \newcommand{\esHcB}{0.65}
 \newcommand{\esHedonsA}{-0.24}
@@ -259,6 +332,8 @@
 \newcommand{\esNetACI}{[-0.40, -0.02]}
 \newcommand{\esNetB}{+0.29}
 \newcommand{\esNetBCI}{[+0.08, +0.52]}
+\newcommand{\exPrompt}{Seeking multiple opinions}
+\newcommand{\exTier}{Sonnet}
 \newcommand{\fbFirst}{1.02}
 \newcommand{\firstDecileHi}{0.75}
 \newcommand{\firstDecileLo}{0.65}
@@ -330,8 +405,8 @@
 \newcommand{\kernYelpCI}{[-0.15, -0.09]}
 \newcommand{\lastDecileHi}{1.55}
 \newcommand{\lastDecileLo}{1.34}
-\newcommand{\locoA}{2/4}
-\newcommand{\locoKappa}{0.2/0.5}
+\newcommand{\locoA}{2 or 4}
+\newcommand{\locoKappa}{0.2 or 0.5}
 \newcommand{\lossBlob}{0.054}
 \newcommand{\lossBowPool}{-0.044}
 \newcommand{\lossDistil}{-0.096}
@@ -545,20 +620,36 @@
 \newcommand{\robertaRateAll}{83}
 \newcommand{\rvBoostControl}{-0.48}
 \newcommand{\rvBoostDraft}{-0.60}
+\newcommand{\rvBoostHumanizer}{-0.44}
 \newcommand{\rvBoostReport}{-0.57}
+\newcommand{\rvBoostSepia}{-0.42}
 \newcommand{\rvControl}{0.53}
+\newcommand{\rvDeclined}{3}
 \newcommand{\rvDraft}{0.66}
 \newcommand{\rvHuman}{1.16}
+\newcommand{\rvHumanizer}{0.54}
 \newcommand{\rvLiftControl}{+0.21}
 \newcommand{\rvLiftDraft}{+0.31}
+\newcommand{\rvLiftHumanizer}{+0.18}
 \newcommand{\rvLiftReport}{+0.02}
+\newcommand{\rvLiftSepia}{+0.16}
 \newcommand{\rvN}{57}
+\newcommand{\rvNegControl}{-0.04}
+\newcommand{\rvNegDraft}{-0.27}
+\newcommand{\rvNegHumanizer}{-0.14}
+\newcommand{\rvNegReport}{+0.07}
+\newcommand{\rvNegSepia}{-0.03}
 \newcommand{\rvReport}{0.41}
 \newcommand{\rvScoreControl}{0.55}
 \newcommand{\rvScoreDraft}{0.62}
 \newcommand{\rvScoreHuman}{0.38}
+\newcommand{\rvScoreHumanizer}{0.56}
 \newcommand{\rvScoreReport}{0.53}
+\newcommand{\rvScoreSepia}{0.55}
+\newcommand{\rvSepia}{0.49}
 \newcommand{\rvVerdict}{undecided}
+\newcommand{\rvVerdictHumanizer}{undecided}
+\newcommand{\rvVerdictSepia}{undecided}
 \newcommand{\scalingSlope}{1.02}
 \newcommand{\sgwAllCores}{0.8}
 \newcommand{\sgwRate}{167,000}

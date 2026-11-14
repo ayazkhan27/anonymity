@@ -3,7 +3,7 @@
 Every number in the manuscript is a macro defined here, so the text cannot drift from the results.
 A result file that is missing leaves its macros as red '??' rather than stopping the build.
 """
-import glob, json, os
+import glob, json, os, re
 
 import numpy as np
 
@@ -67,7 +67,7 @@ if acc:
             M("loss" + tag, np.mean([acc[c]["methods"][key]["sgw_minus"] for c in CORPORA]), "{:.3f}")
             M("wins" + tag, sum(acc[c]["methods"][key]["sgw_minus_ci"][0] > 0 for c in CORPORA))
             M("losses" + tag, sum(acc[c]["methods"][key]["sgw_minus_ci"][1] < 0 for c in CORPORA))
-    M("locoA", "/".join(sorted({f"{acc[c]['loco']['a']:g}" for c in CORPORA}))); M("locoKappa", "/".join(sorted({f"{acc[c]['loco']['kappa']:g}" for c in CORPORA})))
+    M("locoA", " or ".join(sorted({f"{acc[c]['loco']['a']:g}" for c in CORPORA}, key=float))); M("locoKappa", " or ".join(sorted({f"{acc[c]['loco']['kappa']:g}" for c in CORPORA}, key=float)))
     M("shipA", acc["shipped"]["a"], "{:g}"); M("shipKappa", acc["shipped"]["kappa"], "{:g}")
     for c in CORPORA:
         M("n" + TAG[c], acc[c]["n"], "{:,}")
@@ -273,7 +273,7 @@ if mc:
                 ci("es" + m.title().replace("_", "") + c, [x["measures"][m][k] for k in ("d", "d_lo", "d_hi")], "{:+.2f}")
             M("esLiftHuman" + c, x["measures"]["ending_lift"]["human"], "{:.0f}"); M("esLiftMachine" + c, x["measures"]["ending_lift"]["machine"], "{:.0f}")
             for hyp, v in x["decisions"].items():
-                M("es" + hyp + c, v)
+                M("es" + hyp.replace("1", "one").replace("2", "two").replace("3", "three").replace("4", "four") + c, v)
     if "revise" in mc:
         r = mc["revise"]
         M("rvN", r["n"]); M("rvDraft", r["distance"]["draft"], "{:.2f}"); M("rvControl", r["distance"]["control"], "{:.2f}"); M("rvReport", r["distance"]["report"], "{:.2f}"); M("rvHuman", r["distance"]["human"], "{:.2f}")
@@ -294,6 +294,46 @@ if mc:
                     M("dRv" + tag + t, r[k]["diff"], "{:+.2f}"); macros["dRv" + tag + t + "CI"] = f"[{r[k]['ci_prompts'][0]:+.2f}, {r[k]['ci_prompts'][1]:+.2f}]"
                     macros["dRv" + tag + t + "CIessays"] = f"[{r[k]['ci_essays'][0]:+.2f}, {r[k]['ci_essays'][1]:+.2f}]"
 
+def tex(x):
+    for a, b in (("\\", " "), ("&", "\\&"), ("%", "\\%"), ("$", "\\$"), ("#", "\\#"), ("_", "\\_"), ("{", ""), ("}", ""), ("~", " "), ("^", " "), ("\u2019", "'"), ("\u201c", "``"), ("\u201d", "''"), ("\u2014", ", ")):
+        x = x.replace(a, b)
+    return x
+
+
+if mc and "dial" in mc:
+    d = mc["dial"]
+    M("dlN", d["n"]); M("dlDeclined", d["declined"]); M("dlMissing", d["missing_dial"]["total"]); M("dlMissingHaiku", d["missing_dial"]["haiku"]); M("dlRequested", d["missing_dial"]["requested"])
+    for a in ("dial", "control", "draft"):
+        M("dlCorr" + a.title(), d["mean_corr"][a], "{:.2f}")
+    for k, tag in (("corr_dial_minus_control", "dDlCorr"), ("gap_dial_minus_control", "dDlGap"), ("score_dial_minus_control", "dDlScore")):
+        M(tag, d[k]["diff"], "{:+.2f}"); macros[tag + "CI"] = f"[{d[k]['ci_prompts'][0]:+.2f}, {d[k]['ci_prompts'][1]:+.2f}]"
+        macros[tag + "CIessays"] = f"[{d[k]['ci_essays'][0]:+.2f}, {d[k]['ci_essays'][1]:+.2f}]"
+    for a, t in (("draft", "Draft"), ("control_r1", "ControlOne"), ("dial_r1", "DialOne"), ("control", "Control"), ("dial", "Dial")):
+        M("dlGap" + t, d["gap"][a], "{:.2f}")
+    for a in ("draft", "control", "dial", "human"):
+        M("dlScore" + a.title(), d["machine_score"][a], "{:.2f}"); M("dlCentre" + a.title(), d["distance_to_centre"][a], "{:.2f}")
+    for a in ("draft", "control", "dial"):
+        M("dlAuc" + a.title(), d["auc_vs_matched_students"][a], "{:.2f}")
+    M("dlHDone", d["HD1"]); M("dlHDtwo", d["HD2"])
+    for m, t in (("intensified", "Boost"), ("negated", "Neg"), ("ending_lift", "Lift"), ("hedons", "Hed"), ("dolors", "Dol"), ("clustering", "Clu")):
+        M("dlCorr" + t + "Dial", d["corr"]["dial"][m], "{:.2f}"); M("dlCorr" + t + "Control", d["corr"]["control"][m], "{:.2f}")
+    M("dlCorrMin", min(d["corr"]["dial"].values()), "{:.2f}"); M("dlCorrMax", max(d["corr"]["dial"].values()), "{:.2f}")
+    if "judge_better" in d:
+        for k, t in (("judge_better", "dlJudge"), ("judge_student", "dlJudgeStudent")):
+            M(t, 100 * d[k]["share"], "{:.0f}"); macros[t + "CI"] = f"[{100 * d[k]['ci_prompts'][0]:.0f}, {100 * d[k]['ci_prompts'][1]:.0f}]"
+        M("dlJudgeN", d["judge_better"]["n"]); M("dlHDthree", d["HD3"])
+    e = d["excerpt"]
+    v, tg = e["values"], e["target"]
+    row = lambda name, key, f="{:.1f}": f"{name} & {f.format(v['draft'][key])} & {f.format(tg[key])} & {f.format(v['dial'][key])} & {f.format(v['control'][key])} \\\\"
+    open(os.path.join(PAPER, "excerpt.tex"), "w").write(
+        "\\begin{tabular}{@{}p{0.31\\textwidth}p{0.31\\textwidth}p{0.31\\textwidth}@{}}\n\\toprule\nMachine draft & After two rounds with the dial & After two plain revisions \\\\\n\\midrule\n"
+        + " & ".join("\\emph{Opening.} " + tex(e[a]["opening"]) + " \\ldots" for a in ("draft", "dial", "control")) + " \\\\[4pt]\n"
+        + " & ".join("\\emph{Closing.} \\ldots " + tex(e[a]["closing"]) for a in ("draft", "dial", "control")) + " \\\\\n\\bottomrule\n\\end{tabular}\n\n\\vspace{6pt}\n"
+        + "\\begin{tabular}{@{}lrrrr@{}}\n\\toprule\nMeasure & Draft & Target & Dial & Plain \\\\\n\\midrule\n"
+        + "\n".join([row("Hedons per 1,000 words", "hedons"), row("Dolors per 1,000 words", "dolors"), row("Charge negated (\\%)", "negated"),
+                     row("Charge intensified (\\%)", "intensified"), row("Ending lift (per 1,000 words)", "ending_lift")]) + "\n\\bottomrule\n\\end{tabular}\n")
+    M("exTier", e["tier"].title()); M("exPrompt", tex(e["prompt"]))
+
 if not sp:
     macros["speedParagraph"] = "\\textcolor{red}{Throughput benchmark pending.}"
 
@@ -301,5 +341,23 @@ with open(os.path.join(PAPER, "numbers.tex"), "w") as f:
     f.write("% Generated by scripts/make_numbers.py. Do not edit.\n")
     f.write("\\providecommand{\\num}[1]{\\textcolor{red}{??}}\n")
     for k in sorted(macros):
+        assert re.fullmatch(r"[A-Za-z]+", k), f"macro name {k!r} must be letters only"
         f.write(f"\\newcommand{{\\{k}}}{{{macros[k]}}}\n")
+# ---- the "Results in brief" block of the README
+g = lambda k: re.sub(r"(\d)\\times10\^\{(-?\d+)\}", r"\1e\2", macros.get(k, "?").replace("\\%", "%").replace("$", ""))
+block = f"""| | |
+|---|---|
+| Mean Pearson r with human ratings (five rated corpora, constants fitted on other corpora) | signature {g('meanSgw')}; VADER {g('meanVader')}; TextBlob {g('meanBlob')}; hedonometer {g('meanHedo')}; DistilBERT {g('meanDistil')}; Twitter-RoBERTa {g('meanRoberta')} |
+| Sentences per second on one processor core | signature {g('sgwRate')}; VADER {g('vaderRate')}; DistilBERT {g('distilRate')}; DistilBERT on an RTX 3090 {g('distilGpuHalf')} |
+| One billion sentences | {g('billionHours')} hours on one core, {g('billionMinutesAll')} minutes on twelve |
+| Merged against single-pass signatures, {g('nNovels')} novels | relative difference below {g('mergeErr')} in floating point; exact in integers |
+| Chapters of novels | between-chapter variance {g('heteroMedian')} times the shuffled-sentence value (median) |
+| VADER book score by chunk size | {g('vaderOne')} with one-sentence chunks, {g('vaderChapter')} with whole chapters |
+| Recency, three confirmatory tests | {g('confSupported')} of 3 supported |
+| Human against machine essays, ten tone measures | AUC {g('esAucA')} plain, {g('esAucB')} when the model writes as a student; {g('hcAuc')} for ChatGPT answers |
+| The dial | target against achieved value, mean r {g('dlCorrDial')} with the dial and {g('dlCorrControl')} without; a blind judge found the dial revision more student-like in {g('dlJudgeStudent')}% of pairs |"""
+readme = os.path.join(HERE, "..", "README.md")
+t = open(readme).read()
+a, b = t.index("<!-- results:start -->") + len("<!-- results:start -->"), t.index("<!-- results:end -->")
+open(readme, "w").write(t[:a] + "\n" + block + "\n" + t[b:])
 print(len(macros), "macros written")
