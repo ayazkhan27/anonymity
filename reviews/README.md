@@ -8,7 +8,7 @@ The reports describe the draft as it stood when each was written, under its earl
 |---|---|---|
 | [statistics.md](statistics.md) | design and inference | Recency withdrawn (two of its three tests were confounded by the length of the parts); hypotheses reported by their planned rules; Spearman's rho added; jackknife intervals for eight-cluster analyses |
 | [claims.md](claims.md) | claims against evidence | Title and abstract narrowed; weaker results on long texts stated; HC3 reported by source; constants shown by fit |
-| [reproducibility.md](reproducibility.md) | can it be rerun and checked | Keys redacted in the tree; licences and notices; job files and workflow scripts shipped; deviations listed; the limits of the pre-specification record stated |
+| [reproducibility.md](reproducibility.md) | can it be rerun and checked | Credentials removed from every commit; licences and notices; job files and workflow scripts shipped; deviations listed; the limits of the pre-specification record stated |
 | [mathematics.md](mathematics.md) | proofs and formulas | Standard error of the level corrected; merge conditions stated; float precision of span queries documented and tested; proof for relative-position weights added |
 | [code.md](code.md) | implementation | Tokeniser edge case fixed; tests extended; group-term check moved into a script |
 | [domain.md](domain.md) | sentiment analysis practice | Sentence-averaged VADER added as a comparator; transformer rows described as off-the-shelf; social bias, word sense and review boilerplate added to the limits |
