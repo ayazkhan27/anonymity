@@ -1,0 +1,13 @@
+{
+ "device": "NVIDIA GeForce RTX 3090",
+ "torch": "2.3.1",
+ "vram_gb": 23.69110107421875,
+ "distilbert_fp32": 4314.71881798791,
+ "distilbert_check_mean_fp32": -0.09375564091652631,
+ "distilbert_fp16": 12211.336015849454,
+ "distilbert_check_mean_fp16": -0.09381357723325491,
+ "roberta_fp32": 2307.760805166744,
+ "roberta_check_mean_fp32": 0.09386911437418312,
+ "roberta_fp16": 6821.6734746951615,
+ "roberta_check_mean_fp16": 0.09409266697601415
+}

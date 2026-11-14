@@ -114,3 +114,15 @@ Recency. What comes last in a text counts most toward a reader's judgement of it
 - R3, documents. In IMDB film reviews of 100 or more words (test portion, binary labels, not used so far), the net charge per word of the last fifth of a review separates positive from negative reviews better than that of the first fifth. Supported if the interval of AUC(last fifth) minus AUC(first fifth) is above zero.
 
 Intervals by bootstrap, resampling sentences for R1 and R2 and reviews for R3. These three tests are confirmatory for the revised hypothesis.
+
+## Addendum 3: rewrites with anti-slop skills
+
+Written and committed on 13 November 2026, before any such rewrite was generated.
+
+Question. Do prose skills written to remove the marks of machine writing move a machine draft toward the human range on the tone measures?
+
+Arms. The same 60 condition-A drafts as in the tone check. Each is rewritten twice more by a subagent that receives the control instruction plus an instruction to do the rewrite with one named skill: the `humanizer` skill, or the `sepia-recreate` skill. The interface-design skills (unslop, Hallmark, impeccable, taste) do not apply to essays. The `remove-ai-marks` skill strips provenance marks and is not a writing skill; it is not used.
+
+Outcome and decision rule as for HT1: mean squared standardised distance to the human reference (student essays on other assignments), paired differences, resampling assignments.
+
+- HS1. Distance after a skill rewrite differs from distance after the control revision. No direction is predicted: the skills target wording, and the measures target how feeling is carried. Reported for each skill, with the difference from the draft and the classifier's machine score as secondary outcomes.

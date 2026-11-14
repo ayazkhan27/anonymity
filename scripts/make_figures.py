@@ -260,15 +260,22 @@ def fig2():
     # cost
     bx = fig.add_axes([0.075, 0.09, 0.36, 0.29])
     mean = A["mean_r_primary"]
-    pts = [("SGW", Sp["sgw"], BLUE, "Signature", (8, -2)), ("VADER", Sp["vader"], GREY, "VADER", (7, -2)), ("TextBlob", Sp["textblob"], GREY, "TextBlob", (7, -2)),
-           ("Hedonometer", Sp["hedonometer"], GREY, "Hedonometer", (-6, -9)), ("DistilBERT (SST-2)", Sp["distilbert_1"], PURPLE, "DistilBERT", (7, -2)),
-           ("Twitter-RoBERTa", Sp["roberta_1"], PURPLE, "Twitter-RoBERTa", (7, -2))]
+    pts = [("SGW", Sp["sgw"], BLUE, "Signature", (8, -2)), ("VADER", Sp["vader"], GREY, "VADER", (-7, -2)), ("TextBlob", Sp["textblob"], GREY, "TextBlob", (-7, -2)),
+           ("Hedonometer", Sp["hedonometer"], GREY, "Hedonometer", (-7, -2)), ("DistilBERT (SST-2)", Sp["distilbert_1"], PURPLE, "", (0, 0)),
+           ("Twitter-RoBERTa", Sp["roberta_1"], PURPLE, "", (0, 0))]
     for key, x, col, lab, off in pts:
         if key in mean:
             bx.plot(x, mean[key], "o", color=col, ms=4)
-            bx.annotate(lab, (x, mean[key]), xytext=off, textcoords="offset points", fontsize=6.3, color=INK, ha="left" if off[0] > 0 else "right")
+            if lab:
+                bx.annotate(lab, (x, mean[key]), xytext=off, textcoords="offset points", fontsize=6.3, color=INK, ha="left" if off[0] > 0 else "right", va="center")
+    G = R("speed_gpu")
+    for key, gk, lab in (("DistilBERT (SST-2)", "distilbert_fp16", "DistilBERT"), ("Twitter-RoBERTa", "roberta_fp16", "Twitter-RoBERTa")):
+        cpu = Sp[gk.split("_")[0] + "_1"]
+        bx.plot(G[gk], mean[key], "o", color=PURPLE, ms=4, mfc="white", mew=0.9)
+        bx.plot([cpu, G[gk]], [mean[key]] * 2, color=PURPLE, lw=0.5, ls=(0, (2, 2)), zorder=0)
+        bx.text(np.sqrt(cpu * G[gk]), mean[key] + 0.012, lab, fontsize=6.3, color=INK, ha="center")
     bx.set_xscale("log"); bx.set_xlim(8, 3e6); bx.set_ylim(0.36, 0.78)
-    bx.set_xlabel("sentences scored per second, one CPU core"); bx.set_ylabel("mean $r$, five rated corpora")
+    bx.set_xlabel("sentences scored per second (filled: one CPU core; open: RTX 3090)"); bx.set_ylabel("mean $r$, five rated corpora")
     panel(bx, "b", x=-0.14)
     # ablations
     cx = fig.add_axes([0.62, 0.09, 0.37, 0.29])
@@ -280,7 +287,8 @@ def fig2():
         cx.plot(d, [y] * len(d), "o", color="#BDBDBD", ms=2.6, mew=0)
         cx.plot(np.mean(d), y, "D", color=BLUE, ms=3.6)
     cx.axvline(0, color=INK, lw=0.5); cx.set_yticks(range(len(abl))); cx.set_yticklabels([a[1] for a in abl][::-1]); cx.tick_params(axis="y", length=0)
-    cx.set_ylim(-0.6, len(abl) - 0.4); cx.set_xlabel("loss in $r$ when the part is removed (grey: each corpus; blue: mean)")
+    cx.set_ylim(-0.6, len(abl) - 0.4); cx.set_xlabel("loss in $r$ when the part is removed")
+    cx.text(0.98, 0.10, "each corpus", color="#8A8A8A", fontsize=6.3, transform=cx.transAxes, ha="right"); cx.text(0.98, 0.03, "mean", color=BLUE, fontsize=6.3, transform=cx.transAxes, ha="right")
     panel(cx, "c", x=-0.52)
     save(fig, "fig2_accuracy")
 
@@ -409,7 +417,51 @@ def figE1():
     save(fig, "figE1_uncertainty_tales")
 
 
-FIGS = dict(fig1=fig1, fig2=fig2, fig3=fig3, fig4=fig4, fig5=fig5, fig6=fig6, figE1=figE1)
+def fig7():
+    """Human and machine writing on the same prompts, and the tone-check test."""
+    Mc = R("machine")
+    order = ["ending_lift", "intensified", "negated", "after_contrast", "net", "hedons", "dolors", "gross", "charged", "clustering"]
+    names = {"ending_lift": "ending lift", "intensified": "share of charge intensified", "negated": "share of charge negated", "after_contrast": "share of charge after a contrast word",
+             "net": "net density", "hedons": "hedon density", "dolors": "dolor density", "gross": "total charge density", "charged": "share of words charged", "clustering": "sentence clustering"}
+    fig = plt.figure(figsize=(FULL, 3.0))
+    ax = fig.add_axes([0.235, 0.15, 0.30, 0.70])
+    series = [("ChatGPT answers (2023)", Mc["hc3"]["measures"], INK, 0.24, "o"), ("Claude essays, plain instruction", Mc["essays"]["A"]["measures"], BLUE, 0.0, "s"),
+              ("Claude essays, told to write as a student", Mc["essays"]["B"]["measures"], RED, -0.24, "D")]
+    for k, m in enumerate(order):
+        y = len(order) - 1 - k
+        for lab, res, col, dy, mk in series:
+            ax.plot([res[m]["d_lo"], res[m]["d_hi"]], [y + dy, y + dy], color=col, lw=0.8)
+            ax.plot(res[m]["d"], y + dy, mk, color=col, ms=2.8)
+    ax.axvline(0, color=GREY, lw=0.5)
+    ax.set_yticks(range(len(order))); ax.set_yticklabels([names[m] for m in order][::-1]); ax.tick_params(axis="y", length=0)
+    ax.set_ylim(-0.6, len(order) - 0.4); ax.set_xlim(-0.95, 1.0)
+    ax.set_xlabel("machine minus human, in human standard deviations")
+    for j, (lab, _, col, _, _) in enumerate(series):
+        fig.text(0.235 + 0.0, 0.985 - 0.035 * j, lab, color=col, fontsize=6.2, ha="left", va="top")
+    panel(ax, "a", x=-0.76, y=1.13)
+    bx = fig.add_axes([0.625, 0.15, 0.145, 0.75])
+    groups = [("ChatGPT\nanswers", Mc["hc3"], None), ("Claude,\nplain", Mc["essays"]["A"], Mc["essays"]["A"]["auc_trained_on_hc3"]), ("Claude,\nas student", Mc["essays"]["B"], Mc["essays"]["B"]["auc_trained_on_hc3"])]
+    for k, (lab, r, cross) in enumerate(groups):
+        bx.plot([k - 0.12] * 2, r["auc"][1:], color=BLUE, lw=0.9); bx.plot(k - 0.12, r["auc"][0], "o", color=BLUE, ms=3.2)
+        bx.plot([k + 0.12] * 2, r["auc_words"][1:], color=GREY, lw=0.9); bx.plot(k + 0.12, r["auc_words"][0], "o", color=GREY, ms=3.2, mfc="white", mew=0.8)
+    bx.axhline(0.5, color=INK, lw=0.5, ls=(0, (3, 2)))
+    bx.set_xticks(range(3)); bx.set_xticklabels([g[0] for g in groups], fontsize=6); bx.set_xlim(-0.5, 2.5); bx.set_ylim(0.45, 0.95)
+    bx.set_ylabel("AUC, human versus machine")
+    bx.text(0.04, 0.95, "ten tone measures", color=BLUE, fontsize=6, transform=bx.transAxes); bx.text(0.04, 0.89, "word count alone", color="#6F6F6F", fontsize=6, transform=bx.transAxes)
+    panel(bx, "b", x=-0.38)
+    rv = Mc["revise"]
+    cx = fig.add_axes([0.855, 0.15, 0.135, 0.75])
+    arms = [("draft", "draft", BLUE), ("control", "plain\nrevision", GREY), ("report", "revision\nwith\nreport", RED)]
+    cx.bar(range(3), [rv["distance"][a] for a, _, _ in arms], color=[c for _, _, c in arms], width=0.62, lw=0)
+    cx.set_xticks(range(3)); cx.set_xticklabels([l for _, l, _ in arms], fontsize=6); cx.set_ylabel("distance from the centre of human essays"); cx.tick_params(axis="x", length=0)
+    cx.set_ylim(0, 0.8)
+    for k, (a, _, _) in enumerate(arms):
+        cx.text(k, rv["distance"][a] + 0.015, f"{rv['distance'][a]:.2f}", ha="center", fontsize=6)
+    panel(cx, "c", x=-0.42)
+    save(fig, "fig7_machine")
+
+
+FIGS = dict(fig1=fig1, fig2=fig2, fig3=fig3, fig4=fig4, fig5=fig5, fig6=fig6, fig7=fig7, figE1=figE1)
 
 
 if __name__ == "__main__":

@@ -187,14 +187,39 @@ def jobs(n_per_tier=15):
     return {"n": int(len(pick))}
 
 
+SKILLS = {"humanizer": "humanizer:humanizer", "sepia": "sepia:sepia-recreate"}
+
+
+def skilljobs():
+    """Addendum 3: the same drafts rewritten with an anti-slop skill (control instruction plus the skill)."""
+    pick = pd.read_csv(f"{MT}/revision_sample.csv")
+    s = load_essays().set_index("k").loc[pick.k].reset_index()
+    os.makedirs(f"{MT}/skill_jobs", exist_ok=True)
+    root, tiers = os.path.abspath(MT), []
+    for i, r in enumerate(s.itertuples()):
+        who = f"a US grade {int(r.grade)} student" if not np.isnan(r.grade) else "a US high school student"
+        base = (f"Below is a draft essay. Revise it so that it reads as if {who} wrote it in class for a timed writing test. "
+                f"Keep the position it argues and keep it at about {len(r.A.split())} words. The file must contain only the revised essay.")
+        for j, (arm, skill) in enumerate(SKILLS.items()):
+            os.makedirs(f"{MT}/revisions/{arm}", exist_ok=True)
+            extra = f"\n\nDo the rewrite with the skill named `{skill}`: load it with the Skill tool and follow its instructions for rewriting text, then save only the final text."
+            json.dump({"instructions": base + extra + "\n\nDraft:\n\n" + r.A, "output_path": f"{root}/revisions/{arm}/{r.k:03d}_{r.tier}.txt"},
+                      open(f"{MT}/skill_jobs/{len(SKILLS) * i + j:03d}.json", "w"), indent=1)
+            tiers.append(r.tier)
+    print(json.dumps(tiers))
+    return {"n": int(len(s)), "skills": SKILLS}
+
+
 def revise():
     """HT1: is the draft closer to the human range after a revision that saw the report than after one that did not?"""
     pick = pd.read_csv(f"{MT}/revision_sample.csv")
     s = load_essays().set_index("k").loc[pick.k].reset_index()
+    arms = [a for a in ("control", "report", "humanizer", "sepia") if os.path.isdir(f"{MT}/revisions/{a}")]
     texts = {"draft": list(s.A)}
-    for arm in ("control", "report"):
+    for arm in arms:
         texts[arm] = [open(f"{MT}/revisions/{arm}/{k:03d}_{t}.txt", encoding="utf-8").read() if os.path.exists(f"{MT}/revisions/{arm}/{k:03d}_{t}.txt") else None for k, t in zip(s.k, s.tier)]
-    ok = np.array([a is not None and b is not None for a, b in zip(texts["control"], texts["report"])])
+    ok = np.array([all(texts[a][i] is not None for a in arms) for i in range(len(s))])
+    declined = {a: int(sum(t is None for t in texts[a])) for a in arms}
     s = s[ok].reset_index(drop=True)
     refs = {p: essay_reference(p) for p in s.prompt.unique()}
     mu = np.array([[refs[p][m]["mean"] for m in M] for p in s.prompt]); sd = np.array([[refs[p][m]["sd"] for m in M] for p in s.prompt])
@@ -202,19 +227,24 @@ def revise():
     z = np.load(os.path.join(CACHE, "hc3_profiles.npz"))
     corpus = pd.read_parquet(f"{DATA}/persuade/essays.parquet")
     dist, words, prof = {}, {}, {}
-    for arm in ("draft", "control", "report"):
+    for arm in ["draft"] + arms:
         X, n = tone.profiles([t for t, keep in zip(texts[arm], ok) if keep])
         prof[arm] = X
         dist[arm] = np.nanmean(((X - mu) / sd) ** 2, 1)
         words[arm] = float(np.median(n))
     dist["human"] = np.nanmean(((Xh - mu) / sd) ** 2, 1)
     g = s.prompt.values
-    out = dict(n=int(len(s)), words=words, distance={k: float(np.mean(v)) for k, v in dist.items()})
-    for name, a, b in (("report_minus_control", "report", "control"), ("control_minus_draft", "control", "draft"), ("report_minus_draft", "report", "draft")):
+    out = dict(n=int(len(s)), arms=arms, declined=declined, words=words, distance={k: float(np.mean(v)) for k, v in dist.items()})
+    pairs = [("report_minus_control", "report", "control"), ("control_minus_draft", "control", "draft"), ("report_minus_draft", "report", "draft")]
+    pairs += [(f"{a}_minus_control", a, "control") for a in arms if a in SKILLS] + [(f"{a}_minus_draft", a, "draft") for a in arms if a in SKILLS]
+    pairs += [(f"report_minus_{a}", "report", a) for a in arms if a in SKILLS]
+    for name, a, b in pairs:
         e = boot(lambda i: float(np.mean(dist[a][i] - dist[b][i])), g)
         e2 = boot(lambda i: float(np.mean(dist[a][i] - dist[b][i])), np.arange(len(s)))
         out[name] = dict(diff=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])])
-    out["HT1"] = "supported" if out["report_minus_control"]["ci_prompts"][1] < 0 else "refuted" if out["report_minus_control"]["ci_prompts"][0] > 0 else "undecided"
+    verdict = lambda k: "supported" if out[k]["ci_prompts"][1] < 0 else "refuted" if out[k]["ci_prompts"][0] > 0 else "undecided"
+    out["HT1"] = verdict("report_minus_control")
+    out["HS1"] = {a: ("closer" if out[f"{a}_minus_control"]["ci_prompts"][1] < 0 else "farther" if out[f"{a}_minus_control"]["ci_prompts"][0] > 0 else "undecided") for a in arms if a in SKILLS}
     out["per_measure_z"] = {arm: {m: float(np.nanmean(((prof[arm] - mu) / sd)[:, j])) for j, m in enumerate(M)} for arm in prof}
     # secondary: a classifier trained on the other student essays and the other condition-A essays
     rest = load_essays()
@@ -225,7 +255,7 @@ def revise():
     out["machine_score"]["human"] = float(np.mean(clf.predict_proba(Xh)[:, 1]))
     print(json.dumps({k: v for k, v in out.items() if k != "per_measure_z"}, indent=1))
     for m in M:
-        print(f"  mean z  {m:15s} " + "  ".join(f"{arm} {out['per_measure_z'][arm][m]:+.2f}" for arm in ("draft", "control", "report")))
+        print(f"  mean z  {m:15s} " + "  ".join(f"{arm} {out['per_measure_z'][arm][m]:+.2f}" for arm in ["draft"] + arms))
     return out
 
 
@@ -233,5 +263,5 @@ if __name__ == "__main__":
     path = os.path.join(RESULTS, "machine.json")
     res = json.load(open(path)) if os.path.exists(path) else {}
     for name in sys.argv[1:] or ("hc3", "essays", "reference"):
-        res[name] = dict(hc3=hc3, essays=essays, reference=reference, jobs=jobs, revise=revise)[name]()
+        res[name] = dict(hc3=hc3, essays=essays, reference=reference, jobs=jobs, skilljobs=skilljobs, revise=revise)[name]()
         save("machine", res)

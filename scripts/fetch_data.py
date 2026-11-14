@@ -64,8 +64,20 @@ def semeval():
 
 
 def sst():
-    for part in ("default/train", "default/validation", "default/test", "dictionary/dictionary", "ptb/train"):
+    for part in ("default/train", "default/validation", "default/test", "dictionary/dictionary", "ptb/train", "ptb/validation", "ptb/test"):
         get(HF.format("stanfordnlp/sst", part + "/0000.parquet"), f"sst/{part.replace('/', '_')}.parquet")
+
+
+def imdb():
+    get("https://huggingface.co/api/datasets/stanfordnlp/imdb/parquet/plain_text/test/0.parquet", "imdb/test.parquet")
+
+
+def hc3():
+    get("https://huggingface.co/datasets/Hello-SimpleAI/HC3/resolve/main/all.jsonl", "hc3/all.jsonl")
+
+
+def persuade():
+    get("https://drive.usercontent.google.com/download?id=13phHyDzIsb0MHyJr6q-B-qIa9P2tM135&export=download&confirm=t", "persuade/persuade_train.csv")
 
 
 def scale():
@@ -116,7 +128,7 @@ def gutenberg(want=400, seed=0):
     print(f"  gutenberg: {len(got)} of {len(ids)} fetched")
 
 
-SOURCES = dict(lex=lex, emobank=emobank, fb=fb, semeval=semeval, sst=sst, scale=scale, alm=alm, yelp=yelp, gutenberg=gutenberg)
+SOURCES = dict(lex=lex, emobank=emobank, fb=fb, semeval=semeval, sst=sst, scale=scale, alm=alm, yelp=yelp, gutenberg=gutenberg, imdb=imdb, hc3=hc3, persuade=persuade)
 
 if __name__ == "__main__":
     for name in sys.argv[1:] or SOURCES:

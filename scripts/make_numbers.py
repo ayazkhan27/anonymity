@@ -237,6 +237,55 @@ try:                                                              # the worked e
 except Exception as e:
     print("Moby-Dick numbers skipped:", e)
 
+gp = R("speed_gpu")
+if gp and sp:
+    M("gpuName", gp["device"].replace("NVIDIA GeForce ", "")); M("distilGpu", round(gp["distilbert_fp32"], -2), "{:,.0f}"); M("distilGpuHalf", round(gp["distilbert_fp16"], -2), "{:,.0f}")
+    M("robertaGpu", round(gp["roberta_fp32"], -2), "{:,.0f}"); M("robertaGpuHalf", round(gp["roberta_fp16"], -2), "{:,.0f}")
+    M("speedDistilGpu", sp["sgw"] / gp["distilbert_fp16"], "{:.0f}"); M("speedDistilGpuAll", sp["sgw_all_cores"] / gp["distilbert_fp16"], "{:.0f}")
+    M("billionHoursDistilGpu", 1e9 / gp["distilbert_fp16"] / 3600, "{:.0f}")
+if sp:
+    M("billionYearsDistil", 1e9 / sp["distilbert_1"] / 86400 / 365, "{:.1f}")
+    M("tenMillionSeconds", sp["scaling"][-1][1] * 10, "{:.0f}")
+
+if pos and "confirm" in pos:
+    c = pos["confirm"]
+    M("confNodes", c["n_nodes"], "{:,}"); M("confSentences", c["n_sentences"], "{:,}")
+    M("confEarlier", c["R1"]["earlier"], "{:.2f}"); M("confLater", c["R1"]["later"], "{:.2f}"); ci("confWeight", c["R1"]["diff"], "{:+.3f}")
+    ci("confKeptAfter", c["R2"]["kept_after"]); ci("confKeptBefore", c["R2"]["kept_before"]); ci("confKept", c["R2"]["diff"], "{:+.3f}")
+    M("confReviews", c["R3"]["n_reviews"], "{:,}"); ci("confAucFirst", c["R3"]["auc_first"], "{:.3f}"); ci("confAucLast", c["R3"]["auc_last"], "{:.3f}"); ci("confAuc", c["R3"]["diff"], "{:+.3f}")
+    M("confSupported", sum(c[r]["verdict"] == "supported" for r in ("R1", "R2", "R3")))
+
+mc = R("machine")
+if mc:
+    if "hc3" in mc:
+        h = mc["hc3"]
+        M("hcN", h["n"], "{:,}"); ci("hcAuc", h["auc"], "{:.2f}"); ci("hcAucWords", h["auc_words"], "{:.2f}")
+        for m in ("net", "dolors", "clustering", "ending_lift", "negated", "intensified", "after_contrast", "hedons"):
+            ci("hc" + m.title().replace("_", ""), [h["measures"][m][k] for k in ("d", "d_lo", "d_hi")], "{:+.2f}")
+        M("hcSupported", sum(v == "supported" for v in h["decisions"].values()))
+    if "essays" in mc:
+        e = mc["essays"]
+        M("esN", e["n_sampled"])
+        for c in "AB":
+            x = e[c]
+            M("esN" + c, x["n"]); ci("esAuc" + c, x["auc"], "{:.2f}"); ci("esAucWords" + c, x["auc_words"], "{:.2f}"); M("esHc" + c, x["auc_trained_on_hc3"], "{:.2f}")
+            for m in ("net", "dolors", "clustering", "ending_lift", "negated", "intensified", "after_contrast", "hedons"):
+                ci("es" + m.title().replace("_", "") + c, [x["measures"][m][k] for k in ("d", "d_lo", "d_hi")], "{:+.2f}")
+            M("esLiftHuman" + c, x["measures"]["ending_lift"]["human"], "{:.0f}"); M("esLiftMachine" + c, x["measures"]["ending_lift"]["machine"], "{:.0f}")
+            for hyp, v in x["decisions"].items():
+                M("es" + hyp + c, v)
+    if "revise" in mc:
+        r = mc["revise"]
+        M("rvN", r["n"]); M("rvDraft", r["distance"]["draft"], "{:.2f}"); M("rvControl", r["distance"]["control"], "{:.2f}"); M("rvReport", r["distance"]["report"], "{:.2f}"); M("rvHuman", r["distance"]["human"], "{:.2f}")
+        for k, tag in (("report_minus_control", "RvRC"), ("control_minus_draft", "RvCD"), ("report_minus_draft", "RvRD")):
+            M("d" + tag, r[k]["diff"], "{:+.2f}"); macros["d" + tag + "CI"] = f"[{r[k]['ci_prompts'][0]:+.2f}, {r[k]['ci_prompts'][1]:+.2f}]"
+            macros["d" + tag + "CIessays"] = f"[{r[k]['ci_essays'][0]:+.2f}, {r[k]['ci_essays'][1]:+.2f}]"
+        M("rvVerdict", r["HT1"])
+        for arm in ("draft", "control", "report", "human"):
+            M("rvScore" + arm.title(), r["machine_score"][arm], "{:.2f}")
+        for arm in ("draft", "control", "report"):
+            M("rvLift" + arm.title(), r["per_measure_z"][arm]["ending_lift"], "{:+.2f}"); M("rvBoost" + arm.title(), r["per_measure_z"][arm]["intensified"], "{:+.2f}")
+
 if not sp:
     macros["speedParagraph"] = "\\textcolor{red}{Throughput benchmark pending.}"
 
