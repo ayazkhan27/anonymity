@@ -1,6 +1,6 @@
-# Sentiment Gummy Worm
+# Felicific signatures
 
-A measure of sentiment for which granularity holds. Every word carries a positive charge, in hedons, and a negative charge, in dolors, taken from human word ratings. A span of text is summarised by 19 numbers, its signature. Signatures of adjacent spans merge exactly, so one pass over a book gives the score of every chapter, page and sentence, and no result depends on how the text was cut.
+A measure of sentiment for which granularity holds. Every word carries a positive charge, in hedons, and a negative charge, in dolors, taken from human word ratings. A span of text is summarised by 19 numbers, its signature. Signatures of adjacent spans merge exactly, so one pass over a book gives the score of every chapter, page and sentence, and no result depends on how the text was cut. The name comes from the felicific calculus, Bentham's proposal to measure and add pleasures and pains, whose units, hedons and dolors, the measure uses. The project began as the Sentiment Gummy Worm, which is why the Python package is called `sgw`.
 
 - Paper: [paper/sgw.pdf](paper/sgw.pdf), "A mergeable measure of sentiment"
 - Analysis plan, committed before any evaluation data were scored: [ANALYSIS_PLAN.md](ANALYSIS_PLAN.md)
