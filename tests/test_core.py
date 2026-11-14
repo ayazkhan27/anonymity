@@ -73,6 +73,49 @@ def test_operators():
     assert sgw.sketch_exact("very good")[sgw.BOOP] > 0 and sgw.sketch_exact("slightly bad")[sgw.DMPN] > 0
 
 
+def test_every_batch_row_equals_the_single_text():
+    """Messy edges: quotes, unknown words, digits, emoticons, emoji, no final full stop."""
+    r = random.Random(4)
+    extra = ["'wonderful'", '"awful"', "zxqv", "2019", ":)", ":(", "\U0001F600", "caf\u00e9", "don't", "\u2018fine\u2019"]
+    docs = []
+    for _ in range(200):
+        words = [r.choice(extra) if r.random() < 0.3 else r.choice(WORDS) for _ in range(r.randint(1, 15))]
+        docs.append(" ".join(words) + r.choice(["", ".", "!", "'", '"']))
+    batch = sgw.sketch(docs)
+    for d, row in zip(docs, batch):
+        assert np.allclose(sgw.sketch(d), row, rtol=1e-12, atol=1e-12), d
+        ref = sgw.sketch_exact(d).astype(float)
+        ref[2:] /= 1000
+        ref[sgw.SS] /= 1000
+        assert np.allclose(row, ref, rtol=1e-9, atol=1e-9), d
+
+
+def test_float_span_totals_and_fold_at_depth():
+    """In floats a prefix query keeps totals at any depth; position sums of a deep span come from fold."""
+    r = random.Random(5)
+    sents = [sentence(r) for _ in range(12000)]                 # about 200,000 words
+    S = sgw.sketch(sents)
+    pre = sgw.prefix(S)
+    for i, j in ((11990, 11999), (6000, 6003), (11999, 11999)):
+        direct = sgw.sketch(" ".join(sents[i:j + 1]))
+        flat = [sgw.L, sgw.E, sgw.P0, sgw.N0, sgw.NEGP, sgw.SS]
+        assert np.allclose(sgw.span(pre, i, j)[flat], direct[flat], rtol=1e-7, atol=1e-7)
+        assert np.allclose(sgw.fold(S[i:j + 1]), direct, rtol=1e-9, atol=1e-9)
+
+
+def test_standard_error():
+    r = random.Random(6)
+    d = text(r, 40)
+    S = sgw.sketch(d)
+    toks = [t for t in sgw.tokens(d) if sgw.KIND[sgw.VOCAB.get(t, 0)] & sgw.WORD]
+    c = np.array([sgw.CHARGE[sgw.VOCAB.get(t, 0)] for t in toks]) / 1000
+    assert np.isclose(sgw.stderr(S, 0, 1.0), 1000 * c.std() / np.sqrt(len(c)))   # density: the standard error of a mean
+    w = np.where(c != 0, 1.0, 0.2)                                            # level: the ratio estimator, word by word
+    R = c.sum() / (1 + w.sum())
+    u = c - R * w
+    assert np.isclose(sgw.stderr(S, 1, 0.2), 1000 * np.sqrt(np.sum(u * u) - u.sum() ** 2 / len(c)) / (1 + w.sum()))
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"):

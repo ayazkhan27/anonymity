@@ -1,7 +1,7 @@
 """Write paper/numbers.tex and the generated tables from results/*.json.
 
 Every number in the manuscript is a macro defined here, so the text cannot drift from the results.
-A result file that is missing leaves its macros as red '??' rather than stopping the build.
+A result file that is missing leaves its macros undefined, and LaTeX then stops at the first one.
 """
 import glob, json, os, re
 
@@ -57,7 +57,7 @@ if len(sig) == 6:
 
 acc = R("accuracy")
 if acc:
-    names = {"SGW": "Sgw", "SGW level": "Level", "SGW, refined charges": "Refined", "VADER": "Vader", "Hedonometer": "Hedo", "TextBlob": "Blob",
+    names = {"SGW": "Sgw", "SGW level": "Level", "SGW, refined charges": "Refined", "VADER": "Vader", "VADER, mean of sentences": "VaderSent", "Hedonometer": "Hedo", "TextBlob": "Blob",
              "Bag-of-words ridge (other corpora)": "BowPool", "TF-IDF ridge (in-corpus)": "Tfidf", "DistilBERT (SST-2)": "Distil", "Twitter-RoBERTa": "Roberta",
              "SGW, in-corpus constants": "Own", "SGW, no position": "NoPos", "SGW, no dilution": "NoDil", "SGW, no shifters": "NoShift",
              "SGW, one channel": "OneChan", "SGW, no shrinkage": "NoShrink"}
@@ -80,9 +80,9 @@ if acc:
     M("negHedon", b[6] / b[1], "{:.2f}"); M("negDolor", b[7] / b[2], "{:.2f}"); M("boostRatio", b[8] / ((b[1] - b[2]) / 2), "{:.2f}")
     M("dampRatio", b[9] / ((b[1] - b[2]) / 2), "{:.2f}"); M("postRatio", b[10] / ((b[1] - b[2]) / 2), "{:.2f}"); M("dolorOverHedon", -b[2] / b[1], "{:.2f}")
     # table of every method on every corpus
-    order = ["SGW", "SGW level", "SGW, in-corpus constants", "SGW, refined charges", "VADER", "Hedonometer", "TextBlob",
+    order = ["SGW", "SGW level", "SGW, in-corpus constants", "SGW, refined charges", "VADER", "VADER, mean of sentences", "Hedonometer", "TextBlob",
              "Bag-of-words ridge (other corpora)", "TF-IDF ridge (in-corpus)", "DistilBERT (SST-2)", "Twitter-RoBERTa"]
-    label = {"SGW": "Signature, calibrated", "SGW level": "Signature, level only", "SGW, in-corpus constants": "Signature, constants from the same corpus",
+    label = {"VADER": "VADER, whole text", "VADER, mean of sentences": "VADER, mean of sentence scores", "SGW": "Signature, calibrated", "SGW level": "Signature, level only", "SGW, in-corpus constants": "Signature, constants from the same corpus",
              "SGW, refined charges": "Signature, refined charges", "Bag-of-words ridge (other corpora)": "Bag-of-words ridge, other corpora",
              "TF-IDF ridge (in-corpus)": "Bag-of-words ridge, same corpus"}
     rows = []
@@ -331,6 +331,8 @@ if pos and "parts" in pos:
             M(f"pt{s}N{tag}", q["strata"][st]["n"], "{:,}")
         ci("ptDil" + tag, q["dilution"]["matched_before_minus_after"], "{:+.3f}")
     q = pos["parts"]["all"]
+    md = q["dilution"]["matched_before_minus_after"]                # printed as a positive amount "lower"
+    assert md[2] < 0; M("ptDilAbs", -md[0], "{:.3f}"); M("ptDilAbsLo", -md[2], "{:.3f}"); M("ptDilAbsHi", -md[1], "{:.3f}")
     M("ptWordsEarlier", q["words_earlier"], "{:.1f}"); M("ptWordsLater", q["words_later"], "{:.1f}"); M("ptLaterLonger", 100 * q["later_longer"], "{:.0f}")
     M("ptShareLo", q["share_weight"][0][0], "{:.2f}"); M("ptShareHi", q["share_weight"][-1][0], "{:.2f}")
     M("ptRsqPlain", q["r2"]["plain_mean"], "{:.2f}"); M("ptRsqLength", q["r2"]["length_weighted"], "{:.2f}"); M("ptRsqFree", q["r2"]["free_weights"], "{:.2f}")
@@ -338,6 +340,7 @@ if pos and "parts" in pos:
     if "by_rated" in q["dilution"]:
         for side, s in (("after", "After"), ("before", "Before")):
             cells = q["dilution"]["by_rated"][side]["1"]             # rated part of one word, by number of neutral words
+            assert cells[0]["m"] == "1" and cells[-1]["m"] == ("9+" if side == "after" else "5-8"), "text says one, nine or more, five to eight"
             ci("ptKept" + s + "First", cells[0]["kept"]); ci("ptKept" + s + "Last", cells[-1]["kept"]); M("ptKept" + s + "LastM", cells[-1]["m"].replace("-", " to ").replace("9+", "nine or more"))
             M("ptKept" + s + "LastN", cells[-1]["n"], "{:,}")
     if "rated_words_two_plus" in pos["parts"]["held_out"]["dilution"]:
@@ -384,6 +387,15 @@ if mc:
                 ci("es" + m.title().replace("_", "") + c, [x["measures"][m][k] for k in ("d", "d_lo", "d_hi")], "{:+.2f}")
             M("esLiftHuman" + c, x["measures"]["ending_lift"]["human"], "{:.0f}"); M("esLiftMachine" + c, x["measures"]["ending_lift"]["machine"], "{:.0f}")
             M("esWordsHuman" + c, x["words_human"], "{:.0f}"); M("esWordsMachine" + c, x["words_machine"], "{:.0f}")
+            if "intensified_strict" in x:                           # intensifiers without so, too, such, most
+                z = x["intensified_strict"]
+                ci("ejStrict" + c, z["d_jackknife"], "{:+.2f}"); M("esStrictHuman" + c, z["human"], "{:.1f}"); M("esStrictMachine" + c, z["machine"], "{:.1f}")
+            if "ending_exact" in x:                                 # the literal last fifth, as a check on the registered measure
+                ci("ejExact" + c, x["ending_exact"]["d_jackknife"], "{:+.2f}"); M("esExactHuman" + c, x["ending_exact"]["human"], "{:.0f}")
+                M("esExactMachine" + c, x["ending_exact"]["machine"], "{:.0f}"); M("esExactCorr" + c, x["ending_exact"]["corr_with_registered"], "{:.2f}")
+            for k, tag in (("auc_jackknife", "esAuc"), ("auc_words_jackknife", "esAucWords")):
+                if k in x:
+                    macros[tag + c + "CIjack"] = f"[{x[k][1]:.2f}, {x[k][2]:.2f}]"
             for m in x.get("d_jackknife", {}):                      # delete-one-assignment jackknife, t reference: the intervals printed in the text
                 ci("ej" + m.title().replace("_", "") + c, x["d_jackknife"][m], "{:+.2f}")
             for hyp, v in x.get("decisions_jackknife", {}).items():
@@ -430,6 +442,15 @@ if mc and "dial" in mc:
         macros[tag + "CIessays"] = f"[{d[k]['ci_essays'][0]:+.2f}, {d[k]['ci_essays'][1]:+.2f}]"
         macros[tag + "CIjack"] = f"[{d[k]['ci_jackknife'][0]:+.2f}, {d[k]['ci_jackknife'][1]:+.2f}]"
     M("dlModels", len(d["mean_corr_by_model"])); M("dlCorrModelLo", min(v["dial"] for v in d["mean_corr_by_model"].values()), "{:.2f}"); M("dlCorrModelHi", max(v["dial"] for v in d["mean_corr_by_model"].values()), "{:.2f}")
+    if "rank_corr" in d:
+        rk = d["rank_corr"]["dial"]
+        M("dlRhoDial", np.mean(list(rk.values())), "{:.2f}"); M("dlRhoControl", np.mean(list(d["rank_corr"]["control"].values())), "{:.2f}")
+        best = max(rk, key=rk.get)
+        assert best == "dolors" and min(rk, key=rk.get) == "clustering", "text names the best and the worst followed measure"
+        M("dlRhoMax", rk[best], "{:.2f}"); M("dlRhoMin", min(rk.values()), "{:.2f}")
+        M("dlClusters", ", ".join(str(v) for v in d["cluster_sizes"]))
+        for arm in ("draft", "human", "dial", "control"):
+            M("dlSlips" + arm.title(), d["slips_per_1000"][arm], "{:.1f}")
     M("dlAssignments", d.get("n_assignments", "?")); M("dlTrain", d["classifier_training_essays"]); M("dlMissingControl", d["missing_dial"]["missing_control"])
     for a, t in (("draft", "Draft"), ("control_r1", "ControlOne"), ("dial_r1", "DialOne"), ("control", "Control"), ("dial", "Dial")):
         M("dlGap" + t, d["gap"][a], "{:.2f}")
@@ -472,12 +493,33 @@ if pos and "dilute" in pos:
 if pos and "parts" in pos:
     M("ptLaterLongerHeld", 100 * pos["parts"]["held_out"]["later_longer"], "{:.0f}")
 
+dcl = os.path.join(HERE, "..", "machine_text", "declined_requests.json")
+if os.path.exists(dcl):                                           # requests that left no text, with each agent's final message
+    D_ = json.load(open(dcl))
+    why = lambda o: "auth" if re.search(r"pass|misrepresent|disguis|detector|detect", o["final_message"].lower()) else "relay" if re.search(r"vast|request", o["final_message"].lower()) else "silent"
+    M("dcTotal", len(D_)); M("dcAuthorship", sum(why(o) == "auth" for o in D_)); M("dcRelay", sum(why(o) == "relay" for o in D_)); M("dcSilent", sum(why(o) == "silent" for o in D_))
+    M("dcDialFirst", sum(o["experiment"] == "dial, round 1" and o["arm"] == "dial" for o in D_)); M("dcDialSecond", sum(o["experiment"] == "dial, round 2" and o["arm"] == "dial" for o in D_))
+    assert all(o["model"] == "haiku" for o in D_ if why(o) == "auth") and all(o["experiment"] == "essays" for o in D_ if why(o) == "relay"), "text says who declined and why"
+    M("dcHaikuControl", len(glob.glob(os.path.join(HERE, "..", "machine_text", "dial", "r?", "control", "*_haiku.txt"))))
+    M("dcHaikuSkill", len(glob.glob(os.path.join(HERE, "..", "machine_text", "revisions", "humanizer", "*_haiku.txt"))) + len(glob.glob(os.path.join(HERE, "..", "machine_text", "revisions", "sepia", "*_haiku.txt"))))
+try:                                                              # how much of the charged lexicon comes from VADER's list (needs the downloaded lists)
+    vad = {l.split("\t")[0] for l in open(os.path.join(HERE, "..", "data", "lex", "vader_lexicon.txt"), encoding="utf-8")}
+    lab = {l.split("\t")[0] for l in open(os.path.join(HERE, "..", "data", "lex", "labMT_English.tsv"), encoding="utf-8")}
+    chg = [w for w, v in words.items() if abs(int(v)) >= 250]
+    M("lexFromVader", 100 * sum(w in vad for w in chg) / len(chg), "{:.0f}"); M("lexVaderOnly", 100 * sum(w in vad and w not in lab for w in chg) / len(chg), "{:.0f}")
+except Exception as e:
+    print("lexicon source shares skipped:", e)
+
 if not sp:
     macros["speedParagraph"] = "\\textcolor{red}{Throughput benchmark pending.}"
 
 if acc and cr and mc and "dial" in mc:
     assert [c for c in CORPORA if acc[c]["methods"]["SGW, no dilution"]["sgw_minus_ci"][0] > 0] == ["semeval", "fb", "sst", "yelp"], "text names the corpora where the dilution test is supported"
     assert macros["critReversals"] == "0" and macros["dlJudgeBoth"] == "0" and macros["dlMissing"] == macros["dlMissingHaiku"], "text says none / never / all"
+    assert macros["winsVader"] == "3" and macros["lossesVader"] == "0" and macros["winsNoShrink"] == "2", "text says three, none, two"
+    assert acc["fb"]["methods"]["VADER, mean of sentences"]["sgw_minus_ci"][0] > 0 and acc["yelp"]["methods"]["VADER, mean of sentences"]["sgw_minus_ci"][1] < 0
+    assert macros["winsVaderSent"] == "1" and macros["lossesVaderSent"] == "1", "text names Facebook as the one lead and Yelp as the one deficit against sentence-averaged VADER"
+    assert max(v["gross"][0] for k, v in pos["where"].items() if k in ("Film reviews", "Yelp reviews", "Film review paragraphs", "Novel chapters")) < 0.03, "text says at most +0.03 for long units"
     assert macros["lossesNoShrink"] == "1" and acc["scale"]["methods"]["SGW, no shrinkage"]["sgw_minus_ci"][1] < 0, "text says the neutral prior costs a little in film reviews"
 
 minus = lambda s: re.sub(r"(?<![A-Za-z0-9}\\])-(?=[\d.])", lambda m: "\\ensuremath{-}", s)   # a hyphen before a number becomes a minus sign
@@ -494,7 +536,7 @@ for name in glob.glob(os.path.join(PAPER, "table_*.tex")) + [os.path.join(PAPER,
 g = lambda k: re.sub(r"(\d)\\times10\^\{(-?\d+)\}", r"\1e\2", macros.get(k, "?").replace("\\%", "%").replace("$", ""))
 block = f"""| | |
 |---|---|
-| Mean Pearson r with human ratings (five rated corpora, constants fitted on other corpora) | signature {g('meanSgw')}; VADER {g('meanVader')}; TextBlob {g('meanBlob')}; hedonometer {g('meanHedo')}; DistilBERT {g('meanDistil')}; Twitter-RoBERTa {g('meanRoberta')} |
+| Mean Pearson r with human ratings (five rated corpora, constants fitted on other corpora) | signature {g('meanSgw')}; VADER {g('meanVader')} on whole texts and {g('meanVaderSent')} averaged over sentences; TextBlob {g('meanBlob')}; hedonometer {g('meanHedo')}; DistilBERT {g('meanDistil')}; Twitter-RoBERTa {g('meanRoberta')} |
 | Sentences per second on one processor core | signature {g('sgwRate')}; VADER {g('vaderRate')}; DistilBERT {g('distilRate')}; DistilBERT on an RTX 3090 {g('distilGpuHalf')} |
 | One billion sentences | {g('billionHours')} hours on one core, {g('billionMinutesAll')} minutes with twelve processes on six cores |
 | Merged against single-pass signatures, {g('nNovels')} novels | relative difference below {g('mergeErr')} in floating point; exact in integers |
@@ -503,7 +545,7 @@ block = f"""| | |
 | Order of two parts of a phrase, length held fixed | weight of the later part minus the earlier at equal length {g('ptEqDiff')} {g('ptEqDiffCI')}; the raw later-part advantage is a length effect |
 | Neutral words | dilute on either side of the feeling; planned test supported in {g('winsNoDil')} of 6 corpora |
 | Human against machine essays, ten tone measures | AUC {g('esAucA')} plain, {g('esAucB')} when the model writes as a student; {g('hcAuc')} for ChatGPT answers |
-| The dial | target against achieved value, mean r {g('dlCorrDial')} with the dial and {g('dlCorrControl')} without; a model judge found the dial revision more student-like in {g('dlJudgeStudentWins')} of {g('dlJudgeN')} pairs |"""
+| The dial | target against achieved value, mean r {g('dlCorrDial')} with the dial and {g('dlCorrControl')} without; no gain in resemblance to student essays over a plain revision was detected |"""
 readme = os.path.join(HERE, "..", "README.md")
 t = open(readme).read()
 a, b = t.index("<!-- results:start -->") + len("<!-- results:start -->"), t.index("<!-- results:end -->")

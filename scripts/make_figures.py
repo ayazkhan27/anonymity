@@ -92,13 +92,14 @@ def fig1():
     for v, yy in ((h, 1), (d, 0)):
         cx.text(v + 0.12, yy, f"{v:.2f}", va="center", fontsize=6.3)
     panel(cx, "c", x=-0.55, y=1.14)
-    dx = fig.add_axes([0.885, 0.30, 0.105, 0.19])
+    lvl, se = sgw.level(sab, CONST["level_a"], CONST["level_kappa"]), sgw.stderr(sab, CONST["level_a"], CONST["level_kappa"])
+    cx.text(0, -0.78, f"level {lvl:+.0f} $\\pm$ {se:.0f}", fontsize=6.5, transform=cx.transData, va="top", ha="left", clip_on=False)
+    dx = fig.add_axes([0.885, 0.28, 0.105, 0.19])
     g = np.linspace(0, 1, 100)
     dx.plot(g, 1000 * sgw.arc(sab, g), color=INK, lw=0.9)
     dx.axhline(0, color=GREY, lw=0.4)
     dx.set_xticks([0, 1]); dx.set_xticklabels(["start", "end"]); dx.set_ylabel("net per\n1,000 words", fontsize=6)
-    lvl, se = sgw.level(sab, CONST["level_a"], CONST["level_kappa"]), sgw.stderr(sab, CONST["level_a"], CONST["level_kappa"])
-    dx.set_title(f"level {lvl:+.0f} $\\pm$ {se:.0f}", fontsize=6.5, pad=5, loc="left")
+    dx.set_title("arc", fontsize=6.5, pad=3, loc="left")
     save(fig, "fig1_schematic")
 
 
@@ -124,7 +125,7 @@ def fig5():
     ax.axhline(per_k(book), color=GREY, lw=0.5, ls=(0, (3, 2)), zorder=2)
     ax.set_xlim(0, 1); ax.set_ylim(-12, 88); ax.set_xticks([0, 0.25, 0.5, 0.75, 1]); ax.set_xticklabels(["start", "", "middle", "", "end"])
     ax.set_ylabel("net charge per 1,000 words")
-    ax.text(0.015, 0.19, "chapters, with 95\% intervals", color="#6F6F6F", transform=ax.transAxes, fontsize=6.3)
+    ax.text(0.015, 0.19, "sections, with 95\% intervals", color="#6F6F6F", transform=ax.transAxes, fontsize=6.3)
     ax.text(0.015, 0.115, "moving window, 10\% of the book", color=BLUE, transform=ax.transAxes, fontsize=6.3)
     ax.text(0.015, 0.04, "cubic arc from the signature", color=INK, transform=ax.transAxes, fontsize=6.3)
     ax.text(0.995, per_k(book) + 2.5, "whole book", color="#6F6F6F", fontsize=6.3, ha="right")
@@ -142,7 +143,7 @@ def fig5():
     bx.bar(np.arange(12), per_k(seg) - base, bottom=base, color=[BLUE if v >= base else RED for v in per_k(seg)], width=0.7, lw=0)
     bx.errorbar(np.arange(12), per_k(seg), yerr=1.96 * se_k(seg), fmt="none", ecolor=INK, elinewidth=0.5)
     bx.axhline(base, color="#6F6F6F", lw=0.5, ls=(0, (3, 2))); bx.set_xticks([0, 11]); bx.set_xticklabels(["start", "end"])
-    bx.text(11.45, base + 2.5, "whole book", color="#6F6F6F", fontsize=6.3, ha="right")
+    bx.text(11.45, bx.get_ylim()[1] * 0.93, "dashed: whole book", color="#6F6F6F", fontsize=6.3, ha="right")
     bx.set_title(f"last section ({C[k, sgw.L]:,.0f} words), twelve spans", fontsize=7, loc="left", pad=4)
     panel(bx, "b", x=-0.14)
     # all novels
@@ -169,7 +170,7 @@ def fig5():
         m = m * np.sign(m @ lg)
         ex.plot(GRID, m / np.abs(m).max(), color=col, lw=1)
         ex.plot(GRID, lg / np.abs(lg).max(), color=col, lw=0.6, ls=(0, (3, 2)))
-    ex.text(0.62, 0.02, "first mode", color=BLUE, fontsize=6.3); ex.text(0.30, -0.95, "second mode", color=RED, fontsize=6.3)
+    ex.text(0.70, -0.08, "first mode", color=BLUE, fontsize=6.3); ex.text(0.30, -0.95, "second mode", color=RED, fontsize=6.3)
     ex.set_title("dashed: Legendre $P_1$ and $P_2$", fontsize=6.5, loc="left", pad=4)
     ex.set_xticks([0, 1]); ex.set_xticklabels(["start", "end"]); ex.set_yticks([-1, 0, 1]); ex.set_ylim(-1.1, 1.15); ex.set_ylabel("arc shape (scaled)")
     panel(ex, "e", x=-0.14)
@@ -198,7 +199,11 @@ def fig6():
     cx = fig.add_axes([0.75, 0.58, 0.24, 0.34])
     f1 = [100 * v["pair_flip_vs_sentence"][k] for k in sizes]
     f2 = [100 * v["sgw_mean_flip_vs_sentence"][k] for k in sizes[:4]]
-    cx.plot(range(5), f1, color=RED, lw=1, marker="o", ms=2.5); cx.plot(range(4), f2, color=BLUE, lw=1, marker="s", ms=2.3); cx.plot(range(4), [0] * 4, color=INK, lw=1, marker="D", ms=2.3)
+    first = R("books")["books"][:v["n_books"]]                   # mean of chapter densities for the same books, as in make_numbers.py
+    one, mac = np.array(v["sgw_mean_of_chunks"])[:, 0], np.array([b["macro"] for b in first])
+    i, j = np.triu_indices(len(first), 1)
+    f2.append(100 * np.mean(np.sign(one[i] - one[j]) != np.sign(mac[i] - mac[j])))
+    cx.plot(range(5), f1, color=RED, lw=1, marker="o", ms=2.5); cx.plot(range(5), f2, color=BLUE, lw=1, marker="s", ms=2.3); cx.plot(range(5), [0] * 5, color=INK, lw=1, marker="D", ms=2.3)
     cx.text(2.55, f1[3] + 2.0, "VADER", color=RED, fontsize=6.3); cx.text(1.75, f2[2] - 4.2, "density, chunks averaged", color=BLUE, fontsize=6.3); cx.text(0.9, 1.1, "density, signatures merged", color=INK, fontsize=6.3)
     cx.set_xticks(range(5)); cx.set_xticklabels(sizes); cx.set_xlabel("sentences per chunk"); cx.set_ylabel("book pairs that swap order (\%)"); cx.set_ylim(-1.5, 24)
     panel(cx, "c", x=-0.17)
@@ -304,9 +309,9 @@ def fig3():
     for j, (names, title) in enumerate(groups):
         ax = fig.add_axes([0.06 + j * 0.345, 0.56, 0.20, 0.36])
         ends = []
-        for name, col in zip(names, cols):
+        for q, (name, col) in enumerate(zip(names, cols)):
             d = P["where"][name]["decile_density"]
-            ax.plot(x, d, color=col, lw=1, marker="o", ms=2)
+            ax.plot(x + (q - 1.5) * 0.006, d, color=col, lw=1, marker="o", ms=2)
             ends.append([d[-1], LONG[name], col])
         ends.sort()
         for k in range(1, len(ends)):                               # keep the direct labels from colliding

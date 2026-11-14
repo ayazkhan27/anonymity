@@ -9,6 +9,8 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import Ridge
 
+import re
+
 from common import *
 
 VARIANTS = {  # name -> keyword overrides for sgw.features, plus fixed a / kappa where an ablation pins them
@@ -70,6 +72,7 @@ def main():
         own = fit(sig, corpora, [target], "full")                # constants fitted on the target's own training data
         s["SGW, in-corpus constants"] = sgw.predict(own["coef"], sgw.features(sig[target]["test"], own["a"], own["kappa"]))
         s["VADER"] = cached(f"vader_{target}_test", lambda: vader_scores(texts))
+        s["VADER, mean of sentences"] = cached(f"vadersent_{target}_test", lambda: vader_sentence_means(texts))
         s["Hedonometer"] = cached(f"hedo_{target}_test", lambda: hedonometer_scores(texts))
         s["TextBlob"] = cached(f"textblob_{target}_test", lambda: textblob_scores(texts))
 
@@ -89,13 +92,7 @@ def main():
                                               "coef": fmt(loco["coef"])},
                "own": {"a": own["a"], "kappa": own["kappa"], "coef": fmt(own["coef"])}, "methods": {}}
         for name, z in s.items():
-            z, yy = z[keep], y[keep]
-            r = boot(lambda i: pearson(z[i], yy[i]), groups)
-            rho = boot(lambda i: spearman(z[i], yy[i]), groups, 500)
-            ref = s["SGW"][keep]
-            d = boot(lambda i: pearson(ref[i], yy[i]) - pearson(z[i], yy[i]), groups)
-            res["methods"][name] = {"r": fmt(r[0]), "r_ci": [fmt(r[1]), fmt(r[2])], "rho": fmt(rho[0]), "rho_ci": [fmt(rho[1]), fmt(rho[2])],
-                                    "sgw_minus": fmt(d[0]), "sgw_minus_ci": [fmt(d[1]), fmt(d[2])]}
+            res["methods"][name] = agreement(z[keep], y[keep], s["SGW"][keep], groups)
         out[target] = res
         scores[target] = {k: fmt(v) for k, v in s.items()}
         print(f"\n{NAMES[target]} (n={res['n']}; LOCO a={loco['a']}, kappa={loco['kappa']})")
@@ -118,5 +115,45 @@ def main():
         print(f"  {m:28s} {v:.3f}")
 
 
+def agreement(z, yy, ref, groups):
+    """Pearson r and Spearman rho of a score with the ratings, and the signature's r minus this method's, with bootstrap intervals."""
+    r = boot(lambda i: pearson(z[i], yy[i]), groups)
+    rho = boot(lambda i: spearman(z[i], yy[i]), groups, 500)
+    d = boot(lambda i: pearson(ref[i], yy[i]) - pearson(z[i], yy[i]), groups)
+    return {"r": fmt(r[0]), "r_ci": [fmt(r[1]), fmt(r[2])], "rho": fmt(rho[0]), "rho_ci": [fmt(rho[1]), fmt(rho[2])],
+            "sgw_minus": fmt(d[0]), "sgw_minus_ci": [fmt(d[1]), fmt(d[2])]}
+
+
+SENT = re.compile(r"(?<=[.!?])\s+")
+
+
+def vader_sentence_means(texts):
+    """VADER's compound score for each sentence, averaged over the text: the use its authors advise for long texts."""
+    sents = [[s for s in SENT.split(t.replace("\n", " ")) if s.strip()] or [t] for t in texts]
+    flat = vader_scores([s for ss in sents for s in ss])
+    ends = np.cumsum([len(ss) for ss in sents])
+    return np.array([flat[a:b].mean() for a, b in zip(np.r_[0, ends[:-1]], ends)])
+
+
+def add_vader_sentences():
+    """Add the sentence-averaged VADER comparator to an existing accuracy.json without refitting anything (added after review)."""
+    corpora = {c: load() for c, load in LOADERS.items()}
+    out = json.load(open(os.path.join(RESULTS, "accuracy.json")))
+    scores = np.load(os.path.join(CACHE, "test_scores.npz"))
+    name = "VADER, mean of sentences"
+    for c in corpora:
+        test = corpora[c]["test"]
+        z = cached(f"vadersent_{c}_test", lambda: vader_sentence_means(list(test.text)))
+        keep = ~np.isnan(scores[f"{c}|DistilBERT (SST-2)"])
+        assert keep.sum() == out[c]["n"]
+        out[c]["methods"][name] = agreement(z[keep], test.y.values[keep], scores[f"{c}|SGW"][keep], test.group.values[keep])
+        m = out[c]["methods"][name]
+        print(f"{NAMES[c]:22s} r={m['r']:.3f} [{m['r_ci'][0]:.3f}, {m['r_ci'][1]:.3f}] rho={m['rho']:.3f}  SGW-this={m['sgw_minus']:+.3f} [{m['sgw_minus_ci'][0]:+.3f}, {m['sgw_minus_ci'][1]:+.3f}]  (whole-text VADER r={out[c]['methods']['VADER']['r']:.3f})", flush=True)
+    out["mean_r"][name] = float(np.mean([out[c]["methods"][name]["r"] for c in corpora]))
+    out["mean_r_primary"][name] = float(np.mean([out[c]["methods"][name]["r"] for c in corpora if c != "yelp"]))
+    save("accuracy", out)
+    print("mean over the five primary corpora:", round(out["mean_r_primary"][name], 3), "| six:", round(out["mean_r"][name], 3))
+
+
 if __name__ == "__main__":
-    main()
+    add_vader_sentences() if sys.argv[1:] == ["vader_sentences"] else main()

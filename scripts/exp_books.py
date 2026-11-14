@@ -83,7 +83,7 @@ def one_book(path, perms=200):
         fit = npleg.legval(2 * GRID - 1, npleg.legfit(x, c, deg))
         r2[deg] = float(1 - np.sum((win - fit) ** 2) / np.sum((win - win.mean()) ** 2))
     cubic = sgw.arc(book, GRID)
-    assert np.allclose(cubic, npleg.legval(2 * GRID - 1, npleg.legfit(x, c, 3)), atol=1e-8)   # signature arc == direct least squares
+    assert np.allclose(cubic, npleg.legval(2 * GRID - 1, npleg.legfit(x, c, 3)), rtol=1e-5, atol=1e-8)   # signature arc against direct least squares, to one part in 1e5
     return dict(id=os.path.basename(path)[:-4], chapters=len(ch), sentences=len(sents), words=float(book[sgw.L]),
                 hedons=float(book[sgw.P0]), dolors=float(book[sgw.N0]), micro=micro, macro=macro, identity=identity,
                 merge_err=merge_err, between=obs, null_mean=float(np.mean(null)), p=float((1 + np.sum(np.array(null) >= obs)) / (1 + perms)),

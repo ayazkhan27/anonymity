@@ -219,10 +219,24 @@
 \newcommand{\dVaderFilm}{+0.045 [+0.014, +0.075]}
 \newcommand{\dVaderMean}{+0.016}
 \newcommand{\dVaderMeanCI}{[\ensuremath{-}0.017, +0.049]}
+\newcommand{\dVaderSentEmo}{+0.018 [\ensuremath{-}0.037, +0.082]}
+\newcommand{\dVaderSentFb}{+0.053 [+0.020, +0.082]}
+\newcommand{\dVaderSentFilm}{\ensuremath{-}0.010 [\ensuremath{-}0.032, +0.011]}
+\newcommand{\dVaderSentSst}{\ensuremath{-}0.005 [\ensuremath{-}0.032, +0.022]}
+\newcommand{\dVaderSentTw}{+0.011 [\ensuremath{-}0.019, +0.038]}
+\newcommand{\dVaderSentYelp}{\ensuremath{-}0.017 [\ensuremath{-}0.032, \ensuremath{-}0.002]}
 \newcommand{\dVaderSst}{\ensuremath{-}0.013 [\ensuremath{-}0.039, +0.014]}
 \newcommand{\dVaderTw}{\ensuremath{-}0.010 [\ensuremath{-}0.037, +0.017]}
 \newcommand{\dVaderYelp}{+0.055 [+0.037, +0.071]}
 \newcommand{\dampRatio}{\ensuremath{-}0.33}
+\newcommand{\dcAuthorship}{14}
+\newcommand{\dcDialFirst}{10}
+\newcommand{\dcDialSecond}{1}
+\newcommand{\dcHaikuControl}{30}
+\newcommand{\dcHaikuSkill}{30}
+\newcommand{\dcRelay}{2}
+\newcommand{\dcSilent}{1}
+\newcommand{\dcTotal}{17}
 \newcommand{\densFlipChapter}{10}
 \newcommand{\densFlipFive}{8}
 \newcommand{\densFlipLast}{8}
@@ -239,6 +253,7 @@
 \newcommand{\dlCentreDial}{0.80}
 \newcommand{\dlCentreDraft}{0.63}
 \newcommand{\dlCentreHuman}{1.28}
+\newcommand{\dlClusters}{15, 13, 8, 4, 3, 3, 2}
 \newcommand{\dlCorrBoostControl}{0.04}
 \newcommand{\dlCorrBoostDial}{0.43}
 \newcommand{\dlCorrCluControl}{0.10}
@@ -291,10 +306,18 @@
 \newcommand{\dlModels}{3}
 \newcommand{\dlN}{48}
 \newcommand{\dlRequested}{60}
+\newcommand{\dlRhoControl}{0.09}
+\newcommand{\dlRhoDial}{0.58}
+\newcommand{\dlRhoMax}{0.78}
+\newcommand{\dlRhoMin}{0.16}
 \newcommand{\dlScoreControl}{0.44}
 \newcommand{\dlScoreDial}{0.50}
 \newcommand{\dlScoreDraft}{0.64}
 \newcommand{\dlScoreHuman}{0.43}
+\newcommand{\dlSlipsControl}{4.5}
+\newcommand{\dlSlipsDial}{0.0}
+\newcommand{\dlSlipsDraft}{0.0}
+\newcommand{\dlSlipsHuman}{1.9}
 \newcommand{\dlTerrible}{0.55}
 \newcommand{\dlTrain}{98}
 \newcommand{\dolorOverHedon}{1.63}
@@ -326,6 +349,10 @@
 \newcommand{\ejEndingLiftACI}{[+0.13, +1.07]}
 \newcommand{\ejEndingLiftB}{+0.52}
 \newcommand{\ejEndingLiftBCI}{[+0.16, +0.88]}
+\newcommand{\ejExactA}{+0.51}
+\newcommand{\ejExactACI}{[\ensuremath{-}0.01, +1.03]}
+\newcommand{\ejExactB}{+0.43}
+\newcommand{\ejExactBCI}{[+0.06, +0.80]}
 \newcommand{\ejGrossA}{\ensuremath{-}0.20}
 \newcommand{\ejGrossACI}{[\ensuremath{-}0.71, +0.30]}
 \newcommand{\ejGrossB}{+0.34}
@@ -346,6 +373,10 @@
 \newcommand{\ejNetACI}{[\ensuremath{-}0.48, +0.03]}
 \newcommand{\ejNetB}{+0.29}
 \newcommand{\ejNetBCI}{[\ensuremath{-}0.01, +0.60]}
+\newcommand{\ejStrictA}{\ensuremath{-}0.52}
+\newcommand{\ejStrictACI}{[\ensuremath{-}0.72, \ensuremath{-}0.32]}
+\newcommand{\ejStrictB}{\ensuremath{-}0.32}
+\newcommand{\ejStrictBCI}{[\ensuremath{-}0.60, \ensuremath{-}0.05]}
 \newcommand{\emoCats}{6}
 \newcommand{\emoCatsNeg}{0}
 \newcommand{\emoCatsPos}{1}
@@ -367,12 +398,16 @@
 \newcommand{\esAfterContrastBCI}{[\ensuremath{-}0.29, +0.16]}
 \newcommand{\esAucA}{0.74}
 \newcommand{\esAucACI}{[0.68, 0.82]}
+\newcommand{\esAucACIjack}{[0.65, 0.83]}
 \newcommand{\esAucB}{0.64}
 \newcommand{\esAucBCI}{[0.56, 0.76]}
+\newcommand{\esAucBCIjack}{[0.52, 0.77]}
 \newcommand{\esAucWordsA}{0.54}
 \newcommand{\esAucWordsACI}{[0.53, 0.56]}
+\newcommand{\esAucWordsACIjack}{[0.52, 0.56]}
 \newcommand{\esAucWordsB}{0.55}
 \newcommand{\esAucWordsBCI}{[0.54, 0.57]}
+\newcommand{\esAucWordsBCIjack}{[0.53, 0.57]}
 \newcommand{\esClusteringA}{+0.12}
 \newcommand{\esClusteringACI}{[\ensuremath{-}0.12, +0.38]}
 \newcommand{\esClusteringB}{+0.25}
@@ -385,6 +420,12 @@
 \newcommand{\esEndingLiftACI}{[+0.24, +0.93]}
 \newcommand{\esEndingLiftB}{+0.52}
 \newcommand{\esEndingLiftBCI}{[+0.22, +0.75]}
+\newcommand{\esExactCorrA}{0.92}
+\newcommand{\esExactCorrB}{0.91}
+\newcommand{\esExactHumanA}{2}
+\newcommand{\esExactHumanB}{2}
+\newcommand{\esExactMachineA}{14}
+\newcommand{\esExactMachineB}{12}
 \newcommand{\esHLfourA}{supported}
 \newcommand{\esHLfourB}{supported}
 \newcommand{\esHLoneA}{refuted}
@@ -418,6 +459,10 @@
 \newcommand{\esNetACI}{[\ensuremath{-}0.40, \ensuremath{-}0.02]}
 \newcommand{\esNetB}{+0.29}
 \newcommand{\esNetBCI}{[+0.08, +0.52]}
+\newcommand{\esStrictHumanA}{1.0}
+\newcommand{\esStrictHumanB}{1.0}
+\newcommand{\esStrictMachineA}{0.2}
+\newcommand{\esStrictMachineB}{0.5}
 \newcommand{\esWordsHumanA}{388}
 \newcommand{\esWordsHumanB}{390}
 \newcommand{\esWordsMachineA}{404}
@@ -526,6 +571,8 @@
 \newcommand{\kernYelpCI}{[\ensuremath{-}0.15, \ensuremath{-}0.09]}
 \newcommand{\lastDecileHi}{1.55}
 \newcommand{\lastDecileLo}{1.34}
+\newcommand{\lexFromVader}{69}
+\newcommand{\lexVaderOnly}{55}
 \newcommand{\locoA}{2 or 4}
 \newcommand{\locoBoostHi}{+1.09}
 \newcommand{\locoBoostLo}{+0.87}
@@ -554,6 +601,7 @@
 \newcommand{\lossSgw}{0.000}
 \newcommand{\lossTfidf}{\ensuremath{-}0.127}
 \newcommand{\lossVader}{0.023}
+\newcommand{\lossVaderSent}{0.008}
 \newcommand{\lossesBlob}{1}
 \newcommand{\lossesBowPool}{3}
 \newcommand{\lossesDistil}{3}
@@ -570,6 +618,7 @@
 \newcommand{\lossesSgw}{0}
 \newcommand{\lossesTfidf}{3}
 \newcommand{\lossesVader}{0}
+\newcommand{\lossesVaderSent}{1}
 \newcommand{\meanBlob}{0.44}
 \newcommand{\meanBowPool}{0.55}
 \newcommand{\meanDistil}{0.59}
@@ -594,6 +643,7 @@
 \newcommand{\meanSgwThree}{0.506}
 \newcommand{\meanTfidf}{0.61}
 \newcommand{\meanVader}{0.49}
+\newcommand{\meanVaderSent}{0.49}
 \newcommand{\meanVaderSix}{0.50}
 \newcommand{\meanVaderThree}{0.489}
 \newcommand{\mergeErr}{$2\times10^{\ensuremath{-}13}$}
@@ -664,6 +714,9 @@
 \newcommand{\partsVaderWhole}{0.17}
 \newcommand{\postRatio}{\ensuremath{-}0.06}
 \newcommand{\ptDil}{\ensuremath{-}0.050}
+\newcommand{\ptDilAbs}{0.050}
+\newcommand{\ptDilAbsHi}{0.058}
+\newcommand{\ptDilAbsLo}{0.042}
 \newcommand{\ptDilCI}{[\ensuremath{-}0.058, \ensuremath{-}0.042]}
 \newcommand{\ptDilHeld}{\ensuremath{-}0.050}
 \newcommand{\ptDilHeldCI}{[\ensuremath{-}0.064, \ensuremath{-}0.035]}
@@ -846,6 +899,12 @@
 \newcommand{\rVaderEmo}{0.46}
 \newcommand{\rVaderFb}{0.58}
 \newcommand{\rVaderFilm}{0.25}
+\newcommand{\rVaderSentEmo}{0.46}
+\newcommand{\rVaderSentFb}{0.56}
+\newcommand{\rVaderSentFilm}{0.30}
+\newcommand{\rVaderSentSst}{0.44}
+\newcommand{\rVaderSentTw}{0.69}
+\newcommand{\rVaderSentYelp}{0.63}
 \newcommand{\rVaderSst}{0.45}
 \newcommand{\rVaderTw}{0.71}
 \newcommand{\rVaderYelp}{0.55}
@@ -990,6 +1049,7 @@
 \newcommand{\winsTfidf}{2}
 \newcommand{\winsVader}{3}
 \newcommand{\winsVaderPrimary}{2}
+\newcommand{\winsVaderSent}{1}
 \newcommand{\wordsPerSentence}{16}
 \newcommand{\yelpFirst}{1.09}
 \newcommand{\yelpLast}{1.11}

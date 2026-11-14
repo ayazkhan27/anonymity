@@ -74,14 +74,46 @@ def classifier():
     return make_pipeline(SimpleImputer(strategy="median"), StandardScaler(), LogisticRegression(max_iter=2000))
 
 
-def auc(Xh, Xm, groups, folds=10):
-    """Out-of-fold AUC of a logistic regression; a prompt's texts stay in one fold; interval by resampling prompts."""
+def auc(Xh, Xm, groups, folds=10, jk=False):
+    """Out-of-fold AUC of a logistic regression; a prompt's texts stay in one fold; interval by resampling prompts.
+    With jk, also the delete-one-prompt jackknife interval, for comparisons that rest on a handful of prompts."""
     X, y, g = np.vstack([Xh, Xm]), np.r_[np.zeros(len(Xh)), np.ones(len(Xm))], np.r_[groups, groups]
     score = np.zeros(len(y))
     for tr, te in GroupKFold(n_splits=min(folds, len(np.unique(g)))).split(X, y, g):
         score[te] = classifier().fit(X[tr], y[tr]).predict_proba(X[te])[:, 1]
     est, lo, hi = boot(lambda i: roc_auc_score(y[i], score[i]), g, 1000)
-    return [float(est), float(lo), float(hi)]
+    out = [float(est), float(lo), float(hi)]
+    return (out, jack(lambda i: float(roc_auc_score(y[i], score[i])), g)) if jk else out
+
+
+AMBIGUOUS = ("so", "too", "such", "most")                         # intensifiers that are often conjunctions or quantifiers in essays
+SLIPS = re.compile(r"\b(alot|dont|cant|wont|didnt|doesnt|isnt|wasnt|arent|couldnt|wouldnt|shouldnt|thats|theres|theyre|youre|whats|ive)\b", re.I)
+
+
+def strict_intensified(texts):
+    """Share of charge that follows an intensifier, with the ambiguous ones (so, too, such, most) taken off the list."""
+    ids = [sgw.VOCAB[w] for w in AMBIGUOUS]
+    keep = sgw.KIND[ids].copy()
+    sgw.KIND[ids] &= np.uint8(255 - sgw.BOOST)
+    try:
+        return tone.profiles(texts)[0][:, M.index("intensified")]
+    finally:
+        sgw.KIND[ids] = keep
+
+
+def slips(texts):
+    """Informal spellings per 1,000 words: 'alot' and contractions written without their apostrophe."""
+    return 1000 * sum(len(SLIPS.findall(x)) for x in texts) / max(sum(len(x.split()) for x in texts), 1)
+
+
+def last_fifth(texts):
+    """Net charge per 1,000 words in the last fifth of each text minus the text's own density: the literal reading of
+    'ending lift', as a check on the registered measure, which averages the fitted cubic arc over the last fifth."""
+    t = sgw.scan(list(texts))
+    n = np.maximum(t["words"], 1)
+    late = (t["pos"] + 0.5) / n[t["doc"]] >= 0.8
+    num = np.bincount(t["doc"][late], weights=t["c"][late], minlength=len(n)); den = np.maximum(np.bincount(t["doc"][late], minlength=len(n)), 1)
+    return 1000 * (num / den - np.bincount(t["doc"], weights=t["c"], minlength=len(n)) / n)
 
 
 def decisions(res):
@@ -145,10 +177,17 @@ def essays():
         dz = (Xm - Xh) / np.nanstd(Xh, 0)
         jk = {m: jack(lambda i, j=j: float(np.nanmean(dz[i, j])), g) for j, m in enumerate(M)}
         verdict_jk = {h: ("supported" if sgn * jk[m][1] > 0 and sgn * jk[m][2] > 0 else "refuted" if sgn * jk[m][1] < 0 and sgn * jk[m][2] < 0 else "undecided") for h, (m, sgn) in HYP.items()}
+        eh, em = last_fifth(d.human), last_fifth(d[c])
+        (a_all, a_jk), (w_all, w_jk) = auc(Xh, Xm, g, 8, jk=True), auc(np.log(nh)[:, None], np.log(nm)[:, None], g, 8, jk=True)
         out[c] = dict(n=int(len(d)), words_human=float(np.median(nh)), words_machine=float(np.median(nm)), measures=res, decisions=decisions(res),
+                      ending_exact=dict(human=float(eh.mean()), machine=float(em.mean()), d_jackknife=jack(lambda i: float(np.mean((em - eh)[i]) / eh.std()), g),
+                                        corr_with_registered=float(np.corrcoef(np.r_[eh, em], np.r_[Xh[:, M.index("ending_lift")], Xm[:, M.index("ending_lift")]])[0, 1])),
+                      auc_jackknife=a_jk, auc_words_jackknife=w_jk,
+                      intensified_strict=(lambda sh, sm: dict(human=float(np.nanmean(sh)), machine=float(np.nanmean(sm)),
+                                                              d_jackknife=jack(lambda i: float(np.nanmean((sm - sh)[i]) / np.nanstd(sh)), g)))(strict_intensified(d.human), strict_intensified(d[c])),
                       decisions_resampling_essays=decisions(res_item), d_ci_resampling_essays={m: [res_item[m]["d_lo"], res_item[m]["d_hi"]] for m in M},
                       d_jackknife=jk, decisions_jackknife=verdict_jk,
-                      auc=auc(Xh, Xm, g, 8), auc_words=auc(np.log(nh)[:, None], np.log(nm)[:, None], g, 8),
+                      auc=a_all, auc_words=w_all,
                       by_tier={t: {m: float(np.nanmean((Xm - Xh)[idx, j]) / np.nanstd(Xh[:, j])) for j, m in enumerate(M)} for t, idx in d.groupby("tier").indices.items()})
         print(f"\nEssays, condition {c}: {len(d)} pairs; AUC {out[c]['auc'][0]:.3f} [{out[c]['auc'][1]:.3f}, {out[c]['auc'][2]:.3f}]; word count alone {out[c]['auc_words'][0]:.3f}")
         for m in M:
@@ -428,6 +467,9 @@ def dial():
         e, e2 = boot(stat, g), boot(stat, np.arange(len(pick)))
         out[name] = dict(diff=float(e[0]), ci_prompts=[float(e[1]), float(e[2])], ci_essays=[float(e2[1]), float(e2[2])], ci_jackknife=jack(stat, g)[1:])
     out["mean_corr"] = {a: float(np.mean(list(out["corr"][a].values()))) for a in out["corr"]}
+    out["rank_corr"] = {a: {m: float(spearman(T[:, j], np.nan_to_num(P[a][:, j], nan=np.nanmean(P[a][:, j])))) for j, m in enumerate(M)} for a in ("dial", "control")}
+    out["cluster_sizes"] = sorted(pd.Series(g).value_counts().tolist(), reverse=True)
+    out["slips_per_1000"] = dict(draft=slips(s.loc[pick.k].A), human=slips(s.loc[pick.k].human), **{arm: slips([x for x, keep in zip(texts[arm], ok) if keep]) for arm in ("dial", "control")})
     full = pd.read_csv(f"{MT}/dial_sample.csv")
     gone = [t for t, x in zip(full.tier, texts["dial"]) if x is None]
     out["missing_dial"] = dict(total=len(gone), haiku=gone.count("haiku"), requested=int(len(full)), missing_control=int(sum(x is None for x in texts["control"])))

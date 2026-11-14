@@ -102,7 +102,7 @@ def tokens(text):
 
     Plain string operations only (replace, translate, split): no regular expression runs here.
     """
-    text = " " + _clean(text)
+    text = " " + _clean(text) + " "                                 # padded at both ends, so a quote mark at either edge is stripped
     for emo, word in _EMO.items():                                  # an emoticon counts only after a space
         if emo in text:
             text = text.replace(" " + emo, " " + word + " ")
@@ -259,8 +259,19 @@ def prefix(S):
 
 
 def span(pre, i, j):
-    """Signature of spans i..j inclusive from a prefix table: two rows, constant time."""
+    """Signature of spans i..j inclusive from a prefix table: two rows, constant time.
+
+    Exact for integer tables (rows from `sketch_exact`). For float tables the counts and totals,
+    and so density and level, are exact to rounding, but the position sums of a short span deep in
+    a long text are lost to cancellation: read the arc or the valence of such a span from
+    `fold(S[i:j + 1])`, which merges the span's own rows.
+    """
     return pre[j] if i == 0 else unmerge(pre[j], pre[i - 1])
+
+
+def fold(S):
+    """Rows read in order as one text: their forward merge. Accurate in floats at any depth; time grows with the number of rows."""
+    return prefix(S)[-1]
 
 
 # ---------------------------------------------------------------- readouts
@@ -281,10 +292,19 @@ def level(S, a=1.0, kappa=0.2):
 
 
 def stderr(S, a=1.0, kappa=0.2):
-    """Standard error of `level`, treating words as independent draws."""
+    """Standard error of `level`, treating words as independent draws (delta method for the ratio).
+
+    The level is 1000 R with R = net / exposure, and both vary from word to word: a word adds its
+    charge c to the numerator and 1 (charged) or kappa (buffer) to the exposure. With u = c - R w,
+    sum(u^2) = SS - 2 R net + R^2 (E + kappa^2 B) and sum(u) = R a. For a = 0, kappa = 1 this is the
+    usual standard error of a mean.
+    """
     n = np.maximum(S[..., L], 1)
     q = S[..., P0] - S[..., N0]
-    return 1000 * np.sqrt(np.maximum(S[..., SS] - q * q / n, 0)) / exposure(S, a, kappa)
+    x = exposure(S, a, kappa)
+    r = q / x
+    uu = S[..., SS] - 2 * r * q + r * r * (S[..., E] + kappa * kappa * (S[..., L] - S[..., E]))
+    return 1000 * np.sqrt(np.maximum(uu - (r * a) ** 2 / n, 0)) / x
 
 
 def legendre(S, base):

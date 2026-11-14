@@ -25,7 +25,7 @@ LABEL = {
     "negated": ("charge under a negation", "% of charge"),
     "intensified": ("charge after an intensifier such as 'very'", "% of charge"),
     "after_contrast": ("charge after a contrast word such as 'but'", "% of charge"),
-    "ending_lift": ("net charge of the last fifth minus the text's mean", "per 1,000 words"),
+    "ending_lift": ("fitted arc of net charge over the last fifth minus the text's mean", "per 1,000 words"),
     "clustering": ("how unevenly charge is spread over sentences", "1 = as if words were dealt at random"),
 }
 ADVICE = {

@@ -92,9 +92,29 @@ def main():
     R.write(os.path.join(HERE, "..", "data", "lexicons", "lexicon_refined.tsv"))   # kept out of the package: see the paper on bias
     out["shipped"] = dict(a=m["a"], lam=m["lam"], coef=fmt(m["coef"]), n_words=m["n_words"], n_new=m["n_new"])
     out["lambdas"] = list(LAMBDAS)
+    out.update(groups())
     save("refine", out)
     sgw.load_lexicon()
 
 
+GROUP_TERMS = ("women", "men", "girls", "boys", "gay", "lesbian", "muslim", "islam", "christian", "jewish", "black", "white", "asian", "mexican",
+               "immigrants", "obama", "trump", "old", "disabled", "poor")
+
+
+def groups(margin=0.05):
+    """Charges of words about groups of people and two public figures, in the word norms and after refinement.
+    A check added after review: charges fitted to rated text absorb the attitudes of that text."""
+    read = lambda path: {w: int(v) / 1000 for w, v in (l.rstrip("\n").split("\t") for l in open(path, encoding="utf-8"))}
+    norm = read(os.path.join(HERE, "..", "sgw", "lexicon.tsv"))
+    fit_ = read(os.path.join(HERE, "..", "data", "lexicons", "lexicon_refined.tsv"))
+    terms = {w: [norm.get(w, 0.0), fit_.get(w, 0.0)] for w in GROUP_TERMS}
+    return dict(group_terms=terms, group_terms_down=sum(b < a - margin for a, b in terms.values()), group_terms_up=sum(b > a + margin for a, b in terms.values()))
+
+
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:] == ["groups"]:                                 # the check alone, without refitting
+        path = os.path.join(RESULTS, "refine.json")
+        res = json.load(open(path)); res.update(groups()); save("refine", res)
+        print({k: v for k, v in res.items() if k.startswith("group_terms_")})
+    else:
+        main()

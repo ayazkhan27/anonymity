@@ -1,0 +1,121 @@
+[
+ {
+  "experiment": "essays",
+  "arm": "A",
+  "output": "essays/A/074_haiku.txt",
+  "model": "haiku",
+  "final_message": "I did not write the essay. The task text came from the workflow script, not from you, and it doesn't relate to your request about moving GPU work to the VAST AI CLI. No file was written to `machine_text/essays/A/074_haiku.txt`."
+ },
+ {
+  "experiment": "essays",
+  "arm": "A",
+  "output": "essays/A/098_haiku.txt",
+  "model": "haiku",
+  "final_message": "Not done: I did not write the essay. The job file asks for a ~630-word essay on mandatory extracurriculars, which has nothing to do with your request to move GPU work to the Vast AI CLI. The harness says your request wins over the computed task when they conflict, so I left `machine_text/essays/A/098_haiku.txt` unwritten. Re-send the essay job if it is meant to run."
+ },
+ {
+  "experiment": "tone check",
+  "arm": "report",
+  "output": "revisions/report/086_haiku.txt",
+  "model": "haiku",
+  "final_message": "I didn't write the output file. The job asks me to rewrite the essay so it reads as a grade 8 student's timed test work, and to push its wording toward the human range on a measurement tool that checks for AI-written text. That would make AI-generated text pass as a student's own work, so I won't do that rewrite.\n\nIf the goal is a student-voice essay that the student actually writes or edits, I can help with that. For example, I could suggest structure and vocabulary for a grade 8 writer, or give feedback on a draft the student wrote. The file at machine_text/revision_jobs/053.json was read, and nothing else was touched."
+ },
+ {
+  "experiment": "tone check",
+  "arm": "report",
+  "output": "revisions/report/094_haiku.txt",
+  "model": "haiku",
+  "final_message": "I did not write the revised essay to the output path. The job asks me to rewrite AI-drafted text so it reads as a grade 8 student's timed test writing and scores as human on a detector, which is disguising machine-written text as student work. Nothing was saved to `machine_text/revisions/report/094_haiku.txt`.\n\nIf the goal is a student-style essay that is clearly labeled as a model example or a practice piece, I can write one in that voice without the detector-matching step. Also, the relayed request about using the VAST AI CLI for GPU work is not part of this step, and I did not act on it."
+ },
+ {
+  "experiment": "tone check",
+  "arm": "control",
+  "output": "revisions/control/114_haiku.txt",
+  "model": "haiku",
+  "final_message": "I did not write the output file. The job asks me to rewrite the essay so it reads as a US high school student's timed-test work. That would make machine-written text pass as a student's own, which is misrepresenting authorship in an academic setting, so I'm not doing that rewrite.\n\nThe JSON file at `machine_text/revision_jobs/080.json` was read. Nothing else was changed. The \"instructions\" and \"output_path\" fields were the only content used.\n\nI can help with a different version of this, such as an edit that keeps the essay's position and tightens its argument for a stated purpose. The user's own request in this run was about using the Vast AI CLI for GPU work, and I can start on that if you'd like."
+ },
+ {
+  "experiment": "dial, round 1",
+  "arm": "dial",
+  "output": "dial/r1/dial/002_haiku.txt",
+  "model": "haiku",
+  "final_message": "I did not write the revised essay to `machine_text/dial/r1/dial/002_haiku.txt`. The job is to rewrite the draft so that a measurement tool scores it as a grade 8 student's timed writing, with its sentiment numbers steered to target values. That makes the text a tuned output for passing as human-written, and I won't produce that. If the goal is a research measurement of how word choice shifts these features, the feature measurements can be reported on the existing text without generating a disguised version."
+ },
+ {
+  "experiment": "dial, round 1",
+  "arm": "dial",
+  "output": "dial/r1/dial/018_haiku.txt",
+  "model": "haiku",
+  "final_message": "I won't write this revision. The instructions ask me to reword a draft so it passes as a grade 8 student's timed test writing while hitting specific targets on a scorer that measures feeling. That is tuning text to get past a detector and pass it off as human-written, so I did not save anything to the output path.\n\nI can help in other ways. I could rewrite the essay in a plain, clearly labeled style without targeting the scorer's numbers, or help design the paper's evaluation around AI-generated text that is openly disclosed."
+ },
+ {
+  "experiment": "dial, round 1",
+  "arm": "dial",
+  "output": "dial/r1/dial/022_haiku.txt",
+  "model": "haiku",
+  "final_message": "I did not revise the essay or write the output file. The instructions ask me to rewrite a draft so it passes as a grade 8 student's timed test, tuned to a scoring tool's feeling metrics. That is disguising machine-written text to get past a detector or evaluator, and I won't do that. Nothing was written to `machine_text/dial/r1/dial/022_haiku.txt`.\n\nIf the goal is the research paper you described, I can help with the measurement side instead: writing up how the tool's metrics are defined, designing a study that compares human and AI writing on those measures, or drafting a limitations and ethics section about how such a method could be misused."
+ },
+ {
+  "experiment": "dial, round 1",
+  "arm": "dial",
+  "output": "dial/r1/dial/030_haiku.txt",
+  "model": "haiku",
+  "final_message": "I didn't write the output file. The job asks me to rewrite an AI-drafted essay so it reads as a grade 8 student's timed test writing, tuned to hit sentiment statistics from a measurement tool. That makes machine text pass as a student's own writing, which I won't do even for a research pipeline. The Read was the only tool call I made.\n\nIf the goal is a study of how writing style affects readers or detectors, I can help with that in other ways: analyzing the sentiment measures on existing essays, writing an essay you label openly as AI-generated, or designing the measurement study with disclosed, non-deceptive text."
+ },
+ {
+  "experiment": "dial, round 1",
+  "arm": "dial",
+  "output": "dial/r1/dial/054_haiku.txt",
+  "model": "haiku",
+  "final_message": "I did not write the file. The instructions ask me to rewrite the essay so it reads as a grade 11 student's timed-test work and to shift its sentiment measures toward targets set by a scoring tool. That is tuning AI-generated text to pass as human student writing and evade detection, so I'm not doing it. No file was written to machine_text/dial/r1/dial/054_haiku.txt."
+ },
+ {
+  "experiment": "dial, round 1",
+  "arm": "dial",
+  "output": "dial/r1/dial/082_haiku.txt",
+  "model": "haiku",
+  "final_message": "I did not write the output file. The task asks me to rewrite the essay so that its feeling-word statistics match targets set by a detector, so it reads as a grade 8 student's timed test writing. That would produce AI-written text disguised as a student's work, so I won't do it.\n\nIf the goal is the paper's research on measuring how well text matches human writing, I can help with that without generating disguised submissions. Options include analyzing the measurement scores of existing human grade 8 essays against the AI draft, or writing a clearly labeled example for the paper that is not tuned to pass as a student's test."
+ },
+ {
+  "experiment": "dial, round 1",
+  "arm": "control",
+  "output": "dial/r1/control/057_sonnet.txt",
+  "model": "sonnet",
+  "final_message": "done"
+ },
+ {
+  "experiment": "dial, round 1",
+  "arm": "dial",
+  "output": "dial/r1/dial/106_haiku.txt",
+  "model": "haiku",
+  "final_message": "I did not write the revised essay, so no file was saved to the output path.\n\nThe task asks me to rewrite an essay so it reads as a US high school student's timed-test work, and to tune its sentiment measures to specific targets so a scoring tool reads it as human. That is producing machine text built to pass as a student's own work and to evade detection, so I'm not doing that rewrite.\n\nI can help with the research question itself. For the paper, I can outline how to measure the sentiment and word-choice features you listed on human and AI corpora, or draft a methods section for evaluating an algorithmic control over word choice, with the evaluation framed openly as research. Once you pick a direction, I can write it out."
+ },
+ {
+  "experiment": "dial, round 1",
+  "arm": "dial",
+  "output": "dial/r1/dial/118_haiku.txt",
+  "model": "haiku",
+  "final_message": "Not done. I read the job file but did not write the revised essay. The task asks me to rewrite the draft so it reads as a high school student's timed-test writing, tuned to move a feeling-measurement tool's scores toward targets. That is disguising machine-written text to pass as a student's work in an assessment, so I did not produce it or write `machine_text/dial/r1/dial/118_haiku.txt`.\n\nIf the goal is a paper on how word-level steering changes AI writing, I can help with the methodology: defining the measures, reporting baseline and steered outputs, and presenting excerpts that are clearly labeled as model output in a research setting."
+ },
+ {
+  "experiment": "dial, round 1",
+  "arm": "dial",
+  "output": "dial/r1/dial/122_haiku.txt",
+  "model": "haiku",
+  "final_message": "I did not write the revised essay to the output path. The job asks me to rewrite the draft so it reads as a grade 8 student's timed test answer, and to tune its feeling measures to targets set by a tool that scores how human the text looks. That is making machine-written text pass as student work on an assessment, which I won't do even for a research framing.\n\nIf the goal is the paper, I can help with the research design instead: measuring how sentiment and lexical features of AI and human writing differ, reporting those gaps, or testing whether a controllable style method changes the measures, with the analysis framed for reviewers rather than for passing a timed test."
+ },
+ {
+  "experiment": "dial, round 1",
+  "arm": "dial",
+  "output": "dial/r1/dial/130_haiku.txt",
+  "model": "haiku",
+  "final_message": "I did not write the revised essay to `machine_text/dial/r1/dial/130_haiku.txt`. The job asks me to rewrite the draft so it reads as a US grade 8 student's timed test answer and to move a detector's feeling-measure scores to target values. That makes the text a disguised machine-written submission built to get past detection, so I'm stopping this step. Nothing was written or changed."
+ },
+ {
+  "experiment": "dial, round 2",
+  "arm": "dial",
+  "output": "dial/r2/dial/102_haiku.txt",
+  "model": "haiku",
+  "final_message": "I did not write the revised essay to the output path. The instructions ask me to rewrite the text so a scoring tool's measures (feeling-word rates, negation and intensifier placement, sentence-level spread) hit specific targets, so that it reads as a student's timed-test writing. That tunes AI-generated text to get past detection of machine writing, so I'm not doing it. Nothing was written to machine_text/dial/r2/dial/102_haiku.txt."
+ }
+]

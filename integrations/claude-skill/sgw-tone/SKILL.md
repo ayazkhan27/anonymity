@@ -36,11 +36,13 @@ Tested on machine-written essays against student essays on the same assignments 
 
 - A revision that saw the report fixed what the report named, the over-positive ending. On a classifier's score it ended no closer to student essays than a plain revision did.
 - Being close to the average of human texts is not the same as reading like one. Real student essays lie farther from their own centre than any machine draft or revision did.
-- When a model was given exact targets for every measure, it hit them. Its essays did not read more like student writing for that, and a model judge found them less student-like than plain revisions.
+- When a model was given exact targets for every measure, it moved about half way to them. No gain in resemblance to student writing over a plain revision was detected.
 
 So use the report to catch tone problems. Matching the numbers does not make a text human.
 
 ## Do not
+
+- Do not use the scores to judge people or groups. The word ratings carry their raters' attitudes: *deaf*, *disabled*, *blind* and *old* are rated negative, so a text that mentions disability or age scores lower for that alone.
 
 - Do not use this to pass machine-written text off as a person's own work. Where rules require disclosure of AI assistance, the disclosure still applies.
 - Do not treat the measures as a detector of machine text. They separate human from machine essays only modestly.
