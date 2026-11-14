@@ -2,7 +2,7 @@
 
 Writes machine_text/side_by_side.html (a page fragment). Essays are picked by rule, not by eye:
 the median, the largest and the smallest improvement in gap to the target, and one pair the
-blind judge scored for the dial.
+model judge scored for the dial.
 """
 import html, json, os, re, sys
 
@@ -56,7 +56,7 @@ def main():
               ("Worst case for the dial", "the smallest move toward the target", rows[0])]
     liked = [x for x in rows if verdict[x["k"]][1] == "dial"]
     if liked:
-        chosen.append(("A case the judge scored for the dial", f"of the {len(liked)} pairs where the blind judge called the dial revision the more student-like, the middle one by improvement", liked[len(liked) // 2]))
+        chosen.append(("A case the judge scored for the dial", f"of the {len(liked)} pairs where the model judge called the dial revision the more student-like, the middle one by improvement", liked[len(liked) // 2]))
     cols = [("student", "Human", "A real student wrote this", "student"), ("draft", "AI first draft", "The model's first essay for the same topic and length", "ai"),
             ("plain", "AI, plain revision", "Told twice: make it read as a student wrote it", "ai"), ("dial", "AI, dial revision", "The same, plus target numbers from the scorer", "ai")]
     show = [("hedons", "Positive words", "per 1,000 words"), ("dolors", "Negative words", "per 1,000 words"), ("negated", "Feeling under not / never", "% of feeling"),
@@ -76,8 +76,8 @@ def main():
 <p class="why">Picked by rule: {why}. Written by Claude {x['tier'].title()}, matched to a {grade} student's essay (PERSUADE 2.0 essay {x['essay_id']}).</p>
 <div class="topic"><span>The assignment both writers got</span><p>{html.escape(assign[x['prompt']].strip())}</p></div>
 <div class="facts">
-<div><span>Blind judge: better written</span><b>{name(v[0])}</b></div>
-<div><span>Blind judge: more like a student</span><b>{name(v[1])}</b></div>
+<div><span>Model judge: better written</span><b>{name(v[0])}</b></div>
+<div><span>Model judge: more like a student</span><b>{name(v[1])}</b></div>
 <div><span>Distance from the dial's target</span><b>{x['gap']['draft']:.2f} → {x['gap']['dial']:.2f}</b><small>plain revision: {x['gap']['plain']:.2f}</small></div>
 </div>
 <div class="scroll"><table><thead><tr><th scope="col">What the scorer measured</th><th scope="col">Human</th><th scope="col">AI first draft</th><th scope="col" class="tgt">Dial's target</th><th scope="col">AI, plain</th><th scope="col">AI, dial</th></tr></thead><tbody>{trs}</tbody></table></div>

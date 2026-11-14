@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "sentiment-gummy-worm"
 version = "4.0.0"
-description = "A mergeable measure of sentiment for text of any length"
+description = "A mergeable measure of sentiment: word charges in hedons and dolors, and a signature that merges exactly"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { file = "LICENSE" }

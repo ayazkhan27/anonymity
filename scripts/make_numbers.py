@@ -247,6 +247,8 @@ if cr:
         tag = "crit" + p["a"].split()[-1][:3] + p["b"].split()[-1][:3]
         for j, k in enumerate(("total", "within", "mix")):
             macros[tag + k.capitalize()] = f"{p[k]:+.1f} [{p['lo'][j]:+.1f}, {p['hi'][j]:+.1f}]"
+    if "footer" in cr:
+        M("footReviews", cr["footer"]["reviews"]); M("footWith", cr["footer"]["with_footer"]); M("footAdded", cr["footer"]["added"], "{:.2f}")
     M("critReversals", sum(p["reversal"] for p in cr["pairs"])); M("critPairs", len(cr["pairs"])); M("nCritReviews", sum(cr["n"].values()), "{:,}")
 
 un = R("uncertainty")

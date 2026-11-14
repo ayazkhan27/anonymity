@@ -1,0 +1,3060 @@
+[
+ {
+  "command": "file.new",
+  "params": {
+   "name": "Overview"
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "x": 0,
+   "y": 0,
+   "width": 1016,
+   "height": 500,
+   "name": "Overview",
+   "props": {
+    "fill": "#FFFFFF"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 10,
+   "y": 10,
+   "width": 228,
+   "height": 296,
+   "name": "Words carry charge",
+   "props": {
+    "fill": "#FFFFFF",
+    "stroke": "#C5CAD1",
+    "strokeWeight": 1,
+    "cornerRadius": 10
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "ellipse",
+   "parent": {
+    "$step": 1
+   },
+   "x": 22,
+   "y": 22,
+   "width": 20,
+   "height": 20,
+   "name": "badge",
+   "props": {
+    "fill": "#222222"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 22,
+   "y": 24,
+   "text": "1",
+   "name": "1",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 12,
+    "fill": "#FFFFFF",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 20
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 50,
+   "y": 23,
+   "text": "Words carry charge",
+   "name": "Words carry charge",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 15,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 1
+   },
+   "x": 22,
+   "y": 56,
+   "name": "example",
+   "props": {
+    "layout": "horizontal",
+    "gap": 5,
+    "crossGap": 5,
+    "wrap": true,
+    "sizingH": "fixed",
+    "sizingV": "hug",
+    "width": 204,
+    "fills": []
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 6
+   },
+   "name": "The",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fill": "#EEF0F2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 7
+   },
+   "x": 0,
+   "y": 0,
+   "text": "The",
+   "name": "The",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#5C6370",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 6
+   },
+   "name": "service",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fill": "#0072B2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 9
+   },
+   "x": 0,
+   "y": 0,
+   "text": "service",
+   "name": "service",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 13,
+    "fill": "#FFFFFF",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 6
+   },
+   "name": "was",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fill": "#EEF0F2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 11
+   },
+   "x": 0,
+   "y": 0,
+   "text": "was",
+   "name": "was",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#5C6370",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 6
+   },
+   "name": "terrible",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fill": "#D55E00"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 13
+   },
+   "x": 0,
+   "y": 0,
+   "text": "terrible",
+   "name": "terrible",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 13,
+    "fill": "#FFFFFF",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 6
+   },
+   "name": "but",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fills": [],
+    "stroke": "#222222",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 15
+   },
+   "x": 0,
+   "y": 0,
+   "text": "but",
+   "name": "but",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Italic",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 6
+   },
+   "name": "the",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fill": "#EEF0F2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 17
+   },
+   "x": 0,
+   "y": 0,
+   "text": "the",
+   "name": "the",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#5C6370",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 6
+   },
+   "name": "dessert",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fill": "#0072B2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 19
+   },
+   "x": 0,
+   "y": 0,
+   "text": "dessert",
+   "name": "dessert",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 13,
+    "fill": "#FFFFFF",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 6
+   },
+   "name": "was",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fill": "#EEF0F2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 21
+   },
+   "x": 0,
+   "y": 0,
+   "text": "was",
+   "name": "was",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#5C6370",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 6
+   },
+   "name": "very",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fills": [],
+    "stroke": "#222222",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 23
+   },
+   "x": 0,
+   "y": 0,
+   "text": "very",
+   "name": "very",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Italic",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 6
+   },
+   "name": "good",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fill": "#0072B2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 25
+   },
+   "x": 0,
+   "y": 0,
+   "text": "good",
+   "name": "good",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 13,
+    "fill": "#FFFFFF",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 24,
+   "y": 162,
+   "width": 12,
+   "height": 12,
+   "name": "swatch",
+   "props": {
+    "cornerRadius": 3,
+    "fill": "#0072B2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 44,
+   "y": 160,
+   "text": "hedons: positive charge",
+   "name": "hedons: positive charge",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 24,
+   "y": 184,
+   "width": 12,
+   "height": 12,
+   "name": "swatch",
+   "props": {
+    "cornerRadius": 3,
+    "fill": "#D55E00"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 44,
+   "y": 182,
+   "text": "dolors: negative charge",
+   "name": "dolors: negative charge",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 24,
+   "y": 206,
+   "width": 12,
+   "height": 12,
+   "name": "swatch",
+   "props": {
+    "cornerRadius": 3,
+    "fill": "#EEF0F2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 44,
+   "y": 204,
+   "text": "buffer word: no charge",
+   "name": "buffer word: no charge",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 24,
+   "y": 228,
+   "width": 12,
+   "height": 12,
+   "name": "swatch",
+   "props": {
+    "cornerRadius": 3,
+    "fills": [],
+    "stroke": "#222222",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 44,
+   "y": 226,
+   "text": "operator: not, very, slightly, but",
+   "name": "operator: not, very, slightly, but",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 24,
+   "y": 252,
+   "text": "Charges come from human ratings of 16,350 words (labMT, VADER).",
+   "name": "Charges come from human ratings of 16,35",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12,
+    "fill": "#5C6370",
+    "textAlign": "left",
+    "lineHeight": 15,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 266,
+   "y": 10,
+   "width": 228,
+   "height": 296,
+   "name": "Signature of a span",
+   "props": {
+    "fill": "#FFFFFF",
+    "stroke": "#C5CAD1",
+    "strokeWeight": 1,
+    "cornerRadius": 10
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "ellipse",
+   "parent": {
+    "$step": 1
+   },
+   "x": 278,
+   "y": 22,
+   "width": 20,
+   "height": 20,
+   "name": "badge",
+   "props": {
+    "fill": "#222222"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 278,
+   "y": 24,
+   "text": "2",
+   "name": "2",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 12,
+    "fill": "#FFFFFF",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 20
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 306,
+   "y": 23,
+   "text": "Signature of a span",
+   "name": "Signature of a span",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 15,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 280,
+   "y": 50,
+   "text": "19 numbers, whatever the length",
+   "name": "19 numbers, whatever the length",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12,
+    "fill": "#5C6370",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 280,
+   "y": 76,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#DDE3E9",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 295,
+   "y": 76,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#DDE3E9",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 280,
+   "y": 93,
+   "text": "words; charged words",
+   "name": "words; charged words",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#222222",
+    "textAlign": "left",
+    "lineHeight": 15,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 280,
+   "y": 119,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#0072B2",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 295,
+   "y": 119,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#0072B2",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 310,
+   "y": 119,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#0072B2",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 325,
+   "y": 119,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#0072B2",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 340,
+   "y": 119,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#D55E00",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 355,
+   "y": 119,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#D55E00",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 370,
+   "y": 119,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#D55E00",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 385,
+   "y": 119,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#D55E00",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 280,
+   "y": 136,
+   "text": "hedons and dolors weighted by word position, degree 0 to 3",
+   "name": "hedons and dolors weighted by word posit",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#222222",
+    "textAlign": "left",
+    "lineHeight": 15,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 280,
+   "y": 177,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#DCEAF4",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 295,
+   "y": 177,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#DCEAF4",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 310,
+   "y": 177,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#DCEAF4",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 325,
+   "y": 177,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#DCEAF4",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 340,
+   "y": 177,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#FADFCF",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 355,
+   "y": 177,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#FADFCF",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 370,
+   "y": 177,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#FADFCF",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 385,
+   "y": 177,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#FADFCF",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 280,
+   "y": 194,
+   "text": "hedons and dolors under a negation, an intensifier, a diminisher and after a contrast word",
+   "name": "hedons and dolors under a negation, an i",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#222222",
+    "textAlign": "left",
+    "lineHeight": 15,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 280,
+   "y": 250,
+   "width": 12,
+   "height": 12,
+   "name": "entry",
+   "props": {
+    "fill": "#222222",
+    "cornerRadius": 2
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 280,
+   "y": 267,
+   "text": "sum of squared charges",
+   "name": "sum of squared charges",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#222222",
+    "textAlign": "left",
+    "lineHeight": 15,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 522,
+   "y": 10,
+   "width": 228,
+   "height": 296,
+   "name": "Exact merge",
+   "props": {
+    "fill": "#FFFFFF",
+    "stroke": "#C5CAD1",
+    "strokeWeight": 1,
+    "cornerRadius": 10
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "ellipse",
+   "parent": {
+    "$step": 1
+   },
+   "x": 534,
+   "y": 22,
+   "width": 20,
+   "height": 20,
+   "name": "badge",
+   "props": {
+    "fill": "#222222"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 534,
+   "y": 24,
+   "text": "3",
+   "name": "3",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 12,
+    "fill": "#FFFFFF",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 20
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 562,
+   "y": 23,
+   "text": "Exact merge",
+   "name": "Exact merge",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 15,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 544,
+   "y": 58,
+   "width": 66,
+   "height": 28,
+   "name": "σ(A)",
+   "props": {
+    "fill": "#DDE3E9",
+    "cornerRadius": 6
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 544,
+   "y": 64,
+   "text": "σ(A)",
+   "name": "σ(A)",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 14,
+    "fill": "#222222",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 66
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 662,
+   "y": 58,
+   "width": 66,
+   "height": 28,
+   "name": "σ(B)",
+   "props": {
+    "fill": "#DDE3E9",
+    "cornerRadius": 6
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 662,
+   "y": 64,
+   "text": "σ(B)",
+   "name": "σ(B)",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 14,
+    "fill": "#222222",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 66
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 624.0,
+   "y": 61,
+   "text": "⊕",
+   "name": "⊕",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 18,
+    "fill": "#222222",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 24
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "vector",
+   "parent": {
+    "$step": 1
+   },
+   "path": "M 636.0 92 L 636.0 110",
+   "name": "connector",
+   "props": {
+    "stroke": "#222222",
+    "strokeWeight": 1.25,
+    "fills": [],
+    "strokeCap": "round",
+    "endCap": "triangleArrow"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 594.0,
+   "y": 116,
+   "width": 84,
+   "height": 28,
+   "name": "merged",
+   "props": {
+    "fill": "#DDE3E9",
+    "stroke": "#222222",
+    "strokeWeight": 1,
+    "cornerRadius": 6
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 594.0,
+   "y": 122,
+   "text": "σ(AB)",
+   "name": "σ(AB)",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 14,
+    "fill": "#222222",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 84
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 536,
+   "y": 158,
+   "text": "Counts and totals add. Position sums of B shift by the length of A.",
+   "name": "Counts and totals add. Position sums of ",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left",
+    "lineHeight": 16,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 1
+   },
+   "x": 536,
+   "y": 204,
+   "name": "properties",
+   "props": {
+    "layout": "horizontal",
+    "gap": 5,
+    "crossGap": 5,
+    "wrap": true,
+    "sizingH": "fixed",
+    "sizingV": "hug",
+    "width": 200,
+    "fills": []
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 77
+   },
+   "name": "associative",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fill": "#EEF0F2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 78
+   },
+   "x": 0,
+   "y": 0,
+   "text": "associative",
+   "name": "associative",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 77
+   },
+   "name": "invertible",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fill": "#EEF0F2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 80
+   },
+   "x": 0,
+   "y": 0,
+   "text": "invertible",
+   "name": "invertible",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "frame",
+   "parent": {
+    "$step": 77
+   },
+   "name": "exact in integers",
+   "props": {
+    "layout": "horizontal",
+    "padding": [
+     3,
+     7,
+     3,
+     7
+    ],
+    "cornerRadius": 5,
+    "sizingH": "hug",
+    "sizingV": "hug",
+    "fill": "#EEF0F2"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 82
+   },
+   "x": 0,
+   "y": 0,
+   "text": "exact in integers",
+   "name": "exact in integers",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 536,
+   "y": 266,
+   "text": "Holds wherever the cut falls between sentences.",
+   "name": "Holds wherever the cut falls between sen",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12,
+    "fill": "#5C6370",
+    "textAlign": "left",
+    "lineHeight": 15,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 778,
+   "y": 10,
+   "width": 228,
+   "height": 296,
+   "name": "Readouts",
+   "props": {
+    "fill": "#FFFFFF",
+    "stroke": "#C5CAD1",
+    "strokeWeight": 1,
+    "cornerRadius": 10
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "ellipse",
+   "parent": {
+    "$step": 1
+   },
+   "x": 790,
+   "y": 22,
+   "width": 20,
+   "height": 20,
+   "name": "badge",
+   "props": {
+    "fill": "#222222"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 790,
+   "y": 24,
+   "text": "4",
+   "name": "4",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 12,
+    "fill": "#FFFFFF",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 20
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 818,
+   "y": 23,
+   "text": "Readouts",
+   "name": "Readouts",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 15,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 792,
+   "y": 54,
+   "text": "totals",
+   "name": "totals",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 792,
+   "y": 70,
+   "text": "hedons, dolors and words",
+   "name": "hedons, dolors and words",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#5C6370",
+    "textAlign": "left",
+    "lineHeight": 15,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 792,
+   "y": 91,
+   "text": "density",
+   "name": "density",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 792,
+   "y": 107,
+   "text": "net charge per 1,000 words",
+   "name": "net charge per 1,000 words",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#5C6370",
+    "textAlign": "left",
+    "lineHeight": 15,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 792,
+   "y": 128,
+   "text": "level, with a standard error",
+   "name": "level, with a standard error",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 792,
+   "y": 144,
+   "text": "net charge over exposure: a neutral prior, charged words and down-weighted buffer words",
+   "name": "net charge over exposure: a neutral prio",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#5C6370",
+    "textAlign": "left",
+    "lineHeight": 15,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 792,
+   "y": 195,
+   "text": "calibrated valence",
+   "name": "calibrated valence",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 792,
+   "y": 211,
+   "text": "a predicted human rating, fitted to rated text",
+   "name": "a predicted human rating, fitted to rate",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#5C6370",
+    "textAlign": "left",
+    "lineHeight": 15,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 792,
+   "y": 247,
+   "text": "arc",
+   "name": "arc",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 792,
+   "y": 263,
+   "text": "cubic of net charge over relative position",
+   "name": "cubic of net charge over relative positi",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#5C6370",
+    "textAlign": "left",
+    "lineHeight": 15,
+    "textAutoResize": "height"
+   },
+   "width": 200
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "arrow",
+   "parent": {
+    "$step": 1
+   },
+   "x": 243,
+   "y": 158.0,
+   "width": 18,
+   "name": "next",
+   "props": {
+    "stroke": "#222222",
+    "strokeWeight": 1.5
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "arrow",
+   "parent": {
+    "$step": 1
+   },
+   "x": 499,
+   "y": 158.0,
+   "width": 18,
+   "name": "next",
+   "props": {
+    "stroke": "#222222",
+    "strokeWeight": 1.5
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "arrow",
+   "parent": {
+    "$step": 1
+   },
+   "x": 755,
+   "y": 158.0,
+   "width": 18,
+   "name": "next",
+   "props": {
+    "stroke": "#222222",
+    "strokeWeight": 1.5
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 10,
+   "y": 322,
+   "width": 996,
+   "height": 168,
+   "name": "scales",
+   "props": {
+    "fill": "#FFFFFF",
+    "stroke": "#C5CAD1",
+    "strokeWeight": 1,
+    "cornerRadius": 10
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 24,
+   "y": 334,
+   "text": "One pass, every scale",
+   "name": "One pass, every scale",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Bold",
+    "fontSize": 15,
+    "fill": "#222222",
+    "textAlign": "left"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 190.0,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 211.89285714285714,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 233.78571428571428,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 255.67857142857144,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 277.57142857142856,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 299.4642857142857,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 321.3571428571429,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 343.25,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 365.1428571428571,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 387.0357142857143,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 408.92857142857144,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 430.82142857142856,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 452.7142857142857,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 474.60714285714283,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 496.5,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 518.3928571428571,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 540.2857142857142,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 562.1785714285714,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 584.0714285714286,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 605.9642857142858,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 627.8571428571429,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 649.75,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 671.6428571428571,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 693.5357142857142,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 715.4285714285714,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 737.3214285714286,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 759.2142857142857,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 781.1071428571429,
+   "y": 366,
+   "width": 18.892857142857142,
+   "height": 16,
+   "name": "sentence",
+   "props": {
+    "fill": "#EEF0F2",
+    "cornerRadius": 3
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 190.0,
+   "y": 410,
+   "width": 150.25,
+   "height": 22,
+   "name": "chapter 1",
+   "props": {
+    "fill": "#DDE3E9",
+    "cornerRadius": 4
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 190.0,
+   "y": 414,
+   "text": "σ(chapter 1)",
+   "name": "σ(chapter 1)",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#222222",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 150.25
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "vector",
+   "parent": {
+    "$step": 1
+   },
+   "path": "M 192.0 388 L 338.25 388",
+   "name": "connector",
+   "props": {
+    "stroke": "#8A8A8A",
+    "strokeWeight": 1,
+    "fills": [],
+    "strokeCap": "round"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "vector",
+   "parent": {
+    "$step": 1
+   },
+   "path": "M 265.125 388 L 265.125 406",
+   "name": "connector",
+   "props": {
+    "stroke": "#8A8A8A",
+    "strokeWeight": 1,
+    "fills": [],
+    "strokeCap": "round",
+    "endCap": "triangleArrow"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 343.25,
+   "y": 410,
+   "width": 150.25,
+   "height": 22,
+   "name": "chapter 2",
+   "props": {
+    "fill": "#DDE3E9",
+    "cornerRadius": 4
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 343.25,
+   "y": 414,
+   "text": "σ(chapter 2)",
+   "name": "σ(chapter 2)",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#222222",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 150.25
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "vector",
+   "parent": {
+    "$step": 1
+   },
+   "path": "M 345.25 388 L 491.5 388",
+   "name": "connector",
+   "props": {
+    "stroke": "#8A8A8A",
+    "strokeWeight": 1,
+    "fills": [],
+    "strokeCap": "round"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "vector",
+   "parent": {
+    "$step": 1
+   },
+   "path": "M 418.375 388 L 418.375 406",
+   "name": "connector",
+   "props": {
+    "stroke": "#8A8A8A",
+    "strokeWeight": 1,
+    "fills": [],
+    "strokeCap": "round",
+    "endCap": "triangleArrow"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 496.5,
+   "y": 410,
+   "width": 150.25,
+   "height": 22,
+   "name": "chapter 3",
+   "props": {
+    "fill": "#DDE3E9",
+    "cornerRadius": 4
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 496.5,
+   "y": 414,
+   "text": "σ(chapter 3)",
+   "name": "σ(chapter 3)",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#222222",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 150.25
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "vector",
+   "parent": {
+    "$step": 1
+   },
+   "path": "M 498.5 388 L 644.75 388",
+   "name": "connector",
+   "props": {
+    "stroke": "#8A8A8A",
+    "strokeWeight": 1,
+    "fills": [],
+    "strokeCap": "round"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "vector",
+   "parent": {
+    "$step": 1
+   },
+   "path": "M 571.625 388 L 571.625 406",
+   "name": "connector",
+   "props": {
+    "stroke": "#8A8A8A",
+    "strokeWeight": 1,
+    "fills": [],
+    "strokeCap": "round",
+    "endCap": "triangleArrow"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 649.75,
+   "y": 410,
+   "width": 150.25,
+   "height": 22,
+   "name": "chapter 4",
+   "props": {
+    "fill": "#DDE3E9",
+    "cornerRadius": 4
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 649.75,
+   "y": 414,
+   "text": "σ(chapter 4)",
+   "name": "σ(chapter 4)",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#222222",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 150.25
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "vector",
+   "parent": {
+    "$step": 1
+   },
+   "path": "M 651.75 388 L 798.0 388",
+   "name": "connector",
+   "props": {
+    "stroke": "#8A8A8A",
+    "strokeWeight": 1,
+    "fills": [],
+    "strokeCap": "round"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "vector",
+   "parent": {
+    "$step": 1
+   },
+   "path": "M 724.875 388 L 724.875 406",
+   "name": "connector",
+   "props": {
+    "stroke": "#8A8A8A",
+    "strokeWeight": 1,
+    "fills": [],
+    "strokeCap": "round",
+    "endCap": "triangleArrow"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "rectangle",
+   "parent": {
+    "$step": 1
+   },
+   "x": 190,
+   "y": 456,
+   "width": 610,
+   "height": 24,
+   "name": "book",
+   "props": {
+    "fill": "#DDE3E9",
+    "stroke": "#222222",
+    "strokeWeight": 1,
+    "cornerRadius": 4
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 190,
+   "y": 461,
+   "text": "σ(book)",
+   "name": "σ(book)",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "center",
+    "textAutoResize": "height"
+   },
+   "width": 610
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "vector",
+   "parent": {
+    "$step": 1
+   },
+   "path": "M 192 438 L 798 438",
+   "name": "connector",
+   "props": {
+    "stroke": "#8A8A8A",
+    "strokeWeight": 1,
+    "fills": [],
+    "strokeCap": "round"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "vector",
+   "parent": {
+    "$step": 1
+   },
+   "path": "M 495.0 438 L 495.0 452",
+   "name": "connector",
+   "props": {
+    "stroke": "#8A8A8A",
+    "strokeWeight": 1,
+    "fills": [],
+    "strokeCap": "round",
+    "endCap": "triangleArrow"
+   }
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 24,
+   "y": 366,
+   "text": "sentence signatures",
+   "name": "sentence signatures",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left",
+    "textAutoResize": "height"
+   },
+   "width": 152
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 24,
+   "y": 413,
+   "text": "merged into chapters",
+   "name": "merged into chapters",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left",
+    "textAutoResize": "height"
+   },
+   "width": 152
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 24,
+   "y": 460,
+   "text": "merged into the book",
+   "name": "merged into the book",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 13,
+    "fill": "#222222",
+    "textAlign": "left",
+    "textAutoResize": "height"
+   },
+   "width": 152
+  }
+ },
+ {
+  "command": "node.create",
+  "params": {
+   "type": "text",
+   "parent": {
+    "$step": 1
+   },
+   "x": 818,
+   "y": 362,
+   "text": "Each sentence is scanned once. Chapters and the book are merges of signatures, with no second pass over the text, and the same readouts apply at every level. A prefix table gives the totals of any run of sentences from two of its rows.",
+   "name": "Each sentence is scanned once. Chapters ",
+   "props": {
+    "fontFamily": "Nimbus Sans",
+    "fontStyle": "Regular",
+    "fontSize": 12.5,
+    "fill": "#5C6370",
+    "textAlign": "left",
+    "lineHeight": 15.5,
+    "textAutoResize": "height"
+   },
+   "width": 174
+  }
+ }
+]

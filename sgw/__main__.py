@@ -15,11 +15,14 @@ def _text(arg):
 
 def main(argv):
     if argv and argv[0] == "tone":
-        rest = [a for a in argv[1:] if not a.startswith("--")]
-        genre = argv[argv.index("--genre") + 1] if "--genre" in argv else "essay"
-        rest = [a for a in rest if a != genre] or [sys.stdin.read()]
-        text = _text(" ".join(rest))
-        print(json.dumps(tone.compare(text, genre), indent=1) if "--json" in argv else tone.report(text, genre))
+        import argparse
+        p = argparse.ArgumentParser(prog="python3 -m sgw tone", description="Compare a draft with human writing of one kind.")
+        p.add_argument("text", nargs="*", help="a file path or the text itself; standard input if omitted")
+        p.add_argument("--genre", default="essay", choices=sorted(tone.reference(None)))
+        p.add_argument("--json", action="store_true", help="print the numbers as JSON")
+        a = p.parse_args(argv[1:])
+        text = _text(" ".join(a.text)) if a.text else sys.stdin.read()
+        print(json.dumps(tone.compare(text, a.genre), indent=1) if a.json else tone.report(text, a.genre))
     else:
         print(json.dumps(core.read(_text(" ".join(argv)) if argv else sys.stdin.read()), indent=1))
 

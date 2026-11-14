@@ -263,6 +263,19 @@ def parts():
     save("parts", out)
 
 
+def footer(critic="Scott+Renshaw", opening="Visit Scott Renshaw's"):
+    """How much one critic's standard sign-off adds to his pooled density (a check added after review; the reviews are scored as distributed)."""
+    base = os.path.join(HERE, "..", "data", "scale", "scale_whole_review", "scale_whole_review", critic, "txt.parag")
+    texts = [[p.strip() for p in open(os.path.join(base, f), encoding="latin-1").read().split("\n") if p.strip()] for f in sorted(os.listdir(base))]
+    dens = lambda S: float(1000 * (S[:, sgw.P0].sum() - S[:, sgw.N0].sum()) / S[:, sgw.L].sum())
+    whole = dens(sgw.sketch([" ".join(t) for t in texts]))
+    cut = dens(sgw.sketch([" ".join(t[:-1] if t[-1].startswith(opening) else t) for t in texts]))
+    out = dict(critic=critic.replace("+", " "), reviews=len(texts), with_footer=int(sum(t[-1].startswith(opening) for t in texts)), density=whole, density_without=cut, added=whole - cut)
+    path = os.path.join(RESULTS, "critics.json")
+    res = json.load(open(path)); res["footer"] = out; save("critics", res)
+    print(out)
+
+
 if __name__ == "__main__":
-    for name in sys.argv[1:] or ("novels", "tales", "critics"):
-        dict(novels=novels, tales=tales, critics=critics, parts=parts)[name]()
+    for name in sys.argv[1:] or ("novels", "tales", "critics", "footer"):
+        dict(novels=novels, tales=tales, critics=critics, parts=parts, footer=footer)[name]()

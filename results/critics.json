@@ -120,5 +120,13 @@
   "James Berardinelli": 1307,
   "Scott Renshaw": 902,
   "Steve Rhodes": 1770
+ },
+ "footer": {
+  "critic": "Scott Renshaw",
+  "reviews": 902,
+  "with_footer": 486,
+  "density": 52.014276004750215,
+  "density_without": 51.36428636947349,
+  "added": 0.6499896352767252
  }
 }
