@@ -65,6 +65,26 @@ def test_legendre_moments_match_direct_sum():
         assert np.allclose(sgw.legendre(s, sgw.P0), direct, atol=1e-9)
 
 
+def test_cut_inside_a_sentence():
+    """At a cut between two words of one sentence, counts, totals, position sums and squared charges still merge exactly."""
+    r = random.Random(7)
+    keep = [sgw.L, sgw.E] + list(range(sgw.P0, sgw.P0 + sgw.K)) + list(range(sgw.N0, sgw.N0 + sgw.K)) + [sgw.SS]
+    for _ in range(300):
+        words = text(r).split()
+        if len(words) < 2:
+            continue
+        cut = r.randrange(1, len(words))
+        m = sgw.merge(sgw.sketch_exact(" ".join(words[:cut])), sgw.sketch_exact(" ".join(words[cut:])))
+        whole = sgw.sketch_exact(" ".join(words))
+        assert [m[i] for i in keep] == [whole[i] for i in keep]
+
+
+def test_arc_needs_four_words():
+    assert sgw.read("good day")["arc"] is None and sgw.read("a good day for a walk")["arc"] is not None
+    assert np.isnan(sgw.arc(sgw.sketch("good day"), np.array([0.5]))).all()
+    assert np.isfinite(sgw.arc(sgw.sketch(["good day", "a good day for a walk"]), np.array([0.2, 0.8]))[1]).all()
+
+
 def test_operators():
     s = sgw.sketch_exact("not good")
     assert s[sgw.NEGP] == s[sgw.P0] > 0                         # "good" sits under the negation

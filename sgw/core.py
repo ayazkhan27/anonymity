@@ -319,13 +319,15 @@ def legendre(S, base):
 
 
 def arc(S, x):
-    """Cubic least-squares fit of net charge per word at relative positions x in [0, 1]."""
+    """Cubic fit of net charge per word at relative positions x in [0, 1]; NaN for spans under four words."""
     m = legendre(S, P0) - legendre(S, N0)
     n = np.maximum(S[..., L], 1)[..., None]
     coef = m * (2 * np.arange(4) + 1) / n
     t = 2 * np.asarray(x) - 1
     basis = np.stack([np.ones_like(t), t, (3 * t ** 2 - 1) / 2, (5 * t ** 3 - 3 * t) / 2])
-    return coef @ basis
+    out = coef @ basis
+    short = np.asarray(S[..., L]) < 4                            # a cubic needs four words; below that there is no arc
+    return np.where(short[..., None] if out.ndim > short.ndim else short, np.nan, out)
 
 
 FEATURES = ["hedons", "dolors", "net x P1(position)", "net x P2(position)", "net x P3(position)",
@@ -390,4 +392,4 @@ def read(text):
             "level": round(float(level(S, k["level_a"], k["level_kappa"])), 1),
             "level_se": round(float(stderr(S, k["level_a"], k["level_kappa"])), 1),
             "valence": round(float(valence(S)[0]), 3),
-            "arc": [round(float(v), 1) for v in 1000 * arc(S, np.array([0.0, 0.25, 0.5, 0.75, 1.0]))]}
+            "arc": [round(float(v), 1) for v in 1000 * arc(S, np.array([0.0, 0.25, 0.5, 0.75, 1.0]))] if n >= 4 else None}
