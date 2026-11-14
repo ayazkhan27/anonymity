@@ -2,7 +2,7 @@
 
 Eight reports on drafts of the paper, written on 13 November 2026 by AI referee agents (Claude), each reading the paper, the code and the result files from one angle. Every finding was then checked by one or two further agents instructed to refute it: 48 findings were raised and none was refuted outright (most were confirmed, some in part).
 
-The reports describe the draft as it stood when each was written, under its earlier title. The paper has been revised since, so quotations in them may no longer match the text.
+The reports describe the draft as it stood when each was written, under its earlier title, and cite commit identifiers from before the history rewrite of 14 November 2026 (see the last deviation in `ANALYSIS_PLAN.md` for the mapping). The paper has been revised since, so quotations in them may no longer match the text.
 
 | Report | Angle | What changed in response |
 |---|---|---|
