@@ -169,7 +169,7 @@ Added after AI referee agents reviewed the draft. Nothing above this line was ed
 6. H2. The planned test (held-out r with fitted kappa against kappa = 0) is supported in four of six corpora and undecided in EmoBank and film reviews. The partial rank correlations and the curves against kappa are unplanned.
 7. H3. The share of documents whose score differs in sign from the mean of their sentence scores was first computed for the transformers only. VADER was added later (5% of 300 film reviews).
 8. Essay intervals. The planned bootstrap over eight assignments is too narrow for eight clusters. The paper prints delete-one-assignment jackknife intervals with a t reference and states the planned verdicts where they differ: HL1 was "refuted" for plain essays and "supported" for essays written as a student under the planned rule, and is undecided for both under the jackknife.
-9. Timing of a record. The note "Deviation from the addendum (13 November 2026, before any essay was generated)" was committed in `6b4ba13`, after the essays had been written. The job files show that the eight-assignment sample was fixed before generation; the written record of it post-dates them.
+9. Timing of a record. The note "Deviation from the addendum (13 November 2026, before any essay was generated)" was committed in `2a2aa34`, after the essays had been written. The job files show that the eight-assignment sample was fixed before generation; the written record of it post-dates them.
 10. HT1 and HS1. The planned outcome, distance to the centre of student essays, measures how typical a text is. Student essays themselves score 1.16 on it, above every machine draft and revision. The classifier's score is reported beside it.
 11. HD2. The classifier was first trained on essays that excluded only the 48 complete pairs, then retrained excluding all 60 sampled essays. The second is reported.
 12. HD3. The rule "not wholly below 0.5" is passed by any share whose interval reaches 0.5 and carries little information. Exact binomial intervals and the split by writer model are reported.
@@ -186,14 +186,17 @@ Added after AI referee agents reviewed the draft. Nothing above this line was ed
 23. Intensifiers. With so, too, such and most removed from the intensifier list the essay difference remains.
 24. Refusals and other requests that left no text: the agents' final messages are in `machine_text/declined_requests.json` (17 requests: 14 refusals by the smallest model, 2 essays set aside as unrelated to the relayed message, 1 revision reported as written with no file). Deviation 2 of the addenda says one agent declined; both essay agents set the task aside for that reason.
 25. Judge. The plain revisions contain informal spellings (alot, dont) at 4.5 per 1,000 words against none in the dial revisions and 1.9 in the students' essays, so the judge's answer to "more like a student" is confounded with spelling.
-26. History rewrite (14 November 2026). Two scripts from the 2024 version (`twittertestwrite.py`, `testweet.py`) held Twitter API credentials, and the repository also held a Windows executable (`pythonw.exe`). Every commit on every branch was rewritten to replace the credentials with `REDACTED` and drop the executable. No other file in any commit changed, and author and commit dates are unchanged, so each commit's content and time are as before; only the commit identifiers changed. Identifiers cited in this plan and in the paper were updated:
+26. History rewrite (14 November 2026). Two scripts from the 2024 version (`twittertestwrite.py`, `testweet.py`) held Twitter API credentials, and the repository also held a Windows executable (`pythonw.exe`). Every commit on every branch was rewritten to replace the credentials with `REDACTED` and drop the executable. A second pass removed the refined lexicon (`sgw/lexicon_refined.tsv`, not part of the release) from the two commits that held it, and replaced absolute local paths in 791 file versions (job files, one log and one 2024 R script) with relative ones. No other file content and no author or commit date changed; only commit identifiers did. The author reports having deleted the X application that held the credentials. Commits from before the rewrite stay reachable on GitHub through the three pull-request references until GitHub removes them. Identifiers cited in this plan, in the paper and in the referee reports map as follows:
 
 | Before the rewrite | After | Commit |
 |---|---|---|
-| `090411d` | `efe3fce` | Pre-register the anti-slop skill arms (addendum 3) before generating any such rewrite; add benchmark results and recency confirmation |
-| `4b10b12` | `070d1ba` | Add scorer, experiments, first results and paper drafts; pre-register the human vs machine writing addendum |
-| `7524c58` | `0c195da` | Archive 2024 scripts under legacy/ and commit the analysis plan before scoring any evaluation data |
-| `77d4fa2` | `6b4ba13` | Pre-register the recency hypothesis (addendum 2) before examining held-out trees or IMDB; add machine essays, tone module, MCP server |
-| `de181ec` | `f0f0e8f` | Pre-register the dial experiment (addendum 4) before generating any dial revision |
+| `7524c58` | `b7b6f9b` | Archive 2024 scripts under legacy/ and commit the analysis plan before scoring any evaluation data |
+| `4b10b12` | `15eec69` | Add scorer, experiments, first results and paper drafts; pre-register the human vs machine writing addendum |
+| `77d4fa2` | `2a2aa34` | Pre-register the recency hypothesis (addendum 2) before examining held-out trees or IMDB; add machine essays, tone module, MCP server |
+| `090411d` | `966edc2` | Pre-register the anti-slop skill arms (addendum 3) before generating any such rewrite; add benchmark results and recency confirmation |
+| `de181ec` | `4c53156` | Pre-register the dial experiment (addendum 4) before generating any dial revision |
+| `0fc5a78` | `36ba76d` | Record deviations for the addenda; cite the addendum commits in Methods |
+| `a62f3b4` | `4037f54` | Add side-by-side essay page, first two referee reports, README results block |
+| `3955f03` | `4e4c0f5` | Delete bloodybastard.R (tip of main before the rewrite) |
 
 The referee reports in `reviews/` were written before the rewrite and cite the old identifiers. Some commit messages from that evening say "pre-register"; they are the author's record, not an independent registration.
