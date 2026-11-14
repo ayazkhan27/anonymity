@@ -345,6 +345,8 @@ if pos and "parts" in pos:
         for side, s in (("after", "After"), ("before", "Before")):
             cells = q["dilution"]["by_rated"][side]["1"]             # rated part of one word, by number of neutral words
             assert cells[0]["m"] == "1" and cells[-1]["m"] == ("9+" if side == "after" else "5-8"), "text says one, nine or more, five to eight"
+            if side == "after":
+                ci("ptKeptAfterFive", [c for c in cells if c["m"] == "5-8"][0]["kept"])
             ci("ptKept" + s + "First", cells[0]["kept"]); ci("ptKept" + s + "Last", cells[-1]["kept"]); M("ptKept" + s + "LastM", cells[-1]["m"].replace("-", " to ").replace("9+", "nine or more"))
             M("ptKept" + s + "LastN", cells[-1]["n"], "{:,}")
     if "rated_words_two_plus" in pos["parts"]["held_out"]["dilution"]:

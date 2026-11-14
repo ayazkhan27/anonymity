@@ -280,7 +280,7 @@ def fig2():
         bx.plot([cpu, G[gk]], [mean[key]] * 2, color=PURPLE, lw=0.5, ls=(0, (2, 2)), zorder=0)
         bx.text(np.sqrt(cpu * G[gk]), mean[key] + 0.012, lab, fontsize=6.3, color=INK, ha="center")
     bx.set_xscale("log"); bx.set_xlim(8, 3e6); bx.set_ylim(0.36, 0.78)
-    bx.set_xlabel("sentences scored per second (filled: one CPU core; open: RTX 3090)"); bx.set_ylabel("mean $r$, five rated corpora")
+    bx.set_xlabel("sentences scored per second (filled: one CPU core; open: RTX 3090)"); bx.set_ylabel("mean $r$, five primary corpora")
     panel(bx, "b", x=-0.14)
     # ablations
     cx = fig.add_axes([0.62, 0.09, 0.37, 0.29])
